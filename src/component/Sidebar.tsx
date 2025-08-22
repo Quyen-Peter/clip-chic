@@ -1,15 +1,23 @@
 import "../css/Sidebar.css";
 import BSidebar from "../assest/Sidebar.png";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import iconRight from "../assest/IconRightWhile.png";
 import iconDown from "../assest/IconRightDown.png";
 
 type TopFilter = "best" | "new" | null;
-type Facet = "collection" | "color" | "price";
 
-type Query = { top: TopFilter; collection: string | null; color: string | null; price: string | null; };
+type Query = {
+  top: TopFilter;
+  collection: string | null;
+  color: string | null;
+  price: string | null;
+};
 
-export default function Sidebar({ onChange }: { onChange?: (q: Query) => void }) {
+export default function Sidebar({
+  onChange,
+}: {
+  onChange?: (q: Query) => void;
+}) {
   const [showCollection, setShowCollection] = useState(false);
   const [showColor, setShowColor] = useState(false);
   const [showPrice, setShowPrice] = useState(false);
@@ -19,12 +27,26 @@ export default function Sidebar({ onChange }: { onChange?: (q: Query) => void })
   const [color, setColor] = useState<string | null>(null);
   const [price, setPrice] = useState<string | null>(null);
 
+  const hasRun = useRef(false);
+
   useEffect(() => {
-    onChange?.({ top, collection, color, price });   
-  }, [top, collection, color, price, onChange]);
+    if (hasRun.current) return; 
+    hasRun.current = true;
+    onChange?.({ top, collection, color, price });
+  }, [top, collection, color, price]);
 
   const collections = ["All", "New Year Collection", "Summer Collection"];
-  const colors = ["White","Pink","Light blue","Dark blue","Light green","Dark green","Red","Orange","Black"];
+  const colors = [
+    "White",
+    "Pink",
+    "Light blue",
+    "Dark blue",
+    "Light green",
+    "Dark green",
+    "Red",
+    "Orange",
+    "Black",
+  ];
   const prices = [
     { value: "under-100k", label: "Under 100,000vnd" },
     { value: "100k-200k", label: "100,000vnd - 200,000vnd" },
@@ -36,7 +58,6 @@ export default function Sidebar({ onChange }: { onChange?: (q: Query) => void })
       <img className="background-sidebar" src={BSidebar} alt="" />
 
       <nav className="sidebar-menu">
-  
         <button
           type="button"
           className={`top-filter ${top === "best" ? "active" : ""}`}
@@ -53,14 +74,20 @@ export default function Sidebar({ onChange }: { onChange?: (q: Query) => void })
           New Arrivals
         </button>
 
-   
-        <button className="category-toggle" onClick={() => setShowCollection(!showCollection)}>
-          <img className="arrow-icon" src={showCollection ? iconDown : iconRight} alt="" />
+        <button
+          className="category-toggle"
+          onClick={() => setShowCollection(!showCollection)}
+        >
+          <img
+            className="arrow-icon"
+            src={showCollection ? iconDown : iconRight}
+            alt=""
+          />
           <span className="title">Collection</span>
         </button>
         {showCollection && (
           <div className="submenu">
-            {collections.map(c => (
+            {collections.map((c) => (
               <button
                 key={c}
                 type="button"
@@ -70,18 +97,30 @@ export default function Sidebar({ onChange }: { onChange?: (q: Query) => void })
                 {c}
               </button>
             ))}
-            <button type="button" className="submenu-item deselect" onClick={() => setCollection(null)}>deselect</button>
+            <button
+              type="button"
+              className="submenu-item deselect"
+              onClick={() => setCollection(null)}
+            >
+              deselect
+            </button>
           </div>
         )}
 
-  
-        <button className="category-toggle" onClick={() => setShowColor(!showColor)}>
-          <img className="arrow-icon" src={showColor ? iconDown : iconRight} alt="" />
+        <button
+          className="category-toggle"
+          onClick={() => setShowColor(!showColor)}
+        >
+          <img
+            className="arrow-icon"
+            src={showColor ? iconDown : iconRight}
+            alt=""
+          />
           <span className="title">Color</span>
         </button>
         {showColor && (
           <div className="submenu">
-            {colors.map(c => (
+            {colors.map((c) => (
               <button
                 key={c}
                 type="button"
@@ -91,18 +130,30 @@ export default function Sidebar({ onChange }: { onChange?: (q: Query) => void })
                 {c}
               </button>
             ))}
-            <button type="button" className="submenu-item deselect" onClick={() => setColor(null)}>deselect</button>
+            <button
+              type="button"
+              className="submenu-item deselect"
+              onClick={() => setColor(null)}
+            >
+              deselect
+            </button>
           </div>
         )}
 
-       
-        <button className="category-toggle" onClick={() => setShowPrice(!showPrice)}>
-          <img className="arrow-icon" src={showPrice ? iconDown : iconRight} alt="" />
+        <button
+          className="category-toggle"
+          onClick={() => setShowPrice(!showPrice)}
+        >
+          <img
+            className="arrow-icon"
+            src={showPrice ? iconDown : iconRight}
+            alt=""
+          />
           <span className="title">Price</span>
         </button>
         {showPrice && (
           <div className="submenu">
-            {prices.map(p => (
+            {prices.map((p) => (
               <button
                 key={p.value}
                 type="button"
@@ -112,7 +163,13 @@ export default function Sidebar({ onChange }: { onChange?: (q: Query) => void })
                 {p.label}
               </button>
             ))}
-            <button type="button" className="submenu-item deselect" onClick={() => setPrice(null)}>deselect</button>
+            <button
+              type="button"
+              className="submenu-item deselect"
+              onClick={() => setPrice(null)}
+            >
+              deselect
+            </button>
           </div>
         )}
       </nav>
