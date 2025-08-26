@@ -23,8 +23,8 @@
 
 .customizer-layout-preview {
   flex: 1;
-  /* Add max-width to maintain 4:3 aspect ratio */
-  max-width: calc(100vh * 4/3 * 0.8); /* 0.8 to account for padding and sidebar */
+  /* Add max-width to maintain 5:3 aspect ratio */
+  max-width: calc(100vh * 5/3 * 0.8); /* 0.8 to account for padding and sidebar */
 }
 
 .customizer-layout-right {

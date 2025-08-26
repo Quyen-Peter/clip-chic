@@ -58,11 +58,11 @@ return (
           <Center>
             {/* Base product */}
             <Model modelPath={modelPath} scale={1.5} />
+          </Center>
             {/* Các accessories đã drop */}
             {accessories.map((acc) => (
               <Accessory key={acc.id} modelPath={acc.modelPath} />
             ))}
-          </Center>
         </Suspense>
 
         <OrbitControls />
