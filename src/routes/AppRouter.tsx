@@ -10,6 +10,7 @@ import Blindbox from '../screens/Blindbox';
 import Account from '../screens/Account';
 import Cart from '../screens/Cart';
 import Sidebar from '../component/Sidebar';
+import Customizer from '../features/customizer/pages/CustomizerPage.jsx';
 
 const AppRouter = () => {
   return (
@@ -21,6 +22,7 @@ const AppRouter = () => {
       <Route path='/Blindbox' element={<Blindbox/>} />
       <Route path='/Account' element={<Account/>} />
       <Route path='/Cart' element={<Cart/>} />
+      <Route path='/Customizer' element={<Customizer/>} />
     </Routes>
   );
 };
