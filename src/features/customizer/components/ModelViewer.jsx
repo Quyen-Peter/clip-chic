@@ -7,7 +7,7 @@ function Model({ modelPath, position = [0, 0, 0], scale = 1 }) {
   return <primitive object={scene} position={position} scale={scale} />;
 }
 
-function Accessory({ modelPath, isSelected, onSelect, transformMode, initialPosition, onPositionChange }) {
+function Accessory({ modelPath, isSelected, onSelect, transformMode, initialPosition, onPositionChange, initialRotation, onRotationChange, initialScale, onScaleChange }) {
   const { scene } = useGLTF(modelPath);
   const ref = useRef();
   const [objectRef, setObjectRef] = useState(null);
@@ -16,9 +16,15 @@ function Accessory({ modelPath, isSelected, onSelect, transformMode, initialPosi
     const checkRef = () => {
       if (ref.current && !objectRef) {
         setObjectRef(ref.current);
-        // Set initial position
+        // Set initial position, rotation, and scale
         if (initialPosition) {
           ref.current.position.set(...initialPosition);
+        }
+        if (initialRotation) {
+          ref.current.rotation.set(...initialRotation);
+        }
+        if (initialScale) {
+          ref.current.scale.set(...initialScale);
         }
       }
     };
@@ -32,20 +38,29 @@ function Accessory({ modelPath, isSelected, onSelect, transformMode, initialPosi
     return () => clearTimeout(timer);
   }, []); // Empty dependency array to run only once
   
-  // Update position when it changes
+  // Update transform when it changes
   useEffect(() => {
-    if (objectRef && initialPosition) {
-      objectRef.position.set(...initialPosition);
+    if (objectRef) {
+      if (initialPosition) {
+        objectRef.position.set(...initialPosition);
+      }
+      if (initialRotation) {
+        objectRef.rotation.set(...initialRotation);
+      }
+      if (initialScale) {
+        objectRef.scale.set(...initialScale);
+      }
     }
-  }, [initialPosition, objectRef]);
+  }, [initialPosition, initialRotation, initialScale, objectRef]);
   
   return (
     <>
       <primitive 
         ref={ref} 
         object={scene.clone()} 
-        scale={0.5}
+        scale={initialScale || [0.5, 0.5, 0.5]}
         position={initialPosition || [0, 0, 0]}
+        rotation={initialRotation || [0, 0, 0]}
         onClick={(e) => {
           e.stopPropagation();
           onSelect();
@@ -53,7 +68,6 @@ function Accessory({ modelPath, isSelected, onSelect, transformMode, initialPosi
       />
       {objectRef && (
         <TransformControls 
-          key={`${modelPath}-${transformMode}`}
           object={objectRef} 
           mode={transformMode}
           size={0.5}
@@ -61,12 +75,22 @@ function Accessory({ modelPath, isSelected, onSelect, transformMode, initialPosi
           showY={true}
           showZ={true}
           onObjectChange={(e) => {
-            // Update position in parent component when object moves
-            if (objectRef && onPositionChange) {
+            // Update all transform properties in parent component
+            if (objectRef && onPositionChange && onRotationChange && onScaleChange) {
               onPositionChange([
                 objectRef.position.x,
                 objectRef.position.y,
                 objectRef.position.z
+              ]);
+              onRotationChange([
+                objectRef.rotation.x,
+                objectRef.rotation.y,
+                objectRef.rotation.z
+              ]);
+              onScaleChange([
+                objectRef.scale.x,
+                objectRef.scale.y,
+                objectRef.scale.z
               ]);
             }
           }}
@@ -92,7 +116,9 @@ export default function ModelViewer({ modelPath, onAccessoryDrop }) {
         { 
           id: Date.now(), 
           modelPath: accessoryModel,
-          position: [0, 0, 0] // Initial position
+          position: [0, 0, 0], // Initial position
+          rotation: [0, 0, 0], // Initial rotation
+          scale: [0.5, 0.5, 0.5] // Initial scale
         },
       ]);
 
@@ -123,6 +149,26 @@ export default function ModelViewer({ modelPath, onAccessoryDrop }) {
       prev.map((acc) =>
         acc.id === accessoryId
           ? { ...acc, position: newPosition }
+          : acc
+      )
+    );
+  };
+
+  const updateAccessoryRotation = (accessoryId, newRotation) => {
+    setAccessories((prev) =>
+      prev.map((acc) =>
+        acc.id === accessoryId
+          ? { ...acc, rotation: newRotation }
+          : acc
+      )
+    );
+  };
+
+  const updateAccessoryScale = (accessoryId, newScale) => {
+    setAccessories((prev) =>
+      prev.map((acc) =>
+        acc.id === accessoryId
+          ? { ...acc, scale: newScale }
           : acc
       )
     );
@@ -221,6 +267,10 @@ export default function ModelViewer({ modelPath, onAccessoryDrop }) {
               transformMode={transformMode}
               initialPosition={acc.position}
               onPositionChange={(newPosition) => updateAccessoryPosition(acc.id, newPosition)}
+              initialRotation={acc.rotation}
+              onRotationChange={(newRotation) => updateAccessoryRotation(acc.id, newRotation)}
+              initialScale={acc.scale}
+              onScaleChange={(newScale) => updateAccessoryScale(acc.id, newScale)}
             />
           ))}
         </Suspense>
