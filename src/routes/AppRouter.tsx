@@ -10,6 +10,8 @@ import Blindbox from "../screens/Blindbox";
 import Account from "../screens/Account";
 import Cart from "../screens/Cart";
 import Sidebar from "../component/Sidebar";
+import CreateLogin from "../component/CreateLogin";
+import LoginUser from "../component/Login";
 
 const AppRouter = () => {
   return (
@@ -19,8 +21,10 @@ const AppRouter = () => {
       <Route path="/Production" element={<Productions />} />
       <Route path="/Customization" element={<Customization />} />
       <Route path="/Blindbox" element={<Blindbox />} />
-      <Route path="/Account" element={<Account />} />
+      <Route path="/Account" element={<CreateLogin />} />
       <Route path="/Cart" element={<Cart />} />
+      <Route path="/Login" element={<LoginUser />} />
+      <Route path="/CreateLogin" element={<CreateLogin />} />
     </Routes>
   );
 };

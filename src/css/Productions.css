@@ -1,7 +1,8 @@
 .page{
-  min-height: 100vh;
+  
   display: grid;
   grid-template-rows: auto 1fr auto; /* header | body | footer */
+  height: 100vh;
 }
 
 
@@ -36,35 +37,31 @@
 }
 
 
-
-/**/
-
-/* Lưới 3 cột giống hình */
 .products-grid{
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 60px 50px;
-  margin-top: 100px;
+  margin-top: 50px;
   margin-left: 130px;
   margin-right: 65px;
 }
 
-/* Card giống hình */
+
 .card{
   position: relative;
   background: #fff;
   border: 2px solid #FF6EA5;
   border-radius: 14px;
   padding: 18px;
-  display: flex;             /* Thêm */
+  display: flex;           
   flex-direction: column; 
 }
 
-/* Khung ảnh nền vàng nhạt + viền hồng */
+
 .card-thumb{
   border: 2px solid #FF6EA5;
   border-radius: 10px;
-  background: #FBF3D5; /* vàng nhạt */
+  background: #FBF3D5; 
   aspect-ratio: 0.7/0.6;
   display: grid;
   place-items: center;
@@ -77,7 +74,7 @@
   object-fit: contain;
 }
 
-/* Text */
+
 .card-title{
   font-size: 15px;
   line-height: 1.3;
@@ -116,7 +113,6 @@
   font-weight: bold;
 }
 
-/* Nút giỏ (góc phải dưới) */
 .card-cart{
   display: grid;
   place-items: center;
@@ -129,11 +125,13 @@
   width: 23px;
 }
 
-/* Trạng thái rỗng */
+
 .empty{
+  margin-top: 120px;
   padding: 24px 0;
   text-align: center;
   color: #6b7280;
+  margin-bottom: 400px;
 }
 
 .buttom-cart{
@@ -147,7 +145,7 @@
   display: flex;
   justify-content: center;
   margin-top: 70px;
-  margin-bottom: 60px;
+  margin-bottom: 120px;
 }
 
 .view-more button{
@@ -158,4 +156,17 @@
   border-radius: 20px;
   border: none;
   font-size: 16px;
+}
+.products-count {
+  font-size: 14px;
+  color: #173DA2; 
+  margin-bottom: 12px;
+  font-weight: 500;
+  position: absolute;
+  right: 65px;
+  top: -40px;
+}
+
+.content{
+  position: relative;
 }

@@ -1,8 +1,10 @@
 import "../css/Sidebar.css";
 import BSidebar from "../assest/Sidebar.png";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import iconRight from "../assest/IconRightWhile.png";
 import iconDown from "../assest/IconRightDown.png";
+import BackgroundNavbar from "../assest/backgroundNavbar.png";
+
 
 type TopFilter = "best" | "new" | null;
 
@@ -18,24 +20,31 @@ export default function Sidebar({
 }: {
   onChange?: (q: Query) => void;
 }) {
-  const [showCollection, setShowCollection] = useState(false);
-  const [showColor, setShowColor] = useState(false);
-  const [showPrice, setShowPrice] = useState(false);
+  const [showCollection, setShowCollection] = useState(true);
+  const [showColor, setShowColor] = useState(true);
+  const [showPrice, setShowPrice] = useState(true);
 
   const [top, setTop] = useState<TopFilter>(null);
   const [collection, setCollection] = useState<string | null>(null);
   const [color, setColor] = useState<string | null>(null);
   const [price, setPrice] = useState<string | null>(null);
 
-  const hasRun = useRef(false);
+  useEffect(() => {
+    onChange?.({ top, collection, color, price });
+  }, []);
 
   useEffect(() => {
-    if (hasRun.current) return; 
-    hasRun.current = true;
     onChange?.({ top, collection, color, price });
   }, [top, collection, color, price]);
 
-  const collections = ["All", "New Year Collection", "Summer Collection"];
+  const collections = [
+    "All",
+    "Best Sellers",
+    "Classic",
+    "New Arrivals",
+    "Summer",
+  ];
+
   const colors = [
     "White",
     "Pink",
@@ -47,15 +56,22 @@ export default function Sidebar({
     "Orange",
     "Black",
   ];
+
   const prices = [
     { value: "under-100k", label: "Under 100,000vnd" },
     { value: "100k-200k", label: "100,000vnd - 200,000vnd" },
-    { value: "above-200k", label: "Above 200,000vnd" },
+    { value: ">=200k", label: "Above 200,000vnd" },
   ];
+
+  // helper: chọn collection, map "All" -> null
+  const selectCollection = (c: string) => {
+    const v = c === "All" ? null : c;
+    setCollection(collection === v ? null : v);
+  };
 
   return (
     <aside className="sidebar">
-      <img className="background-sidebar" src={BSidebar} alt="" />
+      <img className="background-sidebar" src={BackgroundNavbar} alt="" />
 
       <nav className="sidebar-menu">
         <button
@@ -91,8 +107,10 @@ export default function Sidebar({
               <button
                 key={c}
                 type="button"
-                className={`submenu-item ${collection === c ? "active" : ""}`}
-                onClick={() => setCollection(collection === c ? null : c)}
+                className={`submenu-item ${
+                  (collection ?? "All") === c ? "active" : ""
+                }`}
+                onClick={() => selectCollection(c)}
               >
                 {c}
               </button>
