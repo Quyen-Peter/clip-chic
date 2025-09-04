@@ -12,50 +12,49 @@ const Header = () => {
   const [searchValue, setSearchValue] = useState("");
 
   return (
-    <div className="container">
+    <div className="header-container">
       <img
         onClick={() => navigate("/")}
         src={Logo}
         alt="Logo"
-        className="logo"
+        className="header-logo"
       />
       <div className="link-content">
         <Link className="Link" to="/About">
           About us
+
         </Link>
-        <Link className="Link" to="/Production">
+        <Link className="header-link" to="/Production">
           Our Productions
         </Link>
-        <Link className="Link" to="/Customization">
+        <Link className="header-link" to="/Customization">
           3DCustomization
         </Link>
-        <Link className="Link" style={{ marginRight: "-40px" }} to="/Blindbox">
+        <Link className="header-link" style={{ marginRight: "-40px" }} to="/Blindbox">
           Blindbox
         </Link>
       </div>
 
-      <div className="icon-content">
-        <div className="container-search">
-          
-            <input
-              type="text"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              placeholder="Search..."
-              className="text-search"
-            />
-          
+      <div className="header-icon-content">
+        <div className="header-container-search">
+          <input
+            type="text"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            placeholder="Search..."
+            className="header-text-search"
+          />
         </div>
         <div>
           <img
-            className="icon"
+            className="header-icon"
             onClick={() => setShowSearch(!showSearch)}
             src={Search}
             alt="Search"
           />
-          <img className="icon" src={Cart} onClick={() => navigate('/Cart')} alt="Cart" />
+          <img className="header-icon" src={Cart} onClick={() => navigate('/Cart')} alt="Cart" />
           <img
-            className="icon"
+            className="header-icon"
             onClick={() => navigate("/Account")}
             src={User}
             alt="User"

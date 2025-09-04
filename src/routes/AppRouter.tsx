@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "../screens/Home";
@@ -12,6 +13,8 @@ import Cart from "../screens/Cart";
 import Sidebar from "../component/Sidebar";
 import CreateLogin from "../component/CreateLogin";
 import LoginUser from "../component/Login";
+import Customizer from '../features/customizer/pages/CustomizerPage.jsx';
+
 
 const AppRouter = () => {
   return (
@@ -25,6 +28,8 @@ const AppRouter = () => {
       <Route path="/Cart" element={<Cart />} />
       <Route path="/Login" element={<LoginUser />} />
       <Route path="/CreateLogin" element={<CreateLogin />} />
+      <Route path='/Customizer' element={<Customizer/>} />
+
     </Routes>
   );
 };

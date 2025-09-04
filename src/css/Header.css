@@ -1,4 +1,5 @@
-.container {
+/* Header CSS with unique prefixes to avoid conflicts */
+.header-container {
   display: flex;
   justify-content: space-between;
   background-color: #ffffff;
@@ -7,34 +8,35 @@
   align-items: center;
 }
 
-.logo {
+.header-logo {
   width: 150px;
   height: auto;
   margin-left: 60px;
 }
-.link-content {
+
+.header-link-content {
   margin-top: 10px;
   display: flex;
 }
 
-.Link {
+.header-link {
   margin-right: 50px;
   color: #ff8fb4;
   text-decoration: none;
 }
 
-.icon-content {
+.header-icon-content {
   margin-right: 20px;
   margin-top: 10px;
   display: flex;
 }
 
-.container-search {
+.header-container-search {
   margin-top: -5px;
   margin-right: -30px;
 }
 
-.text-search {
+.header-text-search {
   width: 200px;
   height: 28px;
   border: 2px solid #ff8fb4;
@@ -44,7 +46,7 @@
   padding-right: 30px;
 }
 
-.icon {
+.header-icon {
   width: 25px;
   height: 25px;
   margin-right: 40px;
