@@ -8,7 +8,7 @@
 .home-footer {
   position: relative;
   width: 100%;
-  top: 120pc;
+  top: 130pc;
   z-index: 10;
 }
 
@@ -103,7 +103,7 @@
 }
 .textContainer h2 {
   position: absolute;
-  top: 2%;
+  top: 7%;
   right: 10%;
   width: 550px;
   font-size: 45px;
