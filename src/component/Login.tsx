@@ -11,11 +11,11 @@ const Login = () => {
         <h2>LOG IN ACCOUNT</h2>
         <form className="login-form">
           <div>
-            <a>Email or username</a>
+            <a className="title-a">Email or username</a>
             <input type="email" required className="email-login"/>
           </div>
           <div>
-            <a>Password</a>
+            <a className="title-a">Password</a>
             <input type="password" required  className="password-login"/>
           </div>
           <div className="checkbox-forgot-container">

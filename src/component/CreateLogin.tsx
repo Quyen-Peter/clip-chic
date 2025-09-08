@@ -13,18 +13,18 @@ const CreateLogin = () => {
         <h2>CREATE AN ACCOUNT</h2>
         <form className="create-login-form">
           <div>
-            <a>Name</a>
+            <a className="title-a">Name</a>
             <input type="text"  required className="name"/>
           </div>
           <div>
-            <a>Email</a>
+            <a className="title-a">Email</a>
             <input type="email"  required className="email"/>
           </div>
           <div>
-            <a>Password</a>
+            <a className="title-a">Password</a>
             <input type="password"  required className="password" />
           </div>
-          <div>
+          <div className="title-a">
             <a>Confirm password </a>
             <input type="password"  required className="confirm-password"/>
           </div>

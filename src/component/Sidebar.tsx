@@ -39,10 +39,8 @@ export default function Sidebar({
 
   const collections = [
     "All",
-    "Best Sellers",
-    "Classic",
-    "New Arrivals",
-    "Summer",
+    "New Year Collection",
+    "Summer Collection",
   ];
 
   const colors = [
@@ -76,7 +74,7 @@ export default function Sidebar({
       <nav className="sidebar-menu">
         <button
           type="button"
-          className={`top-filter ${top === "best" ? "active" : ""}`}
+          className={`top-filter best-seller ${top === "best" ? "active" : ""}`}
           onClick={() => setTop(top === "best" ? null : "best")}
         >
           Best Sellers
@@ -84,7 +82,7 @@ export default function Sidebar({
 
         <button
           type="button"
-          className={`top-filter ${top === "new" ? "active" : ""}`}
+          className={`top-filter new-arrival ${top === "new" ? "active" : ""}`}
           onClick={() => setTop(top === "new" ? null : "new")}
         >
           New Arrivals
