@@ -103,7 +103,7 @@ const Home = () => {
           <img
             src={backgroundMainTwo}
             alt="Background"
-            className="backgroundMainTwo reveal-fade"
+            className="backgroundMainTwo"
           />
           <div className="imgContainer">
             <img src={img2} alt="Hair Clip" className="img2 reveal-left" />
@@ -171,7 +171,7 @@ const Home = () => {
           <img
             src={background3}
             alt="Background"
-            className="background3 reveal-fade"
+            className="background3 "
           />
           <div className="home-fourth-content">
             <h3 className="reveal-up">Surprise Me!</h3>

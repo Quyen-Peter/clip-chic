@@ -8,7 +8,7 @@
 .home-footer {
   position: relative;
   width: 100%;
-  top: 140pc;
+  top: 120pc;
   z-index: 10;
 }
 
@@ -160,19 +160,20 @@
 }
 .vector1 {
   position: absolute;
-  width: 50%;
+  width: 45%;
   right: 0;
   top: 100px;
 }
 .clip1 {
   position: absolute;
-  width: 50%;
+  width: 45%;
+  
 }
 
 .Blush-Pearl-h3 {
   position: absolute;
   color: #fbe997;
-  top: 600px;
+  top: 590px;
   right: 16%;
   font-size: 50px;
 }
@@ -180,7 +181,7 @@
 .Blush-Pearl {
   position: absolute;
   color: #ffffff;
-  top: 730px;
+  top: 680px;
   right: 16%;
   width: 420px;
   font-size: 20px;
@@ -189,8 +190,8 @@
 
 .clip2 {
   position: absolute;
-  width: 50%;
-  top: 60pc;
+  width: 45%;
+  top: 52pc;
   right: 0;
 }
 
@@ -198,20 +199,20 @@
   position: absolute;
   width: 35%;
   left: 0;
-  top: 100pc;
+  top: 80pc;
 }
 
 .flutterbelle-h3 {
   position: absolute;
   color: #fbe997;
-  top: 90pc;
+  top: 81pc;
   left: 25%;
   font-size: 50px;
 }
 .flutterbelle {
   position: absolute;
   color: #ffffff;
-  top: 97pc;
+  top: 87pc;
   left: 25%;
   width: 400px;
   font-size: 20px;
@@ -220,23 +221,23 @@
 
 .clip3 {
   position: absolute;
-  width: 50%;
-  top: 125pc;
+  width: 45%;
+  top: 100pc;
   left: 0;
 }
 
 .cloudine-h3 {
   position: absolute;
   color: #fbe997;
-  top: 160pc;
-  right: 15%;
+  top: 140pc;
+  right: 20%;
   font-size: 50px;
 }
 .cloudine {
   position: absolute;
   color: #ffffff;
-  top: 167pc;
-  right: 15%;
+  top: 145pc;
+  right: 20%;
   width: 400px;
   font-size: 20px;
   text-align: right;
@@ -244,7 +245,7 @@
 
 .home-third button {
   position: absolute;
-  top: 185pc;
+  top: 165pc;
   width: 170px;
   height: 50px;
   border-radius: 30px;
@@ -288,24 +289,24 @@
 
 .vecter3 {
   position: absolute;
-  width: 60%;
+  width: 50%;
   right: 0%;
-  top: -5pc;
+  top: -10pc;
   z-index: 10;
 }
 .box1 {
   position: absolute;
-  width: 55%;
-  left: 4%;
-  top: 10pc;
+  width: 52%;
+  left: 10%;
+  top: 1pc;
   z-index: 10;
 }
 .box1-h3 {
   position: absolute;
   color: #ff6ea5;
-  top: 2pc;
+  top: 1pc;
   right: 15%;
-  font-size: 60px;
+  font-size: 55px;
   z-index: 10;
   width: 30%;
   text-align: right;
@@ -314,7 +315,7 @@
 .box1-p1 {
   position: absolute;
   color: #ffffff;
-  top: 17pc;
+  top: 12pc;
   right: 1%;
   font-size: 17px;
   z-index: 10;
@@ -323,7 +324,7 @@
 .box1-p2 {
   position: absolute;
   color: #ffffff;
-  top: 20pc;
+  top: 14pc;
   right: 14.5%;
   font-size: 17px;
   z-index: 10;
@@ -334,7 +335,7 @@
 .box1-p3 {
   position: absolute;
   color: #ffffff;
-  top: 27pc;
+  top: 21pc;
   right: 13%;
   font-size: 17px;
   z-index: 10;
@@ -343,7 +344,7 @@
 
 .box1-button {
   position: absolute;
-  top: 39pc;
+  top: 25pc;
   right: 15%;
   width: 170px;
   height: 50px;
@@ -357,25 +358,25 @@
 
 .vecter4 {
   position: absolute;
-  width: 60%;
+  width: 50%;
   left: 0%;
-  top: 60pc;
+  top: 50pc;
   z-index: 10;
 }
 
 .box2{
   position: absolute;
-  width: 55%;
-  right: 4%;
-  top: 77pc;
+  width: 52%;
+  right: 10%;
+  top: 62pc;
   z-index: 10;
 }
 
 .box2-h3 {
   position: absolute;
   color: #FFE983;
-  top: 70pc;
-  left: 15%;
+  top: 60pc;
+  left: 11%;
   font-size: 50px;
   z-index: 10;
   width: 30%;
@@ -384,8 +385,8 @@
 .box2-p1 {
   position: absolute;
   color: #ffffff;
-  top: 83pc;
-  left: 15%;
+  top: 70pc;
+  left: 11%;
   font-size: 17px;
   z-index: 10;
   width: 30%;
@@ -393,8 +394,8 @@
 .box2-p2 {
   position: absolute;
   color: #ffffff;
-  top: 86pc;
-  left: 15%;
+  top: 72pc;
+  left: 11%;
   font-size: 17px;
   z-index: 10;
   width: 23%;
@@ -402,15 +403,15 @@
 .box2-p3 {
   position: absolute;
   color: #ffffff;
-  top: 93pc;
-  left: 15%;
+  top: 79pc;
+  left: 11%;
   font-size: 17px;
   z-index: 10;
   width: 30%;
 }
 .box2-button {
   position: absolute;
-  top: 104pc;
+  top: 86pc;
   left: 15%;
   width: 170px;
   height: 50px;
