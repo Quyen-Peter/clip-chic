@@ -21,12 +21,13 @@ const Header = () => {
       />
       <div className="header-link-content">
         <Link className="header-link" to="/About">
-          Abount us
+          About us
+
         </Link>
         <Link className="header-link" to="/Production">
           Our Productions
         </Link>
-        <Link className="header-link" to="/Customization">
+        <Link className="header-link" to="/Customizer">
           3DCustomization
         </Link>
         <Link className="header-link" style={{ marginRight: "-40px" }} to="/Blindbox">

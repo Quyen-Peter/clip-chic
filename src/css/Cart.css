@@ -1,0 +1,38 @@
+.cart-page {
+  background-color: #FF8FB4;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+}
+
+.cart-main {
+  display: flex;
+  position: relative;
+  gap: 24px;
+  height: 100vh;
+}
+
+.card-bg{
+    z-index: 0;
+    object-fit: cover;
+    width: 40%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    position: fixed;
+}
+
+.cart-footer {
+    z-index: 1;
+}
+
+.card-right{
+    z-index: 1;
+    position: absolute;
+    right: 10px;
+    border: 1px solid rgba(255,255,255,.6);
+    padding: 20px;
+    top: 50px;
+}

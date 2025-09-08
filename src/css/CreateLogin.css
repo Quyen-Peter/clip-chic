@@ -1,0 +1,145 @@
+.create-login-main-container {
+  background-color: #173da2;
+  margin-top: 40px;
+  margin-left: 70px;
+  width: 570px;
+  padding: 30px;
+  border-radius: 20px;
+}
+
+.logoCreateLogin {
+  width: 150px;
+  height: auto;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 20px;
+}
+
+.create-login-container{
+ margin-left: 10px;
+}
+
+
+
+.create-login-container h2,a,p{
+  color: white;
+}
+
+.create-login-form{
+  margin-top: 20px;
+}
+
+.title-a{
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.create-login-form input[type="text"], input[type="email"], input[type="password"] {
+   width: 330px;
+   height: 40px;
+   border-radius: 10px;
+   padding-left: 10px;
+   border: 1.6px solid #ff5ca2;
+   background-color: #4564B5;
+  color: white;
+  outline: none;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.confirm-password{
+  margin-left: 24px;
+}
+.password{
+  margin-left: 90px;
+}
+.email{
+  margin-left: 119px;
+}
+.name{
+  margin-left: 115px;
+}
+
+.checkbox-container{
+  display: flex;
+  align-items: center;
+}
+.checkbox-container input[type="checkbox"]{
+  width: 16px;
+  height: 16px;
+  margin-right: 10px;
+  border: 1.6px solid #ffffff;
+  background-color: #4564B5;
+  margin-left: -2px;
+  margin-top: -9px;
+}
+
+.create-login-form p{
+  color: white;
+  font-size: 13px;
+}
+
+.create-login-form button[type="submit"] {
+  width: 500px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: #ff5ca2;
+  color: white;
+  font-weight: bold;
+  border: none;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.line-coler{
+  width: 230px;
+  height: 1px;
+  background-color: white;
+}
+
+.or-container{
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  justify-content: space-between;
+  margin-right: 10px;
+}
+
+.or-container a{
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  
+}
+.social-login{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  margin-left: -23px;
+}
+.social-login a{
+  color: #FF8FB4;
+  font-size: 14px;
+  text-decoration: none;
+  margin-left: 9px;
+  margin-right: 9px;
+}
+
+.login-link{
+  display: flex;
+  justify-content: center;
+  margin-left: -1opx;
+  margin-top: -10px;
+}
+.login-link p{
+  color: white;
+  font-size: 15px;
+}
+.login-link a{
+  text-decoration: none;
+  font-weight: bold;
+  color: #ffffff;
+}
