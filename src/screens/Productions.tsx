@@ -124,21 +124,21 @@ const Productions = () => {
 
             <div className="products-grid">
               {filtered.map((p) => (
-                <article key={p.id} className="card">
-                  <div className="card-thumb">
+                <article key={p.id} className="production">
+                  <div className="production-thumb">
                     <img src={p.image} alt={p.name} />
                   </div>
-                  <div className="card-sub">
-                    <p className="card-title">
+                  <div className="production-sub">
+                    <p className="production-title">
                       <a className="collection">{p.collection}</a>
-                      <a>- {p.name}</a>
+                      <a className="name-product"> - {p.name}</a>
                     </p>
                   </div>
-                  <div className="buttom-cart">
-                    <div className="card-price">
+                  <div className="buttom-production">
+                    <div className="production-price">
                       {formatVND(p.price)} <span className="currency">vnd</span>
                     </div>
-                    <button className="card-cart" aria-label="Add to cart">
+                    <button className="production-cart" aria-label="Add to cart">
                       <img src={cart} />
                     </button>
                   </div>
