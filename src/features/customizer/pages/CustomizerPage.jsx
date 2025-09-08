@@ -1,18 +1,20 @@
 // src/features/customizer/pages/CustomizerPage.jsx
 import React, { useState } from "react";
-import { baseProducts, materials, textures, accessories } from "../mock/mockData";
+import { baseProducts, materials, accessories } from "../mock/mockData";
 import ModelViewer from "../components/ModelViewer";
 import Header from "../../../component/Header";
 import "../css/CustomizerLayout.css";
 
 export default function CustomizerPage() {
   const [selectedMaterial, setSelectedMaterial] = useState(materials[0]);
-  const [selectedTexture, setSelectedTexture] = useState(textures[0]);
   const [selectedProduct, setSelectedProduct] = useState(baseProducts[0]);
+  const [baseModelColor, setBaseModelColor] = useState("#ffffff");
+  const [detailColor, setDetailColor] = useState("#000000");
 
   return (
+    <div>
+    <Header />
     <div className="customizer-layout-container">
-      <Header />
 
       {/* Main content container */}
       <div className="customizer-layout-main">
@@ -55,19 +57,105 @@ export default function CustomizerPage() {
                 ))}
               </div>
 
-              <h5 className="customizer-layout-title">Textures</h5>
-              <div className="customizer-layout-materials-grid">
-                {textures.map((t) => (
-                  <img
-                    key={t.id}
-                    src={t.previewImage}
-                    alt={t.name}
-                    className={`customizer-layout-thumbnail ${
-                      selectedTexture.id === t.id ? "selected" : ""
-                    }`}
-                    onClick={() => setSelectedTexture(t)}
-                  />
-                ))}
+              <h5 className="customizer-layout-title">Base Model Colors</h5>
+              <div className="customizer-layout-color-section">
+                <div className="customizer-layout-color-group">
+                  <label className="customizer-layout-color-label">Base Color:</label>
+                  <div className="customizer-layout-color-picker">
+                    <input
+                      type="color"
+                      value={baseModelColor}
+                      onChange={(e) => setBaseModelColor(e.target.value)}
+                      className="customizer-layout-color-input"
+                      title="Change base model color"
+                    />
+                    <span className="customizer-layout-color-value">{baseModelColor}</span>
+                  </div>
+                  <div className="customizer-layout-preset-colors">
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#ffffff" }}
+                      onClick={() => setBaseModelColor("#ffffff")}
+                      title="White"
+                    ></div>
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#000000" }}
+                      onClick={() => setBaseModelColor("#000000")}
+                      title="Black"
+                    ></div>
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#ff0000" }}
+                      onClick={() => setBaseModelColor("#ff0000")}
+                      title="Red"
+                    ></div>
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#00ff00" }}
+                      onClick={() => setBaseModelColor("#00ff00")}
+                      title="Green"
+                    ></div>
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#0000ff" }}
+                      onClick={() => setBaseModelColor("#0000ff")}
+                      title="Blue"
+                    ></div>
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#ffff00" }}
+                      onClick={() => setBaseModelColor("#ffff00")}
+                      title="Yellow"
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="customizer-layout-color-group">
+                  <label className="customizer-layout-color-label">Detail Color:</label>
+                  <div className="customizer-layout-color-picker">
+                    <input
+                      type="color"
+                      value={detailColor}
+                      onChange={(e) => setDetailColor(e.target.value)}
+                      className="customizer-layout-color-input"
+                      title="Change detail color"
+                    />
+                    <span className="customizer-layout-color-value">{detailColor}</span>
+                  </div>
+                  <div className="customizer-layout-preset-colors">
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#000000" }}
+                      onClick={() => setDetailColor("#000000")}
+                      title="Black"
+                    ></div>
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#ffffff" }}
+                      onClick={() => setDetailColor("#ffffff")}
+                      title="White"
+                    ></div>
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#ffff00" }}
+                      onClick={() => setDetailColor("#ffff00")}
+                      title="Yellow"
+                    ></div>
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#ffa500" }}
+                      onClick={() => setDetailColor("#ffa500")}
+                      title="Orange"
+                    ></div>
+                    <div 
+                      className="customizer-layout-color-preset"
+                      style={{ backgroundColor: "#800080" }}
+                      onClick={() => setDetailColor("#800080")}
+                      title="Purple"
+                    ></div>
+                  </div>
+                </div>
               </div>
 
               <h5 className="customizer-layout-title">Accessories</h5>
@@ -93,9 +181,12 @@ export default function CustomizerPage() {
                 {selectedProduct && (
                   <ModelViewer
                     modelPath={selectedProduct.modelPath}
+                    baseModelColor={baseModelColor}
+                    detailColor={detailColor}
                     onAccessoryDrop={(accessoryModel) => {
                       console.log("Accessory dropped:", accessoryModel);
                     }}
+                    style={{ width: '100%', height: '100%' }}
                   />
                 )}
               </div>
@@ -111,6 +202,7 @@ export default function CustomizerPage() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
