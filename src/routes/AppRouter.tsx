@@ -14,12 +14,12 @@ import Sidebar from "../component/Sidebar";
 import CreateLogin from "../component/CreateLogin";
 import LoginUser from "../component/Login";
 import Customizer from '../features/customizer/pages/CustomizerPage.jsx';
-
+import ProductDetail from "../screens/ProductDetail";
 
 const AppRouter = () => {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<ProductDetail/>} />
       <Route path="/About" element={<About />} />
       <Route path="/Production" element={<Productions />} />
       <Route path="/Customization" element={<Customization />} />
