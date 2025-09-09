@@ -3,6 +3,7 @@ import Header from "../component/Header";
 import { useEffect, useState } from "react";
 import cart from "../assest/shoppingCart.png";
 import Footer from "../component/Footer";
+import { useParams } from "react-router-dom";
 
 type Product = {
   id: string;
@@ -18,6 +19,7 @@ type Product = {
 const formatVND = (n: number) => `${n.toLocaleString("vi-VN")}`;
 
 const ProductDetail = () => {
+  const {productId} = useParams(); 
   const [quantity, setQuantity] = useState(1);
   const [stock, setStock] = useState(10);
 

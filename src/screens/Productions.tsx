@@ -4,6 +4,7 @@ import Footer from "../component/Footer";
 import "../css/Productions.css";
 import { useMemo, useState, useEffect } from "react";
 import cart from "../assest/shoppingCart.png";
+import { Link } from "react-router-dom";
 
 
 type Product = {
@@ -124,6 +125,7 @@ const Productions = () => {
 
             <div className="products-grid">
               {filtered.map((p) => (
+                <Link to={`/productdetail/${p.id}`} key={p.id} className="link-product">
                 <article key={p.id} className="production">
                   <div className="production-thumb">
                     <img src={p.image} alt={p.name} />
@@ -143,6 +145,7 @@ const Productions = () => {
                     </button>
                   </div>
                 </article>
+                </Link>
               ))}
             </div>
 

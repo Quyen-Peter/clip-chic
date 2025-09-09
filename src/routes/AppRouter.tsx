@@ -19,7 +19,7 @@ import ProductDetail from "../screens/ProductDetail";
 const AppRouter = () => {
   return (
     <Routes>
-      <Route path="/" element={<ProductDetail/>} />
+      <Route path="/" element={<Home/>} />
       <Route path="/About" element={<About />} />
       <Route path="/Production" element={<Productions />} />
       <Route path="/Customization" element={<Customization />} />
@@ -28,7 +28,8 @@ const AppRouter = () => {
       <Route path="/Cart" element={<Cart />} />
       <Route path="/Login" element={<LoginUser />} />
       <Route path="/CreateLogin" element={<CreateLogin />} />
-      <Route path='/Customizer' element={<Customizer/>} />
+      <Route path="/Customizer" element={<Customizer/>} />
+      <Route path="/productdetail/:productId" element={<ProductDetail/>} />
 
     </Routes>
   );
