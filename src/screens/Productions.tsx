@@ -6,7 +6,6 @@ import { useMemo, useState, useEffect } from "react";
 import cart from "../assest/shoppingCart.png";
 import { Link } from "react-router-dom";
 
-
 type Product = {
   id: string;
   name: string;
@@ -27,7 +26,6 @@ type Query = {
 };
 
 const formatVND = (n: number) => `${n.toLocaleString("vi-VN")}`;
-
 
 function matchPrice(price: number, filter: string) {
   const f = filter.replace(/\s/g, "").toLowerCase();
@@ -125,27 +123,35 @@ const Productions = () => {
 
             <div className="products-grid">
               {filtered.map((p) => (
-                <Link to={`/productdetail/${p.id}`} key={p.id} className="link-product">
                 <article key={p.id} className="production">
-                  <div className="production-thumb">
-                    <img src={p.image} alt={p.name} />
-                  </div>
-                  <div className="production-sub">
-                    <p className="production-title">
-                      <a className="collection">{p.collection}</a>
-                      <a className="name-product"> - {p.name}</a>
-                    </p>
-                  </div>
-                  <div className="buttom-production">
-                    <div className="production-price">
-                      {formatVND(p.price)} <span className="currency">vnd</span>
+                  <Link
+                    to={`/productdetail/${p.id}`}
+                    key={p.id}
+                    className="link-product"
+                  >
+                    <div className="production-thumb">
+                      <img src={p.image} alt={p.name} />
                     </div>
-                    <button className="production-cart" aria-label="Add to cart">
-                      <img src={cart} />
-                    </button>
-                  </div>
+                    <div className="production-sub">
+                      <p className="production-title">
+                        <a className="collection">{p.collection}</a>
+                        <a className="name-product"> - {p.name}</a>
+                      </p>
+                    </div>
+                    <div className="buttom-production">
+                      <div className="production-price">
+                        {formatVND(p.price)}{" "}
+                        <span className="currency">vnd</span>
+                      </div>
+                      <button
+                        className="production-cart"
+                        aria-label="Add to cart"
+                      >
+                        <img src={cart} />
+                      </button>
+                    </div>
+                  </Link>
                 </article>
-                </Link>
               ))}
             </div>
 

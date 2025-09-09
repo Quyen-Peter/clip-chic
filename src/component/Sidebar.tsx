@@ -29,9 +29,9 @@ export default function Sidebar({
   const [color, setColor] = useState<string | null>(null);
   const [price, setPrice] = useState<string | null>(null);
 
-  useEffect(() => {
-    onChange?.({ top, collection, color, price });
-  }, []);
+  // useEffect(() => {
+  //   onChange?.({ top, collection, color, price });
+  // }, []);
 
   useEffect(() => {
     onChange?.({ top, collection, color, price });
