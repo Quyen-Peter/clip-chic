@@ -1,5 +1,6 @@
 
 import React from "react";
+import ScrollToTop from "../routes/ScrollToTop";
 import { Routes, Route } from "react-router-dom";
 import Home from "../screens/Home";
 import Footer from "../component/Footer";
@@ -15,9 +16,14 @@ import CreateLogin from "../component/CreateLogin";
 import LoginUser from "../component/Login";
 import Customizer from '../features/customizer/pages/CustomizerPage.jsx';
 import ProductDetail from "../screens/ProductDetail";
+import BlindboxDetail from "../screens/BlindboxDetail";
+
+
 
 const AppRouter = () => {
   return (
+    <>
+    <ScrollToTop />
     <Routes>
       <Route path="/" element={<Home/>} />
       <Route path="/About" element={<About />} />
@@ -30,8 +36,10 @@ const AppRouter = () => {
       <Route path="/CreateLogin" element={<CreateLogin />} />
       <Route path="/Customizer" element={<Customizer/>} />
       <Route path="/productdetail/:productId" element={<ProductDetail/>} />
+      <Route path="/blindboxDetail/:blindboxId" element={<BlindboxDetail/>} />
 
     </Routes>
+    </>
   );
 };
 

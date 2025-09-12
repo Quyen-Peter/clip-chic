@@ -89,7 +89,7 @@ const Blindbox = () => {
           
           {filterBlindbox.map((item) => (
             <div key={item.id} className="bindbox-item">
-              <Link to={`/products/${item.id}`} className="bindbox-link">
+              <Link to={`/blindboxDetail/${item.id}`} className="bindbox-link">
                 <div className="img-blindbox-container">
                   <img
                     src={item.coverImage}
