@@ -1,15 +1,24 @@
-import { Link } from "react-router-dom";
-import logologin from "../assest/logoNoBack.png";
-import "../css/Login.css";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import logologin from "../../assest/logoNoBack.png";
+import "../../css/Login.css";
 
 
 const Login = () => {
+
+  const navigate = useNavigate();
+
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    localStorage.setItem("isLoggedIn", "true");
+    navigate("/Account");
+  };
+
   return (
     <div className="login-main-container">
       <img src={logologin} alt="Logo" className="logoLogin"/>
       <div className="login-container">
         <h2>LOG IN ACCOUNT</h2>
-        <form className="login-form">
+        <form className="login-form" onSubmit={handleLogin}>
           <div>
             <a className="title-a">Email or username</a>
             <input type="email" required className="email-login"/>
@@ -39,8 +48,10 @@ const Login = () => {
         </div>
         <div className="login-link">
           <p>
-            Don’t have an account? <Link to={"/CreateLogin"}>Create your account</Link>
+            Don’t have an account?  <Link to={"/Account/Create"}>Create your account</Link>
           </p>
+          <div className="sidebar-item">
+        </div>
         </div>
       </div>
     </div>

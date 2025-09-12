@@ -1,5 +1,5 @@
-import "../css/CreateLogin.css";
-import logo from "../assest/logoNoBack.png";
+import "../../css/CreateLogin.css";
+import logo from "../../assest/logoNoBack.png";
 import { Link } from "react-router-dom";
 
 
@@ -45,7 +45,7 @@ const CreateLogin = () => {
           <Link to={"/About"} >Google</Link>
         </div>
         <div className="login-link">
-          <p>Already have an account? <Link to={"/Login"}>Login</Link></p>
+          <p>Already have an account? <Link to={"/Account/Login"}>Login</Link></p>
         </div>
       </div>
     </div>

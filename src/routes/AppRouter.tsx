@@ -12,13 +12,19 @@ import Blindbox from "../screens/Blindbox";
 import Account from "../screens/Account";
 import Cart from "../screens/Cart";
 import Sidebar from "../component/Sidebar";
-import CreateLogin from "../component/CreateLogin";
-import LoginUser from "../component/Login";
 import Customizer from '../features/customizer/pages/CustomizerPage.jsx';
 import ProductDetail from "../screens/ProductDetail";
 import BlindboxDetail from "../screens/BlindboxDetail";
+import SidebarProfile from "../component/SidebarProfile";
 
 
+import Profile from "../screens/account/Profile";
+import MyDesign from "../screens/account/MyDesign";
+import OrderHistory from "../screens/account/OrderHistory";
+import TrackShipping from "../screens/account/TrackShipping";
+import PrivacyHelp from "../screens/account/PrivacyHelp";
+import LoginUser from "../screens/account/Login";
+import CreateLogin from "../screens/account/CreateLogin";
 
 const AppRouter = () => {
   return (
@@ -30,13 +36,24 @@ const AppRouter = () => {
       <Route path="/Production" element={<Productions />} />
       <Route path="/Customization" element={<Customization />} />
       <Route path="/Blindbox" element={<Blindbox />} />
-      <Route path="/Account" element={<CreateLogin />} />
+      <Route path="/Account" element={<Account />} />
       <Route path="/Cart" element={<Cart />} />
-      <Route path="/Login" element={<LoginUser />} />
-      <Route path="/CreateLogin" element={<CreateLogin />} />
       <Route path="/Customizer" element={<Customizer/>} />
       <Route path="/productdetail/:productId" element={<ProductDetail/>} />
       <Route path="/blindboxDetail/:blindboxId" element={<BlindboxDetail/>} />
+      <Route path="/SidebarProfile" element={<SidebarProfile />} />
+      
+
+
+      <Route path="/Account/*" element={<Account />} >
+        <Route index element={<Profile />} />               
+        <Route path="MyDesign" element={<MyDesign />} />            
+        <Route path="TrackShipping" element={<TrackShipping />} />  
+        <Route path="OrderHistory" element={<OrderHistory />} />     
+        <Route path="Privacy" element={<PrivacyHelp />} />  
+        <Route path="Login" element={<LoginUser />} /> 
+        <Route path="Create" element={<CreateLogin />} />
+      </Route>
 
     </Routes>
     </>
