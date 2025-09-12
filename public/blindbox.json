@@ -1,0 +1,86 @@
+[
+  {
+    "id": "bb-001",
+    "slug": "summer-2025-collection",
+    "title": "SUMMER 2025 COLLECTION",
+    "subtitle": "Sun-kissed colors. Carefree vibes.",
+    "description": "Clip & Chic’s Summer Collection brings the brightness of sunny days into every clip — perfect for beach strolls, iced coffee dates, and everything in between.",
+    "price": 75000,
+    "currency": "vnd",
+    "coverImage": "https://picsum.photos/seed/bb001-box/760/480",
+    "gallery": [
+      "https://picsum.photos/seed/bb001-1/600/600",
+      "https://picsum.photos/seed/bb001-2/600/600"
+    ],
+    "stock": 120,
+    "maxPerOrder": 5,
+    "releaseDate": "2025-06-01",
+    "status": "active",
+    "bestSeller": true,
+    "newArrival": false,
+    "collection": "Summer"
+  },
+  {
+    "id": "bb-002",
+    "slug": "back-to-school-2025",
+    "title": "BACK TO SCHOOL 2025 COLLECTION",
+    "subtitle": "New semester, new style.",
+    "description": "Made for fresh starts and bold self-expression — whether you're acing classes or turning hallways into runways.",
+    "price": 75000,
+    "currency": "vnd",
+    "coverImage": "https://picsum.photos/seed/bb002-box/760/480",
+    "gallery": [
+      "https://picsum.photos/seed/bb002-1/600/600",
+      "https://picsum.photos/seed/bb002-2/600/600"
+    ],
+    "stock": 100,
+    "maxPerOrder": 5,
+    "releaseDate": "2025-08-15",
+    "status": "active",
+    "bestSeller": false,
+    "newArrival": true,
+    "collection": "School"
+  },
+  {
+    "id": "bb-003",
+    "slug": "new-year-2025-collection",
+    "title": "NEW YEAR 2025 COLLECTION",
+    "subtitle": "Celebrate with sparkle.",
+    "description": "Limited edition box for the holiday season. Ring in the new year with shimmering accessories designed to shine bright.",
+    "price": 85000,
+    "currency": "vnd",
+    "coverImage": "https://picsum.photos/seed/bb003-box/760/480",
+    "gallery": [
+      "https://picsum.photos/seed/bb003-1/600/600",
+      "https://picsum.photos/seed/bb003-2/600/600"
+    ],
+    "stock": 80,
+    "maxPerOrder": 3,
+    "releaseDate": "2024-12-20",
+    "status": "active",
+    "bestSeller": false,
+    "newArrival": true,
+    "collection": "Holiday"
+  },
+  {
+    "id": "bb-004",
+    "slug": "cosmic-galaxy",
+    "title": "COSMIC GALAXY",
+    "subtitle": "Out-of-this-world sparkles.",
+    "description": "Shimmering finishes and stellar shades for night-out looks.",
+    "price": 89000,
+    "currency": "vnd",
+    "coverImage": "https://picsum.photos/seed/bb004-box/760/480",
+    "gallery": [
+      "https://picsum.photos/seed/bb004-1/600/600",
+      "https://picsum.photos/seed/bb004-2/600/600"
+    ],
+    "stock": 60,
+    "maxPerOrder": 3,
+    "releaseDate": "2025-09-01",
+    "status": "active",
+    "bestSeller": true,
+    "newArrival": false,
+    "collection": "Galaxy"
+  }
+]
