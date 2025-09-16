@@ -5,6 +5,7 @@ import SidebarProfile from "../component/SidebarProfile";
 import Header from "../component/Header";
 import "../css/Account.css";
 import background from "../assest/logologin.png";
+import Footer from "../component/Footer";
 
 
 const Account = () => {
@@ -23,14 +24,17 @@ const Account = () => {
       <Header />
       <div className="main-container">
         {isLoggedIn ? (
-          <>
+          <div>
             <div className="SidebarProfile">
               <SidebarProfile />
             </div>
             <div className="account-content">
               <Outlet />
             </div>
-          </>
+            <div className="footer-account">
+              <Footer/>
+            </div>
+          </div>
         ) : (
           <div className="account-login-container">
             <div className="logo-background">

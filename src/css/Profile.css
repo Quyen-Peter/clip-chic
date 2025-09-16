@@ -1,0 +1,210 @@
+.header-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3%;
+}
+
+.basic-infor {
+  color: #ff8fb4;
+  font-weight: bold;
+}
+
+.bnt-handle-change-edit {
+  border: none;
+  background-color: #ffffff;
+  color: #ff3538;
+  text-decoration: underline;
+  font-weight: bold;
+  margin-right: 10%;
+}
+
+.bnt-handle-change-apply {
+  border: none;
+  background-color: #ffffff;
+  color: #173da2;
+  text-decoration: underline;
+  font-weight: bold;
+  margin-right: 10%;
+}
+
+.content-info {
+  display: flex;
+  align-items: center;
+}
+
+.content-info p {
+  color: #173da2;
+  font-size: 17px;
+}
+
+.content-info-change {
+  display: flex;
+  align-items: center;
+}
+
+.content-info-change p {
+  color: #173da2;
+  font-size: 17px;
+}
+
+.text-p-content-name {
+  margin-left: 32%;
+  width: 500px;
+}
+.text-p-content-date {
+  margin-left: 22%;
+  width: 500px;
+}
+.text-p-content-email {
+  margin-left: 33%;
+  width: 500px;
+}
+.text-p-content-phone {
+  margin-left: 18%;
+  width: 500px;
+}
+
+.text-p-content-address {
+  margin-left: 29%;
+  width: 500px;
+}
+
+.profile-actions img {
+  max-width: 70px;
+  min-width: 70px;
+  max-height: 70px;
+  min-height: 70px;
+  border-radius: 40px;
+}
+
+.profile-actions {
+  display: flex;
+  align-items: center;
+  margin-left: 10%;
+}
+
+.chooce-action input {
+  display: none;
+}
+
+.chooce-action {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10%;
+}
+.upload-text {
+  font-size: 15px;
+  color: #173da2;
+  width: 150px;
+  margin-left: 5px;
+}
+
+.remove-text {
+  border: none;
+  background-color: #ffffff;
+  font-size: 15px;
+  color: #ff3538;
+  display: flex;
+  justify-content: left;
+  left: 0;
+}
+
+.line-info {
+  background-color: #ff8fb4;
+  height: 1px;
+  width: 90%;
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+
+.bnt-input-info {
+  width: 500px;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom-color: #c1bebe;
+  display: flex;
+  margin-top: -14px;
+  outline: none;
+}
+
+.footer-info {
+  margin-top: 50px;
+  margin-bottom: 150px;
+}
+
+.account-info {
+  color: #ff8fb4;
+  font-weight: bold;
+}
+
+.user-name-container {
+  display: flex;
+  margin-top: 40px;
+}
+
+.user-name-container p {
+  color: #173da2;
+  font-size: 17px;
+}
+
+.user-name {
+  margin-left: 12%;
+}
+
+.password-container {
+  display: flex;
+}
+
+.password-container p {
+  color: #173da2;
+  font-size: 17px;
+}
+
+.password-info {
+  position: relative;
+  width: 300px;
+  margin-top: -9px;
+  margin-left: 12.5%;
+}
+
+.password-input {
+  width: 100%;
+  padding: 8px 35px 8px 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  color: #173da2;
+  font-size: 17px;
+  margin-left: 20px;
+}
+
+.password-button {
+  position: absolute;
+  left: 0;
+  top: 40%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.password-info input[type="password"]{
+  width: 100%;
+  padding: 8px 35px 8px 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  color: #173da2;
+  font-size: 17px;
+  background-color: #ffffff;
+}
+
+.change-password{
+   position: absolute;
+  color: #173da2;
+  font-size: 15px;
+  right: 6.5%;
+}
