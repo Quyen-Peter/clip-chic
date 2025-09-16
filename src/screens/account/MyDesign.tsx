@@ -1,8 +1,8 @@
-
+import "../../css/MyDesign.css";
 
 const MyDesign = () =>{
      return(
-        <div>
+        <div className="my-design-container">
             <a>my design</a>
         </div>
     )

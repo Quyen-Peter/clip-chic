@@ -2,6 +2,7 @@ import "../../css/Profile.css";
 import avata from "../../assest/avata.png";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import profile from "../../assest/profile.png";
 
 const Profile = () => {
   const [image, setImage] = useState(avata);
@@ -26,7 +27,7 @@ const Profile = () => {
   };
 
   const handleRemove = () => {
-    setImage("https://via.placeholder.com/120");
+    setImage(profile);
   };
 
   return (

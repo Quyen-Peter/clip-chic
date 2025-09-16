@@ -1,8 +1,8 @@
-
+import "../../css/TrackingShip.css";
 
 const TrackShipping = () =>{
      return(
-        <div>
+        <div className="tracking-shipping-container">
             <a>Truck shipping</a>
         </div>
     )
