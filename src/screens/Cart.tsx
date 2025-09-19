@@ -2,6 +2,14 @@ import "../css/Cart.css";
 import Footer from "../component/Footer";
 import RightBackgrount from "../assest/RightBackgrount.png";
 import { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
+import icon_out_cart from "../assest/icon-out-cart.png";
+import trast from "../assest/trast-cart.png";
+import cod from "../assest/COD.png";
+import qr from "../assest/QAPayment.png";
+import visa from "../assest/VISA.png";
+import mastercard from "../assest/Mastercard.png";
+import qrPay from "../assest/QRPay.png";
 
 type Product = {
   id: number;
@@ -13,7 +21,9 @@ type Product = {
 };
 
 const Cart = () => {
+  const Navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
+  const [method, setMethod] = useState("cod");
 
   useEffect(() => {
     const mockData: Product[] = [
@@ -22,7 +32,7 @@ const Cart = () => {
         name: "Flutterbelle",
         desc: "Hair Clips",
         price: 85000,
-        img: "https://via.placeholder.com/60x60.png?text=Hair",
+        img: "https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg",
         qty: 1,
       },
       {
@@ -30,7 +40,7 @@ const Cart = () => {
         name: "Summer Box",
         desc: "Blind box",
         price: 150000,
-        img: "https://via.placeholder.com/60x60.png?text=Box",
+        img: "https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg",
         qty: 1,
       },
       {
@@ -38,7 +48,15 @@ const Cart = () => {
         name: "Back To School Box",
         desc: "Blind box",
         price: 150000,
-        img: "https://via.placeholder.com/60x60.png?text=School",
+        img: "https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg",
+        qty: 1,
+      },
+      {
+        id: 4,
+        name: "Back To School Box",
+        desc: "Blind box",
+        price: 150000,
+        img: "https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg",
         qty: 1,
       },
     ];
@@ -48,78 +66,172 @@ const Cart = () => {
   const subtotal = products.reduce((sum, p) => sum + p.price * p.qty, 0);
   const shipping = 10000;
   const total = subtotal + shipping;
+  const increase = (id: number) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, qty: p.qty + 1 } : p))
+    );
+  };
+
+  const decrease = (id: number) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, qty: Math.max(1, p.qty - 1) } : p))
+    );
+  };
 
   return (
     <div className="cart-page">
-
-      {/* 2 cột */}
-      <main className="cart-main">
-        <img src={RightBackgrount} className="card-bg" alt="" />
-
-        <section className="panel cart-left">
-          <h3>Shopping cart</h3>
+      <div className="main-content-cart">
+        <div className="info-product">
+          <button
+            onClick={() => Navigate("/")}
+            className="shoping-continue-btn"
+          >
+            <img src={icon_out_cart} className="icon-out-cart" />
+            Shopping Continue
+          </button>
+          <div className="line-cart"></div>
+          <h4 className="title-cart-info-product">Shopping cart</h4>
           <p>You have {products.length} item in your cart</p>
 
           {products.map((p) => (
-            <div className="cart-item" key={p.id}>
-              <img src={p.img} className="thumb" />
-              <div className="item-info">
-                <div className="title">{p.name}</div>
-                <div className="sub">{p.desc}</div>
+            <div className="product-container">
+              <div className="left-container">
+                <div className="border-img-product">
+                  <img src="https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg" />
+                </div>
+
+                <div className="product-info-left-container">
+                  <h5>Flutterbelle</h5>
+                  <p>Hair Clips</p>
+                </div>
               </div>
-              <div className="qty">
-                <span>{p.qty}</span>
+
+              <div className="right-container">
+                <div className="quantity-container-cart">
+                  <span className="qty">{p.qty}</span>
+                  <div className="quantity-control">
+                    <button className="btn-qty" onClick={() => increase(p.id)}>
+                      ▲
+                    </button>
+                    <button className="btn-qty" onClick={() => decrease(p.id)}>
+                      ▼
+                    </button>
+                  </div>
+                </div>
+                <p className="price">
+                  {(p.price * p.qty).toLocaleString("vi-VN")} vnd
+                </p>
+                <button className="bnt-delete-cart">
+                  <img src={trast} />
+                </button>
               </div>
-              <div className="price">{p.price.toLocaleString()} vnd</div>
-              <button className="trash">🗑</button>
             </div>
           ))}
-        </section>
+        </div>
 
-        <aside className="panel card-right">
-          <div className="card-inner">
-            <h3>Card Details</h3>
+        <div className="info-payment">
+          <img src={RightBackgrount} className="right-backgrount" />
 
-            <div className="field">
-              <label>Name on card</label>
-              <input placeholder="Name" />
+          <div className="payment-show">
+            <h4>Payment</h4>
+            <p className="title-payment-info">
+              All transactions are secured and encrypted.
+            </p>
+            <div className="bnt-payment-container">
+              <button className={`bnt-payment ${method==="cod" ? "bnt-payment-active":""}`} onClick={() => setMethod("cod")}>
+                <img className="img-payment-bnt" src={cod} />
+              </button>
+              <button className={`bnt-payment ${method==="qr" ? "bnt-payment-active":""}`} onClick={() => setMethod("qr")}>
+                <img className="img-payment-bnt" src={qr} />
+              </button>
+              <button
+                className={`bnt-payment ${method==="visa" ? "bnt-payment-active":""}`}
+                onClick={() => setMethod("visa")}
+              >
+                <img src={visa} className="img-payment-bnt-visa" />{" "}
+                <img className="img-payment-bnt-visa" src={mastercard} />
+              </button>
             </div>
 
-            <div className="field">
-              <label>Card Number</label>
-              <input placeholder="1111 2222 3333 4444" />
+            <div className="content-payment-method">
+              {method === "visa" && (
+                <div className="card-payment-method">
+                  <p className="title-content-card">Name on card</p>
+                  <input
+                    className="input-content"
+                    type="text"
+                    placeholder="Name"
+                  />
+                  <p className="title-content-card">Card Number</p>
+                  <input
+                    className="input-content"
+                    type="text"
+                    placeholder="1111 2222 3333 4444"
+                  />
+                  <div className="content-date-cvv-card">
+                    <div>
+                      <p className="title-content-card">Expiration date</p>
+                      <input
+                        className="input-content-date-cvv"
+                        type="text"
+                        placeholder="mm/yy"
+                      />
+                    </div>
+                    <div className="cvv-card">
+                      <p className="title-content-card">CVV</p>
+                      <input
+                        className="input-content-date-cvv"
+                        type="text"
+                        placeholder="123"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {method === "qr" && (
+                <div className="border-qr-one">
+                  <p className="content-qr-pay">
+                    Use your banking app with QR code support to scan the code
+                  </p>
+                  <div className="border-qr-two">
+                    <div className="border-qr-three">
+                      <img src={qrPay} />
+                    </div>
+                  </div>
+                  <p className="payment-amount-qr">
+                    Payment Amount 350.000.000 vnd
+                  </p>
+                </div>
+              )}
             </div>
 
-            <div className="row-2">
-              <input placeholder="mm/yy" />
-              <input placeholder="123" />
-            </div>
+            <div className="line-payment-amount"></div>
 
-            <div className="summary">
-              <div>
-                <span>Subtotal</span>
-                <b>{subtotal.toLocaleString()} vnd</b>
+            <div className="sub-payment-container">
+              <div className="sub-payment">
+                <p>Subtotal</p>
+                <p>385.000 vnd</p>
               </div>
-              <div>
-                <span>Shipping</span>
-                <b>{shipping.toLocaleString()} vnd</b>
+              <div className="sub-payment">
+                <p>Shipping</p>
+                <p>10.000 vnd</p>
               </div>
-              <div>
-                <span>Total</span>
-                <b>{total.toLocaleString()} vnd</b>
+              <div className="sub-payment">
+                <p>Total (Tax incl.)</p>
+                <p>395.000 vnd</p>
               </div>
+              <button className="bnt-checkout-payment">Checkout</button>
             </div>
 
-            <button className="btn-primary">
-              {total.toLocaleString()} vnd — Checkout →
-            </button>
+            <div></div>
           </div>
-        </aside>
-      </main>
+        </div>
+      </div>
 
       <div className="cart-footer">
-        <Footer />  
-</div>
+        <Footer />
+      </div>
     </div>
   );
 };
