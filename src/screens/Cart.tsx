@@ -1,7 +1,7 @@
 import "../css/Cart.css";
 import Footer from "../component/Footer";
 import RightBackgrount from "../assest/RightBackgrount.png";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import icon_out_cart from "../assest/icon-out-cart.png";
 import trast from "../assest/trast-cart.png";
@@ -78,6 +78,33 @@ const Cart = () => {
     );
   };
 
+
+  const footerRef = useRef<HTMLDivElement>(null);
+  const [shrinkPayment, setShrinkPayment] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setShrinkPayment(true);
+        } else {
+          setShrinkPayment(false);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (footerRef.current) {
+      observer.observe(footerRef.current);
+    }
+
+    return () => {
+      if (footerRef.current) {
+        observer.unobserve(footerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className="cart-page">
       <div className="main-content-cart">
@@ -132,7 +159,7 @@ const Cart = () => {
         <div className="info-payment">
           <img src={RightBackgrount} className="right-backgrount" />
 
-          <div className="payment-show">
+          <div className={`payment-show ${shrinkPayment ? "shrink" : ""}`}>
             <h4>Payment</h4>
             <p className="title-payment-info">
               All transactions are secured and encrypted.
@@ -229,7 +256,7 @@ const Cart = () => {
         </div>
       </div>
 
-      <div className="cart-footer">
+      <div ref={footerRef} className="cart-footer">
         <Footer />
       </div>
     </div>
