@@ -66,6 +66,9 @@ const Cart = () => {
   const subtotal = products.reduce((sum, p) => sum + p.price * p.qty, 0);
   const shipping = 10000;
   const total = subtotal + shipping;
+  const formatVNDText = (value: number) => {
+    return value.toLocaleString("vi-VN") + " vnd";
+  };
   const increase = (id: number) => {
     setProducts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, qty: p.qty + 1 } : p))
@@ -77,7 +80,6 @@ const Cart = () => {
       prev.map((p) => (p.id === id ? { ...p, qty: Math.max(1, p.qty - 1) } : p))
     );
   };
-
 
   const footerRef = useRef<HTMLDivElement>(null);
   const [shrinkPayment, setShrinkPayment] = useState(false);
@@ -165,14 +167,26 @@ const Cart = () => {
               All transactions are secured and encrypted.
             </p>
             <div className="bnt-payment-container">
-              <button className={`bnt-payment ${method==="cod" ? "bnt-payment-active":""}`} onClick={() => setMethod("cod")}>
+              <button
+                className={`bnt-payment ${
+                  method === "cod" ? "bnt-payment-active" : ""
+                }`}
+                onClick={() => setMethod("cod")}
+              >
                 <img className="img-payment-bnt" src={cod} />
               </button>
-              <button className={`bnt-payment ${method==="qr" ? "bnt-payment-active":""}`} onClick={() => setMethod("qr")}>
+              <button
+                className={`bnt-payment ${
+                  method === "qr" ? "bnt-payment-active" : ""
+                }`}
+                onClick={() => setMethod("qr")}
+              >
                 <img className="img-payment-bnt" src={qr} />
               </button>
               <button
-                className={`bnt-payment ${method==="visa" ? "bnt-payment-active":""}`}
+                className={`bnt-payment ${
+                  method === "visa" ? "bnt-payment-active" : ""
+                }`}
                 onClick={() => setMethod("visa")}
               >
                 <img src={visa} className="img-payment-bnt-visa" />{" "}
@@ -227,7 +241,7 @@ const Cart = () => {
                     </div>
                   </div>
                   <p className="payment-amount-qr">
-                    Payment Amount 350.000.000 vnd
+                    Payment Amount {formatVNDText(total)}
                   </p>
                 </div>
               )}
@@ -238,15 +252,17 @@ const Cart = () => {
             <div className="sub-payment-container">
               <div className="sub-payment">
                 <p>Subtotal</p>
-                <p>385.000 vnd</p>
+                <p>{formatVNDText(subtotal)}</p>
               </div>
               <div className="sub-payment">
                 <p>Shipping</p>
-                <p>10.000 vnd</p>
+                <p>
+                  { formatVNDText(shipping)}
+                </p>
               </div>
               <div className="sub-payment">
                 <p>Total (Tax incl.)</p>
-                <p>395.000 vnd</p>
+                <p>{formatVNDText(total)}</p>
               </div>
               <button className="bnt-checkout-payment">Checkout</button>
             </div>

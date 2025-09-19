@@ -257,6 +257,8 @@
   margin-top: 10%;
   color: #ffffff;
   font-weight: bold;
+  width: 150px;
+  padding-left: 30px;
 }
 
 .card-payment-method{
