@@ -24,7 +24,7 @@
 }
 
 .order-history th {
-  background: #ff8fb4;
+  background: #ff8fb4 !important;
   color: white;
   padding: 12px;
   text-transform: uppercase;
