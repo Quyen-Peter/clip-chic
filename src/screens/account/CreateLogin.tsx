@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 const CreateLogin = () => {
   return (
     <div className="create-login-main-container">
-      <img src={logo} alt="Logo" className="logoCreateLogin" />
+      {/* <img src={logo} alt="Logo" className="logoCreateLogin" /> */}
       <div className="create-login-container">
         
         <h2>CREATE AN ACCOUNT</h2>

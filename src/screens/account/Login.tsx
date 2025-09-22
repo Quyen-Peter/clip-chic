@@ -15,7 +15,7 @@ const Login = () => {
 
   return (
     <div className="login-main-container">
-      <img src={logologin} alt="Logo" className="logoLogin"/>
+      {/* <img src={logologin} alt="Logo" className="logoLogin"/> */}
       <div className="login-container">
         <h2>LOG IN ACCOUNT</h2>
         <form className="login-form" onSubmit={handleLogin}>
@@ -29,7 +29,7 @@ const Login = () => {
           </div>
           <div className="checkbox-forgot-container">
             <div className="checkbox-container-login">
-              <input type="checkbox" required />
+              <input type="checkbox"/>
               <a>Save password</a>
             </div>
             <Link to={"/Forgot"} className="link-forgot">Forgot your password?</Link>

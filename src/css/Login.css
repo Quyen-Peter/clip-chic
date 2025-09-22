@@ -4,7 +4,6 @@
   width: 570px;
   padding: 30px;
   border-radius: 20px;
-  padding-bottom: 93.5px;
 }
 
 .logoLogin {
@@ -61,9 +60,11 @@ p {
   display: flex;
   margin-left: 155px;
   margin-top: 5px;
+  color: #ffffff;
 }
 .checkbox-container-login a {
   font-size: 13.5px;
+  
 }
 .checkbox-container-login input[type="checkbox"] {
   width: 14px;
@@ -77,6 +78,9 @@ p {
 .link-forgot {
   margin-left: 90px;
   font-size: 13.5px;
+  color: #ffffff;
+  text-decoration: none;
+  margin-top: 5px;
 }
 
 .login-form button[type="submit"] {
@@ -98,6 +102,7 @@ p {
   margin-bottom: 20px;
   justify-content: space-between;
   margin-right: 10px;
+  color: white;
 }
 
 .or-container-login a {
