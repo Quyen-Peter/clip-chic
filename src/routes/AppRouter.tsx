@@ -25,6 +25,7 @@ import TrackShipping from "../screens/account/TrackShipping";
 import PrivacyHelp from "../screens/account/PrivacyHelp";
 import LoginUser from "../screens/account/Login";
 import CreateLogin from "../screens/account/CreateLogin";
+import OrderDetail from "../screens/account/OrderDetail";
 
 const AppRouter = () => {
   return (
@@ -53,6 +54,7 @@ const AppRouter = () => {
         <Route path="Privacy" element={<PrivacyHelp />} />  
         <Route path="Login" element={<LoginUser />} /> 
         <Route path="Create" element={<CreateLogin />} />
+        <Route path="OrderDtail/:OrderId" element={<OrderDetail/>} />
       </Route>
 
     </Routes>
