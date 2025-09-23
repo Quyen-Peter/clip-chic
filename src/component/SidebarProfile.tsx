@@ -29,12 +29,12 @@ const SidebarProfile = () => {
             My Design
           </NavLink>
         </div>
-        <div className="sidebar-item">
+        {/* <div className="sidebar-item">
           <img src={icon} className="arrow-icon" />
           <NavLink to="/Account/TrackShipping" className="link-sidebar-profile">
             Track Shipping
           </NavLink>
-        </div>
+        </div> */}
         <div className="sidebar-item">
           <img src={icon} className="arrow-icon" />
           <NavLink to="/Account/OrderHistory" className="link-sidebar-profile">
