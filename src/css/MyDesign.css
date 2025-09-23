@@ -1,3 +1,88 @@
 .my-design-container{
     height: 100vh;
+    margin-bottom: 40%;
+}
+
+.history-title{
+    color: #FF8FB4;
+    font-weight: bold;
+}
+
+.my-design-form{
+    margin-top: 4%;
+    margin-bottom: 5%;
+}
+
+.my-design-input{
+    width: 400px;
+    height: 45px;
+    border: 2px solid #FF8FB4;
+    border-radius: 20px;
+    padding: 10px;
+    margin-right: 10px;
+    outline: #FF8FB4;
+    color: #FF8FB4;
+    padding-right: 65px;
+}
+
+.my-design-button{
+    width: 50px;
+    height: 40px;
+    border: none;
+    border-radius: 20px;
+    background-color: white;
+    cursor: pointer;
+    margin-left: -65px;
+}
+
+.icon-search-bnt{
+    width: 25px;
+    height: 25px;
+    margin-top: -5px;
+}
+
+.my-design-content{
+    border: 2px solid #FF8FB4;
+    border-radius: 20px;
+    margin-right: 60px;
+    overflow: hidden; 
+}
+
+.history-work-title{
+    color: #FF8FB4;
+    font-weight: bold;
+    font-size: 15px;
+    padding-left: 20px;
+    padding-top: 5px;
+}
+
+.my-design-list{
+    display: grid; 
+    grid-template-columns: repeat(4, 1fr);
+    border-collapse: collapse;
+}
+
+.my-design-item{
+    border: 2px solid #FF8FB4;
+    padding: 10px;
+    border-left: none;
+    display: table-cell;
+}
+
+.my-design-image{
+    width: 100%;
+}
+
+.my-design-name{
+    color: #FF8FB4;
+    font-weight: bold;
+    margin-top: 5%;
+    font-size: 14px;
+}
+
+.my-design-button-use{
+    border: none;
+    background-color: #ffffff;
+    color: #173DA2;
+    margin-bottom: 15%;
 }

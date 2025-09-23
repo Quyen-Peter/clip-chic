@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Cherry Cream",
+    "image": "https://hoatrangnguyen.com.vn/wp-content/uploads/2023/11/truyen-ve-sau-va-kien.jpg",
+    "current": true
+  },
+  {
+    "id": 2,
+    "name": "Flutterbelle",
+    "image": "https://hoatrangnguyen.com.vn/wp-content/uploads/2023/11/truyen-ve-sau-va-kien.jpg",
+    "current": false
+  },
+  {
+    "id": 3,
+    "name": "Sea Whisper",
+    "image": "https://hoatrangnguyen.com.vn/wp-content/uploads/2023/11/truyen-ve-sau-va-kien.jpg",
+    "current": false
+  },
+  {
+    "id": 4,
+    "name": "Very Pink",
+    "image": "https://hoatrangnguyen.com.vn/wp-content/uploads/2023/11/truyen-ve-sau-va-kien.jpg",
+    "current": false
+  },
+  {
+    "id": 4,
+    "name": "Very Pink",
+    "image": "https://hoatrangnguyen.com.vn/wp-content/uploads/2023/11/truyen-ve-sau-va-kien.jpg",
+    "current": false
+  }
+]
