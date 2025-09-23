@@ -10,6 +10,8 @@ import qr from "../assest/QAPayment.png";
 import visa from "../assest/VISA.png";
 import mastercard from "../assest/Mastercard.png";
 import qrPay from "../assest/QRPay.png";
+import address from "../assest/address.png";
+import iconchange from "../assest/icon-out-cart.png";
 
 type Product = {
   id: number;
@@ -24,6 +26,7 @@ const Cart = () => {
   const Navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [method, setMethod] = useState("cod");
+  const [isAddress, setIsAddress] = useState(false);
 
   useEffect(() => {
     const mockData: Product[] = [
@@ -195,6 +198,45 @@ const Cart = () => {
             </div>
 
             <div className="content-payment-method">
+              {method === "cod" && (
+                <div className="cod-payment-method">
+                  <div className="title-cod-pay">
+                    <img src={address} className="img-address-cod" />
+                    <h5 className="delivery-information">
+                      DELIVERY INFORMATION
+                    </h5>
+                  </div>
+
+                  <div className="info-cod-pay">
+                    {isAddress ? (
+                      <div className="border-info-cod-pay-address-edit">
+
+                        <input className="input-address-cod-pay" type="text" placeholder="Trịnh Trọng Quyền"/>
+                        <input className="input-address-cod-pay" type="text" placeholder="(+84) 123 456 789"/>
+                        <input className="input-address-cod-pay" type="text" placeholder="123 Đường ABC, Phường XYZ, Quận 1, TP. HCM"/>
+                        <button className="bnt-apply-address" onClick={()=> setIsAddress(false)}>Apply</button>
+                      </div>
+                    ) : (
+                      <div className="border-info-cod-pay">
+                        <div>
+                          <p className="content-cod-pay">
+                            Trịnh Trọng Quyền (+84) 123 456 789
+                          </p>
+                          <p className="address-cod-pay">
+                            123 Đường ABC, Phường XYZ, Quận 1, TP. HCM
+                          </p>
+                        </div>
+                        <button
+                          className="bnt-change-address"
+                          onClick={() => setIsAddress(true)}
+                        >
+                          <img src={iconchange} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
               {method === "visa" && (
                 <div className="card-payment-method">
                   <p className="title-content-card">Name on card</p>
@@ -256,9 +298,7 @@ const Cart = () => {
               </div>
               <div className="sub-payment">
                 <p>Shipping</p>
-                <p>
-                  { formatVNDText(shipping)}
-                </p>
+                <p>{formatVNDText(shipping)}</p>
               </div>
               <div className="sub-payment">
                 <p>Total (Tax incl.)</p>
