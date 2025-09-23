@@ -49,7 +49,7 @@ const About = () => {
           <p>We create little moments of self-expression.</p>
         </div>
 
-        <div className="about-block line">
+        <div className="about-block line-line">
           <h3 className="eyebrow pink">THE CLIP – A TWIST OF YOU</h3>
 
           <p>
