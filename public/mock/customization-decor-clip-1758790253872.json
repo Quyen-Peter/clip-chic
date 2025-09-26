@@ -1,0 +1,47 @@
+{
+  "baseId": 2,
+  "baseModel": "/mock/models/decor_clip.glb",
+  "baseModelColor": "#000000",
+  "charms": [
+    {
+      "charmId": 1,
+      "modelPath": "/mock/models/accessories/flower.glb",
+      "position": [
+        0,
+        1.057823616643595,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    {
+      "charmId": 1,
+      "modelPath": "/mock/models/accessories/flower.glb",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    }
+  ],
+  "timestamp": "2025-09-25T08:50:53.870Z",
+  "version": "1.0"
+}
