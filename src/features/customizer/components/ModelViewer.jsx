@@ -1,25 +1,14 @@
-import React, { Suspense, useState, useRef, useEffect } from "react";
+import React, { Suspense, useState, useRef, useEffect, useImperativeHandle, forwardRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Center, OrbitControls, useGLTF, TransformControls } from "@react-three/drei";
 
-function Model({ modelPath, position = [0, 0, 0], scale = 1, baseColor = "#ffffff", detailColor = "#000000" }) {
+function Model({ modelPath, position = [0, 0, 0], scale = 1, baseColor = "#ffffff" }) {
   const { scene } = useGLTF(modelPath); // load glb
   
-  // Apply colors to different parts of the model
+  // Apply color to the model
   useEffect(() => {
     if (scene) {
-      // Debug: Log all mesh names when scene loads
-      console.log('=== MODEL LOADED ===');
-      console.log('Model path:', modelPath);
-      console.log('Scene:', scene);
-      
-      scene.traverse((child) => {
-        if (child.isMesh) {
-          console.log(`Mesh found: "${child.name}" | Material: "${child.material.name || 'unnamed'}" | Type: ${child.type}`);
-        }
-      });
-      
-      // Apply colors
+      // Apply base color to all meshes
       scene.traverse((child) => {
         if (child.isMesh && child.material) {
           // Clone the material to avoid affecting other instances
@@ -28,109 +17,150 @@ function Model({ modelPath, position = [0, 0, 0], scale = 1, baseColor = "#fffff
             child.material.isColorCustomized = true;
           }
           
-          // Apply different colors based on the mesh name or material name
-          if (child.name.toLowerCase().includes('detail') || child.name.toLowerCase().includes('trim') || child.name.toLowerCase().includes('metal')) {
-            // Detail/Trim/Metal parts get the detail color
-            child.material.color.setHex(parseInt(detailColor.replace('#', ''), 16));
-            console.log(`Applied detail color (${detailColor}) to: "${child.name}"`);
-          } else {
-            // Base/Body parts get the base color
-            child.material.color.setHex(parseInt(baseColor.replace('#', ''), 16));
-            console.log(`Applied base color (${baseColor}) to: "${child.name}"`);
-          }
+          // Apply base color to all parts
+          child.material.color.setHex(parseInt(baseColor.replace('#', ''), 16));
         }
       });
     }
-  }, [scene, baseColor, detailColor]);
+  }, [scene, baseColor]);
 
   return <primitive object={scene} position={position} scale={scale} />;
 }
 
-function Accessory({ modelPath, isSelected, onSelect, transformMode, initialPosition, onPositionChange, initialRotation, onRotationChange, initialScale, onScaleChange }) {
+function Charm({ modelPath, isSelected, onSelect, transformMode, initialPosition, onPositionChange, initialRotation, onRotationChange, initialScale, onScaleChange, charmId, onTransformingChange }) {
   const { scene } = useGLTF(modelPath);
-  const ref = useRef();
-  const [objectRef, setObjectRef] = useState(null);
+  const groupRef = useRef();
+  const transformRef = useRef();
+  const [isTransforming, setIsTransforming] = useState(false);
   
+  // Apply visual selection effect
   useEffect(() => {
-    const checkRef = () => {
-      if (ref.current && !objectRef) {
-        setObjectRef(ref.current);
-        // Set initial position, rotation, and scale
-        if (initialPosition) {
-          ref.current.position.set(...initialPosition);
+    if (groupRef.current && scene) {
+      scene.traverse((child) => {
+        if (child.isMesh) {
+          if (isSelected) {
+            // Add a subtle emission to selected charms
+            child.material = child.material.clone();
+            child.material.emissive.setHex(0x444444);
+          } else {
+            // Reset emission for unselected charms
+            if (child.material.emissive) {
+              child.material.emissive.setHex(0x000000);
+            }
+          }
         }
-        if (initialRotation) {
-          ref.current.rotation.set(...initialRotation);
-        }
-        if (initialScale) {
-          ref.current.scale.set(...initialScale);
-        }
-      }
-    };
-    
-    // Check immediately
-    checkRef();
-    
-    // Also check after a short delay to ensure the ref is set
-    const timer = setTimeout(checkRef, 50);
-    
-    return () => clearTimeout(timer);
-  }, []); // Empty dependency array to run only once
+      });
+    }
+  }, [isSelected, scene]);
   
-  // Update transform when it changes
+  // Set initial transform only when not actively transforming
   useEffect(() => {
-    if (objectRef) {
+    if (groupRef.current && !isTransforming) {
       if (initialPosition) {
-        objectRef.position.set(...initialPosition);
+        groupRef.current.position.set(...initialPosition);
       }
       if (initialRotation) {
-        objectRef.rotation.set(...initialRotation);
+        groupRef.current.rotation.set(...initialRotation);
       }
       if (initialScale) {
-        objectRef.scale.set(...initialScale);
+        groupRef.current.scale.set(...initialScale);
       }
     }
-  }, [initialPosition, initialRotation, initialScale, objectRef]);
+  }, [initialPosition, initialRotation, initialScale, isTransforming]);
   
   return (
     <>
-      <primitive 
-        ref={ref} 
-        object={scene.clone()} 
-        scale={initialScale || [0.5, 0.5, 0.5]}
-        position={initialPosition || [0, 0, 0]}
-        rotation={initialRotation || [0, 0, 0]}
+      <group 
+        ref={groupRef}
         onClick={(e) => {
           e.stopPropagation();
           onSelect();
         }}
-      />
-      {objectRef && (
+      >
+        <primitive object={scene.clone()} />
+      </group>
+      {groupRef.current && isSelected && (
         <TransformControls 
-          object={objectRef} 
+          ref={transformRef}
+          key={`transform-${charmId}-${isSelected}`} // Force recreation when selection changes
+          object={groupRef.current} 
           mode={transformMode}
           size={0.5}
+          space="local"
+          translationSnap={null}
+          rotationSnap={null}
+          scaleSnap={null}
           showX={true}
           showY={true}
           showZ={true}
-          onObjectChange={(e) => {
-            // Update all transform properties in parent component
-            if (objectRef && onPositionChange && onRotationChange && onScaleChange) {
-              onPositionChange([
-                objectRef.position.x,
-                objectRef.position.y,
-                objectRef.position.z
-              ]);
-              onRotationChange([
-                objectRef.rotation.x,
-                objectRef.rotation.y,
-                objectRef.rotation.z
-              ]);
-              onScaleChange([
-                objectRef.scale.x,
-                objectRef.scale.y,
-                objectRef.scale.z
-              ]);
+          enabled={true}
+          onPointerDown={(e) => {
+            console.log('TransformControls pointer down for charm:', charmId);
+            // Prevent canvas click when interacting with transform controls
+            e.stopPropagation();
+          }}
+          onObjectChange={() => {
+            console.log('*** onObjectChange fired for charm:', charmId);
+            // Capture position during transform as backup
+            if (groupRef.current && onPositionChange && onRotationChange && onScaleChange) {
+              const newPosition = [
+                groupRef.current.position.x,
+                groupRef.current.position.y,
+                groupRef.current.position.z
+              ];
+              const newRotation = [
+                groupRef.current.rotation.x,
+                groupRef.current.rotation.y,
+                groupRef.current.rotation.z
+              ];
+              const newScale = [
+                groupRef.current.scale.x,
+                groupRef.current.scale.y,
+                groupRef.current.scale.z
+              ];
+              
+              // Update state with current transform values
+              onPositionChange(newPosition);
+              onRotationChange(newRotation);
+              onScaleChange(newScale);
+            }
+          }}
+          onDraggingChanged={(dragging) => {
+            console.log('*** onDraggingChanged fired ***', { dragging, charmId });
+            setIsTransforming(dragging);
+            if (onTransformingChange) {
+              onTransformingChange(dragging);
+            }
+            
+            // Only update position when dragging ENDS to prevent re-renders during drag
+            if (!dragging && groupRef.current && onPositionChange && onRotationChange && onScaleChange) {
+              console.log('Dragging ended for charm:', charmId);
+              // Add a small delay to ensure transform controls are properly detached
+              setTimeout(() => {
+                if (groupRef.current) {
+                  const newPosition = [
+                    groupRef.current.position.x,
+                    groupRef.current.position.y,
+                    groupRef.current.position.z
+                  ];
+                  const newRotation = [
+                    groupRef.current.rotation.x,
+                    groupRef.current.rotation.y,
+                    groupRef.current.rotation.z
+                  ];
+                  const newScale = [
+                    groupRef.current.scale.x,
+                    groupRef.current.scale.y,
+                    groupRef.current.scale.z
+                  ];
+                  
+                  // Update the state with actual values
+                  console.log('Transform ended, updating position to:', newPosition);
+                  onPositionChange(newPosition);
+                  onRotationChange(newRotation);
+                  onScaleChange(newScale);
+                }
+              }, 50);
             }
           }}
         />
@@ -139,232 +169,167 @@ function Accessory({ modelPath, isSelected, onSelect, transformMode, initialPosi
   );
 }
 
-export default function ModelViewer({ modelPath, onAccessoryDrop, baseModelColor = "#ffffff", detailColor = "#000000" }) {
-  const [accessories, setAccessories] = useState([]);
-  const [selectedAccessory, setSelectedAccessory] = useState(null);
-  const [isCameraLocked, setIsCameraLocked] = useState(true);
-  const [transformMode, setTransformMode] = useState("translate");
+const ModelViewer = forwardRef(({ 
+  modelPath, 
+  onCharmAdd, 
+  baseModelColor = "#ffffff",
+  transformMode = "translate",
+  isCameraLocked = true,
+  selectedCharm = null,
+  onSelectedCharmChange
+}, ref) => {
+  const [charms, setCharms] = useState([]);
+  const [isAnyCharmTransforming, setIsAnyCharmTransforming] = useState(false);
+  const canvasRef = useRef();
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const accessoryModel = e.dataTransfer.getData("modelPath");
-    if (accessoryModel) {
-      // Thêm accessory vào danh sách đang render
-      setAccessories((prev) => [
-        ...prev,
-        { 
-          id: Date.now(), 
-          modelPath: accessoryModel,
-          position: [0, 0, 0], // Initial position
-          rotation: [0, 0, 0], // Initial rotation
-          scale: [0.5, 0.5, 0.5] // Initial scale
-        },
-      ]);
+  // Expose addCharm, removeCharm, getCharms, and captureScreenshot functions to parent component
+  useImperativeHandle(ref, () => ({
+    addCharm,
+    addCharmWithTransforms,
+    removeCharm,
+    getCharms: () => charms,
+    captureScreenshot,
+    getCurrentCharmsWithTransforms,
+    getLatestCharm: () => charms[charms.length - 1] // Helper to get the most recently added charm
+  }));
 
-      // Gọi callback cho CustomizerPage nếu có
-      if (onAccessoryDrop) onAccessoryDrop(accessoryModel);
-    }
+  // Get current charms with actual 3D transforms
+  const getCurrentCharmsWithTransforms = () => {
+    console.log('Getting charms with transforms:', charms);
+    return charms;
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleCanvasClick = () => {
-    // Deselect accessory when clicking on empty space
-    setSelectedAccessory(null);
-  };
-
-  const toggleCameraLock = () => {
-    setIsCameraLocked(!isCameraLocked);
-  };
-
-  const changeTransformMode = (mode) => {
-    setTransformMode(mode);
-  };
-
-  const updateAccessoryPosition = (accessoryId, newPosition) => {
-    setAccessories((prev) =>
-      prev.map((acc) =>
-        acc.id === accessoryId
-          ? { ...acc, position: newPosition }
-          : acc
-      )
-    );
-  };
-
-  const updateAccessoryRotation = (accessoryId, newRotation) => {
-    setAccessories((prev) =>
-      prev.map((acc) =>
-        acc.id === accessoryId
-          ? { ...acc, rotation: newRotation }
-          : acc
-      )
-    );
-  };
-
-  const updateAccessoryScale = (accessoryId, newScale) => {
-    setAccessories((prev) =>
-      prev.map((acc) =>
-        acc.id === accessoryId
-          ? { ...acc, scale: newScale }
-          : acc
-      )
-    );
-  };
-
-  // Save customization data
-  const saveCustomization = () => {
-    const customizationData = {
-      baseModel: modelPath,
-      baseModelColor: baseModelColor,
-      detailColor: detailColor,
-      accessories: accessories.map(acc => ({
-        modelPath: acc.modelPath,
-        position: acc.position,
-        rotation: acc.rotation,
-        scale: acc.scale
-      })),
-      timestamp: new Date().toISOString(),
-      version: "1.0"
-    };
-
-    // Convert to JSON and create downloadable file
-    const dataStr = JSON.stringify(customizationData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `customized-product-${Date.now()}.json`;
-    link.click();
-    
-    URL.revokeObjectURL(url);
-    
-    console.log('Customization saved:', customizationData);
-  };
-
-  // Load customization data
-  const loadCustomization = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = JSON.parse(e.target.result);
-          if (data.baseModel === modelPath && data.accessories) {
-            setAccessories(data.accessories.map(acc => ({
-              ...acc,
-              id: Date.now() + Math.random() // Generate new IDs
-            })));
-            
-            // Load colors if available
-            if (data.detailColor) {
-              console.log('Detail color loaded:', data.detailColor);
-              // Note: detailColor is now controlled by parent component
-            }
-            
-            console.log('Customization loaded:', data);
-            alert('Customization loaded successfully!');
-          } else {
-            alert('This customization file is not compatible with the current base model.');
-          }
-        } catch (error) {
-          alert('Error loading customization file: ' + error.message);
+  // Capture screenshot of the 3D scene
+  const captureScreenshot = () => {
+    return new Promise((resolve) => {
+      if (canvasRef.current) {
+        // Get the canvas element from the Three.js renderer
+        const canvas = canvasRef.current.querySelector('canvas');
+        if (canvas) {
+          // Convert canvas to blob
+          canvas.toBlob((blob) => {
+            resolve(blob);
+          }, 'image/png');
+        } else {
+          resolve(null);
         }
-        
-        // Reset the file input so user can select the same file again
-        event.target.value = '';
-      };
-      reader.readAsText(file);
+      } else {
+        resolve(null);
+      }
+    });
+  };
+
+  // Add charm with transforms (for loading saved configurations)
+  const addCharmWithTransforms = (charmModelPath, charmId, position, rotation, scale, savedId = null) => {
+    // Use saved ID if provided, otherwise generate a consistent one
+    const id = savedId || `charm-${charmId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    setCharms((prev) => [
+      ...prev,
+      { 
+        id: id, 
+        charmId: charmId,
+        modelPath: charmModelPath,
+        position: position || [0, 0, 0],
+        rotation: rotation || [0, 0, 0],
+        scale: scale || [0.5, 0.5, 0.5]
+      },
+    ]);
+
+    // Call callback for CustomizerPage if available
+    if (onCharmAdd) onCharmAdd(charmModelPath);
+  };
+
+  // Add charm programmatically (called from parent component)
+  const addCharm = (charmModelPath, charmId = null) => {
+    // Generate a consistent, unique ID for new charms
+    const id = `charm-${charmId || 'unknown'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
+    setCharms((prev) => [
+      ...prev,
+      { 
+        id: id, 
+        charmId: charmId,
+        modelPath: charmModelPath,
+        position: [0, 0, 0], // Initial position
+        rotation: [0, 0, 0], // Initial rotation
+        scale: [0.5, 0.5, 0.5] // Initial scale
+      },
+    ]);
+
+    // Call callback for CustomizerPage if available
+    if (onCharmAdd) onCharmAdd(charmModelPath);
+  };
+
+  // Remove charm programmatically (called from parent component)
+  const removeCharm = (charmId) => {
+    setCharms((prev) => prev.filter(charm => charm.id !== charmId));
+    
+    // Deselect charm if it was selected
+    if (selectedCharm === charmId && onSelectedCharmChange) {
+      onSelectedCharmChange(null);
     }
   };
 
+  const handleCanvasClick = (e) => {
+    // Don't deselect on single click - only through double click or deselect button
+  };
+
+  const handleCanvasDoubleClick = (e) => {
+    // Only deselect charm on double click of empty canvas space
+    if (!isAnyCharmTransforming) {
+      if (onSelectedCharmChange) {
+        onSelectedCharmChange(null);
+      }
+    }
+  };
+
+  // Remove the control functions since they're now handled by parent
+  // const toggleCameraLock = () => {
+  //   setIsCameraLocked(!isCameraLocked);
+  // };
+
+  // const changeTransformMode = (mode) => {
+  //   setTransformMode(mode);
+  // };
+
+  const updateCharmPosition = (charmId, newPosition) => {
+    console.log('updateCharmPosition called:', charmId, newPosition);
+    setCharms((prev) =>
+      prev.map((charm) =>
+        charm.id === charmId
+          ? { ...charm, position: newPosition }
+          : charm
+      )
+    );
+  };
+
+  const updateCharmRotation = (charmId, newRotation) => {
+    setCharms((prev) =>
+      prev.map((charm) =>
+        charm.id === charmId
+          ? { ...charm, rotation: newRotation }
+          : charm
+      )
+    );
+  };
+
+  const updateCharmScale = (charmId, newScale) => {
+    setCharms((prev) =>
+      prev.map((charm) =>
+        charm.id === charmId
+          ? { ...charm, scale: newScale }
+          : charm
+      )
+    );
+  };
+  
   return (
     <div
+      ref={canvasRef}
       className="w-full h-full relative"
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
     >
-      {/* Control buttons */}
-      <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-        <button
-          onClick={toggleCameraLock}
-          className={`px-3 py-2 rounded text-sm font-medium ${
-            isCameraLocked 
-              ? 'bg-green-600 text-white' 
-              : 'bg-red-600 text-white'
-          }`}
-        >
-          {isCameraLocked ? '🔒 Camera Locked' : '🔓 Camera Unlocked'}
-        </button>
-        
-        {/* Transform mode selector */}
-        <div className="flex gap-1">
-          <button
-            onClick={() => changeTransformMode("translate")}
-            className={`px-2 py-1 rounded text-xs font-medium ${
-              transformMode === "translate" 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-            title="Move (Translate)"
-          >
-            Move
-          </button>
-          <button
-            onClick={() => changeTransformMode("rotate")}
-            className={`px-2 py-1 rounded text-xs font-medium ${
-              transformMode === "rotate" 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-            title="Rotate"
-          >
-            Rotate
-          </button>
-          <button
-            onClick={() => changeTransformMode("scale")}
-            className={`px-2 py-1 rounded text-xs font-medium ${
-              transformMode === "scale" 
-                ? 'bg-blue-600 text-white' 
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-            title="Scale"
-          >
-            Scale
-          </button>
-        </div>
-
-        {/* Save/Load buttons */}
-        <div className="flex gap-1">
-          <button
-            onClick={saveCustomization}
-            className="px-2 py-1 rounded text-xs font-medium bg-green-500 text-white hover:bg-green-600"
-            title="Save Customization"
-          >
-            💾 Save
-          </button>
-          <label className="px-2 py-1 rounded text-xs font-medium bg-blue-500 text-white hover:bg-blue-600 cursor-pointer">
-            📁 Load
-            <input
-              type="file"
-              accept=".json"
-              onChange={loadCustomization}
-              style={{ display: 'none' }}
-            />
-          </label>
-        </div>
-
-        {selectedAccessory && (
-          <button
-            onClick={() => setSelectedAccessory(null)}
-            className="px-3 py-2 rounded text-sm font-medium bg-gray-500 text-white hover:bg-gray-600"
-          >
-            Deselect
-          </button>
-        )}
-      </div>
+      {/* Control buttons moved to parent component */}
 
       <Canvas
         className="w-full h-full"
@@ -372,6 +337,7 @@ export default function ModelViewer({ modelPath, onAccessoryDrop, baseModelColor
         camera={{ position: [0, 2, 5], fov: 50 }}
         gl={{ preserveDrawingBuffer: true }}
         onClick={handleCanvasClick}
+        onDoubleClick={handleCanvasDoubleClick}
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 5, 5]} intensity={1} />
@@ -379,35 +345,42 @@ export default function ModelViewer({ modelPath, onAccessoryDrop, baseModelColor
         <Suspense fallback={null}>
           <Center>
             {/* Base product */}
-            <Model modelPath={modelPath} scale={1.5} baseColor={baseModelColor} detailColor={detailColor} />
+            <Model modelPath={modelPath} scale={1.5} baseColor={baseModelColor} />
           </Center>
-          {/* Các accessories đã drop */}
-          {accessories.map((acc) => (
-            <Accessory 
-              key={acc.id} 
-              modelPath={acc.modelPath}
-              isSelected={selectedAccessory === acc.id}
+          {/* Rendered charms */}
+          {charms.map((charm) => (
+            <Charm 
+              key={charm.id} 
+              modelPath={charm.modelPath}
+              charmId={charm.id}
+              isSelected={selectedCharm === charm.id}
               onSelect={() => {
-                setSelectedAccessory(acc.id);
+                console.log('Charm clicked! Selecting charm ID:', charm.id);
+                if (onSelectedCharmChange) {
+                  onSelectedCharmChange(charm.id);
+                }
               }}
               transformMode={transformMode}
-              initialPosition={acc.position}
-              onPositionChange={(newPosition) => updateAccessoryPosition(acc.id, newPosition)}
-              initialRotation={acc.rotation}
-              onRotationChange={(newRotation) => updateAccessoryRotation(acc.id, newRotation)}
-              initialScale={acc.scale}
-              onScaleChange={(newScale) => updateAccessoryScale(acc.id, newScale)}
+              initialPosition={charm.position}
+              onPositionChange={(newPosition) => updateCharmPosition(charm.id, newPosition)}
+              initialRotation={charm.rotation}
+              onRotationChange={(newRotation) => updateCharmRotation(charm.id, newRotation)}
+              initialScale={charm.scale}
+              onScaleChange={(newScale) => updateCharmScale(charm.id, newScale)}
+              onTransformingChange={setIsAnyCharmTransforming}
             />
           ))}
         </Suspense>
 
         <OrbitControls 
-          enabled={!isCameraLocked}
-          enablePan={!isCameraLocked}
-          enableZoom={!isCameraLocked}
-          enableRotate={!isCameraLocked}
+          enabled={!isCameraLocked && !isAnyCharmTransforming}
+          enablePan={!isCameraLocked && !isAnyCharmTransforming}
+          enableZoom={!isCameraLocked && !isAnyCharmTransforming}
+          enableRotate={!isCameraLocked && !isAnyCharmTransforming}
         />
       </Canvas>
     </div>
   );
-}
+});
+
+export default ModelViewer;
