@@ -189,7 +189,8 @@ const ModelViewer = forwardRef(({
     removeCharm,
     getCharms: () => charms,
     captureScreenshot,
-    getCurrentCharmsWithTransforms
+    getCurrentCharmsWithTransforms,
+    getLatestCharm: () => charms[charms.length - 1] // Helper to get the most recently added charm
   }));
 
   // Get current charms with actual 3D transforms
@@ -219,11 +220,14 @@ const ModelViewer = forwardRef(({
   };
 
   // Add charm with transforms (for loading saved configurations)
-  const addCharmWithTransforms = (charmModelPath, charmId, position, rotation, scale) => {
+  const addCharmWithTransforms = (charmModelPath, charmId, position, rotation, scale, savedId = null) => {
+    // Use saved ID if provided, otherwise generate a consistent one
+    const id = savedId || `charm-${charmId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
     setCharms((prev) => [
       ...prev,
       { 
-        id: Date.now(), 
+        id: id, 
         charmId: charmId,
         modelPath: charmModelPath,
         position: position || [0, 0, 0],
@@ -238,10 +242,13 @@ const ModelViewer = forwardRef(({
 
   // Add charm programmatically (called from parent component)
   const addCharm = (charmModelPath, charmId = null) => {
+    // Generate a consistent, unique ID for new charms
+    const id = `charm-${charmId || 'unknown'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    
     setCharms((prev) => [
       ...prev,
       { 
-        id: Date.now(), 
+        id: id, 
         charmId: charmId,
         modelPath: charmModelPath,
         position: [0, 0, 0], // Initial position
@@ -316,69 +323,7 @@ const ModelViewer = forwardRef(({
       )
     );
   };
-
-  // Save customization data
-  const saveCustomization = () => {
-    const customizationData = {
-      baseModel: modelPath,
-      baseModelColor: baseModelColor,
-      charms: charms.map(charm => ({
-        modelPath: charm.modelPath,
-        position: charm.position,
-        rotation: charm.rotation,
-        scale: charm.scale
-      })),
-      timestamp: new Date().toISOString(),
-      version: "1.0"
-    };
-
-    // Convert to JSON and create downloadable file
-    const dataStr = JSON.stringify(customizationData, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `customized-product-${Date.now()}.json`;
-    link.click();
-    
-    URL.revokeObjectURL(url);
-  };
-
-  // Load customization data
-  const loadCustomization = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = JSON.parse(e.target.result);
-          if (data.baseModel === modelPath && data.charms) {
-            setCharms(data.charms.map(charm => ({
-              ...charm,
-              id: Date.now() + Math.random() // Generate new IDs
-            })));
-            
-            // Load color if available
-            if (data.baseModelColor) {
-              // Note: baseModelColor is now controlled by parent component
-            }
-            
-            alert('Customization loaded successfully!');
-          } else {
-            alert('This customization file is not compatible with the current base model.');
-          }
-        } catch (error) {
-          alert('Error loading customization file: ' + error.message);
-        }
-        
-        // Reset the file input so user can select the same file again
-        event.target.value = '';
-      };
-      reader.readAsText(file);
-    }
-  };
-
+  
   return (
     <div
       ref={canvasRef}

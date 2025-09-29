@@ -85,18 +85,22 @@ export default function CustomizerPage() {
   const handleCharmDoubleClick = (charm) => {
     // Call addCharm function on ModelViewer component with charm data
     if (modelViewerRef.current) {
-      const newCharmId = Date.now();
       modelViewerRef.current.addCharm(charm.modelPath, charm.id);
       // Update local state immediately to keep UI in sync
-      const newCharm = {
-        id: newCharmId,
-        charmId: charm.id,
-        modelPath: charm.modelPath,
-        position: [0, 0, 0],
-        rotation: [0, 0, 0],
-        scale: [0.5, 0.5, 0.5]
-      };
-      setCurrentCharms(prev => [...prev, newCharm]);
+      // Use a small delay to ensure ModelViewer state is updated
+      setTimeout(() => {
+        const latestCharm = modelViewerRef.current.getLatestCharm();
+        if (latestCharm) {
+          setCurrentCharms(prev => {
+            // Check if charm already exists to avoid duplicates
+            const exists = prev.some(c => c.id === latestCharm.id);
+            if (!exists) {
+              return [...prev, latestCharm];
+            }
+            return prev;
+          });
+        }
+      }, 10);
     }
   };
 
@@ -145,19 +149,26 @@ export default function CustomizerPage() {
           
           // Add loaded charms with a delay to ensure base model is loaded
           setTimeout(() => {
+            // Clear local state first
+            setCurrentCharms([]);
+            
             configData.charms.forEach((charmData, index) => {
-              // Add charm to 3D viewer with saved transforms
+              // Generate a consistent ID for the loaded charm
+              const charmInstanceId = charmData.id || `charm-${charmData.charmId}-${Date.now()}-${index}`;
+              
+              // Add charm to 3D viewer with saved transforms and ID
               modelViewerRef.current.addCharmWithTransforms(
                 charmData.modelPath, 
                 charmData.charmId,
                 charmData.position,
                 charmData.rotation,
-                charmData.scale
+                charmData.scale,
+                charmInstanceId // Pass the saved ID
               );
               
-              // Update local state with positioning data
+              // Update local state with positioning data using the same ID
               const newCharm = {
-                id: Date.now() + index,
+                id: charmInstanceId,
                 charmId: charmData.charmId,
                 modelPath: charmData.modelPath,
                 position: charmData.position || [0, 0, 0],
@@ -193,6 +204,7 @@ export default function CustomizerPage() {
         baseModel: selectedBase.modelPath,
         baseModelColor: baseModelColor,
         charms: currentCharms.map(charm => ({
+          id: charm.id, // Include the instance ID for proper loading
           charmId: charm.charmId || null,
           modelPath: charm.modelPath,
           position: charm.position,

@@ -182,27 +182,31 @@ export const useCustomizer = () => {
         setSelectedBase(base);
       }
 
-      // Reconstruct charm configurations
-      const charmConfigs = await Promise.all(
-        customizationData.charms.map(async (charmConfig) => {
-          const charm = charms.find(c => c.id === charmConfig.charmId);
-          return {
-            id: Date.now() + Math.random(),
-            charmId: charmConfig.charmId,
-            charm: charm,
-            position: charmConfig.position,
-            rotation: charmConfig.rotation,
-            scale: charmConfig.scale
-          };
-        })
-      );
+      // Find all charms first
+      const loadedCharms = customizationData.charms.map(charmConfig => 
+        charms.find(c => c.id === charmConfig.charmId)
+      ).filter(Boolean);
+
+      // Set selected charms first
+      setSelectedCharms(loadedCharms);
+
+      // Then reconstruct charm configurations
+      const charmConfigs = customizationData.charms.map(charmConfig => {
+        const charm = charms.find(c => c.id === charmConfig.charmId);
+        return {
+          id: Date.now() + Math.random(),
+          charmId: charmConfig.charmId,
+          charm,
+          position: charmConfig.position,
+          rotation: charmConfig.rotation,
+          scale: charmConfig.scale
+        };
+      });
 
       setCustomizationConfig({
         baseModelColor: customizationData.baseModelColor,
         charms: charmConfigs
       });
-
-      setSelectedCharms(charmConfigs.map(config => config.charm).filter(Boolean));
       
       return customizationData;
     } catch (err) {

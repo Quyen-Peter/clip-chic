@@ -106,10 +106,6 @@ export default function TransformControls({
           </p>
         </div>
       )}
-      
-      <p className="customizer-layout-info-text">
-        Use the transform controls above to manipulate selected charms in the 3D view.
-      </p>
     </div>
   );
 }
