@@ -38,27 +38,27 @@ export default function Sidebar({
   }, [top, collection, color, price]);
 
   const collections = [
-    "All",
-    "New Year Collection",
-    "Summer Collection",
+    "Tất cả",
+    "Bộ sưu tập năm mới",
+    "Bộ sưu tập mùa hè",
   ];
 
   const colors = [
-    "White",
-    "Pink",
-    "Light blue",
-    "Dark blue",
-    "Light green",
-    "Dark green",
-    "Red",
-    "Orange",
-    "Black",
+    "Trắng",
+    "Hồng",
+    "Xanh nhạt",
+    "Xanh đậm",
+    "Xanh lá nhạt",
+    "Xanh lá đậm",
+    "Đỏ",
+    "Vàng",
+    "Tím",
   ];
 
   const prices = [
-    { value: "under-100k", label: "Under 100,000vnd" },
+    { value: "under-100k", label: "Nhỏ hơn 100,000vnd" },
     { value: "100k-200k", label: "100,000vnd - 200,000vnd" },
-    { value: ">=200k", label: "Above 200,000vnd" },
+    { value: ">=200k", label: "Nhỏ hơn 200,000vnd" },
   ];
 
   // helper: chọn collection, map "All" -> null
@@ -77,7 +77,7 @@ export default function Sidebar({
           className={`top-filter best-seller ${top === "best" ? "active" : ""}`}
           onClick={() => setTop(top === "best" ? null : "best")}
         >
-          Best Sellers
+          Bán chạy
         </button>
 
         <button
@@ -85,7 +85,7 @@ export default function Sidebar({
           className={`top-filter new-arrival ${top === "new" ? "active" : ""}`}
           onClick={() => setTop(top === "new" ? null : "new")}
         >
-          New Arrivals
+          Sản phẩm mới
         </button>
 
         <button
@@ -97,7 +97,7 @@ export default function Sidebar({
             src={showCollection ? iconDown : iconRight}
             alt=""
           />
-          <span className="title">Collection</span>
+          <span className="title">Bộ sưu tập</span>
         </button>
         {showCollection && (
           <div className="submenu">
@@ -118,7 +118,7 @@ export default function Sidebar({
               className="submenu-item deselect"
               onClick={() => setCollection(null)}
             >
-              deselect
+              Bỏ chọn
             </button>
           </div>
         )}
@@ -132,7 +132,7 @@ export default function Sidebar({
             src={showColor ? iconDown : iconRight}
             alt=""
           />
-          <span className="title">Color</span>
+          <span className="title">Màu sắc</span>
         </button>
         {showColor && (
           <div className="submenu">
@@ -151,7 +151,7 @@ export default function Sidebar({
               className="submenu-item deselect"
               onClick={() => setColor(null)}
             >
-              deselect
+              Bỏ chọn
             </button>
           </div>
         )}
@@ -165,7 +165,7 @@ export default function Sidebar({
             src={showPrice ? iconDown : iconRight}
             alt=""
           />
-          <span className="title">Price</span>
+          <span className="title">Giá</span>
         </button>
         {showPrice && (
           <div className="submenu">

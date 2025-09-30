@@ -20,13 +20,13 @@ const SidebarProfile = () => {
         <div className="sidebar-item">
           <img src={icon} className="arrow-icon" />
           <NavLink end to="/Account" className="link-sidebar-profile">
-            Account
+            Thông tin cá nhân
           </NavLink>
         </div>
         <div className="sidebar-item">
           <img src={icon} className="arrow-icon" />
           <NavLink to="/Account/MyDesign" className="link-sidebar-profile">
-            My Design
+            Thiết kế của tôi
           </NavLink>
         </div>
         {/* <div className="sidebar-item">
@@ -38,19 +38,19 @@ const SidebarProfile = () => {
         <div className="sidebar-item">
           <img src={icon} className="arrow-icon" />
           <NavLink to="/Account/OrderHistory" className="link-sidebar-profile">
-            Order History
+            Lịch sử đặt hàng
           </NavLink>
         </div>
         <div className="sidebar-item">
           <img src={icon} className="arrow-icon" />
           <NavLink to="/Account/Privacy" className="link-sidebar-profile">
-            Privacy & Help
+            Bảo mật & Trợ giúp
           </NavLink>
         </div>
 
         <div className="sidebar-item buttom-logout">
           <button className="logout" onClick={handleLogout}>
-            Log Out
+            Đăng xuất
           </button>
         </div>
       </div>

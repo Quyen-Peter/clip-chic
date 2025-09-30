@@ -21,16 +21,16 @@ const Header = () => {
       />
       <div className="header-link-content">
         <Link className="header-link" to="/About">
-          About us
+          Về chúng tôi
         </Link>
         <Link className="header-link" to="/Production">
-          Our Productions
+          Sản phẩm
         </Link>
         <Link className="header-link" to="/Customizer">
-          3DCustomization
+          3D thiết kế
         </Link>
         <Link className="header-link" style={{ marginRight: "-40px" }} to="/Blindbox">
-          Blindbox
+          Hộp bất ngờ
         </Link>
       </div>
 

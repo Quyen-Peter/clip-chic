@@ -26,7 +26,7 @@ const SidebarBlindbox = ({ onChange }: { onChange?: (q: QueryBlindbox) => void }
     onChange?.({ top, collection });
   }, [top, collection]);
 
-  const collections = ["All", "New Year Collection", "Summer Collection"];
+  const collections = ["Tất cả", "Bộ sưu tập năm mới", "Bộ sưu tập mùa hè"];
 
   // helper: chọn collection, map "All" -> null
   const selectCollection = (c: string) => {
@@ -44,7 +44,7 @@ const SidebarBlindbox = ({ onChange }: { onChange?: (q: QueryBlindbox) => void }
           className={`top-filter best-seller ${top === "best" ? "active" : ""}`}
           onClick={() => setTop(top === "best" ? null : "best")}
         >
-          Best Sellers
+          Bán chạy
         </button>
 
         <button
@@ -52,7 +52,7 @@ const SidebarBlindbox = ({ onChange }: { onChange?: (q: QueryBlindbox) => void }
           className={`top-filter new-arrival ${top === "new" ? "active" : ""}`}
           onClick={() => setTop(top === "new" ? null : "new")}
         >
-          New Arrivals
+          Sản phẩm mới
         </button>
 
         <button
@@ -64,7 +64,7 @@ const SidebarBlindbox = ({ onChange }: { onChange?: (q: QueryBlindbox) => void }
             src={showCollection ? iconDown : iconRight}
             alt=""
           />
-          <span className="title">Collection</span>
+          <span className="title">Bộ sưu tập</span>
         </button>
         {showCollection && (
           <div className="submenu">
@@ -85,7 +85,7 @@ const SidebarBlindbox = ({ onChange }: { onChange?: (q: QueryBlindbox) => void }
               className="submenu-item deselect"
               onClick={() => setCollection(null)}
             >
-              deselect
+              Bỏ chọn
             </button>
           </div>
         )}

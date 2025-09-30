@@ -1,3 +1,7 @@
+/* .home{
+  width: 90%;
+} */
+
 .home-header {
   position: fixed;
   width: 100%;
@@ -58,7 +62,8 @@
   color: #ffffff;
   border: none;
   font-size: 17px;
-  margin-top: 50px;
+  margin-top: 5%;
+  font-weight: Arial;
 }
 
 .home-first-content button:hover {
@@ -66,12 +71,15 @@
 }
 
 .home-first-content h1 {
-  font-size: 49px;
+  font-size: 48px;
+  margin-bottom: 4%;
+  font-weight: Arial;
 }
 .home-first-content p {
   font-size: 17px;
   max-width: 400px;
   color: #173da2;
+  font-weight: Arial;
 }
 
 .backgroundMainTwo {
@@ -106,18 +114,20 @@
   top: 7%;
   right: 10%;
   width: 550px;
-  font-size: 45px;
+  font-size: 43px;
   color: #173da2;
   text-align: right;
+  font-weight: Arial;
 }
 .textContainer p {
   position: absolute;
   top: 50%;
   right: 10%;
   width: 400px;
-  font-size: 15px;
+  font-size: 16px;
   color: #173da2;
   text-align: right;
+  font-weight: Arial;
 }
 
 .textContainer button {
@@ -131,6 +141,7 @@
   color: #ffffff;
   border: none;
   font-size: 17px;
+  font-weight: Arial;
 }
 
 .home-third {
@@ -305,8 +316,8 @@
   position: absolute;
   color: #ff6ea5;
   top: 1pc;
-  right: 15%;
-  font-size: 55px;
+  right: 12%;
+  font-size: 45px;
   z-index: 10;
   width: 30%;
   text-align: right;
@@ -315,8 +326,8 @@
 .box1-p1 {
   position: absolute;
   color: #ffffff;
-  top: 12pc;
-  right: 1%;
+  top: 8pc;
+  right: 6%;
   font-size: 17px;
   z-index: 10;
   width: 30%;
@@ -324,8 +335,8 @@
 .box1-p2 {
   position: absolute;
   color: #ffffff;
-  top: 14pc;
-  right: 14.5%;
+  top: 11pc;
+  right: 12%;
   font-size: 17px;
   z-index: 10;
   width: 22%;
@@ -336,10 +347,10 @@
   position: absolute;
   color: #ffffff;
   top: 21pc;
-  right: 13%;
+  right: 12%;
   font-size: 17px;
   z-index: 10;
-  width: 15%;
+  width: 17%;
 }
 
 .box1-button {
@@ -377,7 +388,7 @@
   color: #FFE983;
   top: 60pc;
   left: 11%;
-  font-size: 50px;
+  font-size: 45px;
   z-index: 10;
   width: 30%;
   text-align: left;
@@ -385,7 +396,7 @@
 .box2-p1 {
   position: absolute;
   color: #ffffff;
-  top: 70pc;
+  top: 67pc;
   left: 11%;
   font-size: 17px;
   z-index: 10;
@@ -394,7 +405,7 @@
 .box2-p2 {
   position: absolute;
   color: #ffffff;
-  top: 72pc;
+  top: 70pc;
   left: 11%;
   font-size: 17px;
   z-index: 10;

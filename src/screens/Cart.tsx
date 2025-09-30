@@ -119,11 +119,11 @@ const Cart = () => {
             className="shoping-continue-btn"
           >
             <img src={icon_out_cart} className="icon-out-cart" />
-            Shopping Continue
+            Tiếp tục mua sắm
           </button>
           <div className="line-cart"></div>
-          <h4 className="title-cart-info-product">Shopping cart</h4>
-          <p>You have {products.length} item in your cart</p>
+          <h4 className="title-cart-info-product">Giỏ hàng</h4>
+          <p>Bạn có {products.length} sản phẩm trong giỏ hàng</p>
 
           {products.map((p) => (
             <div className="product-container">
@@ -165,9 +165,9 @@ const Cart = () => {
           <img src={RightBackgrount} className="right-backgrount" />
 
           <div className={`payment-show ${shrinkPayment ? "shrink" : ""}`}>
-            <h4>Payment</h4>
+            <h4>Thanh toán</h4>
             <p className="title-payment-info">
-              All transactions are secured and encrypted.
+              Mọi giao dịch đều được bảo mật và mã hóa.
             </p>
             <div className="bnt-payment-container">
               <button
@@ -203,7 +203,7 @@ const Cart = () => {
                   <div className="title-cod-pay">
                     <img src={address} className="img-address-cod" />
                     <h5 className="delivery-information">
-                      DELIVERY INFORMATION
+                      Thông tin giao hàng
                     </h5>
                   </div>
 
@@ -214,7 +214,7 @@ const Cart = () => {
                         <input className="input-address-cod-pay" type="text" placeholder="Trịnh Trọng Quyền"/>
                         <input className="input-address-cod-pay" type="text" placeholder="(+84) 123 456 789"/>
                         <input className="input-address-cod-pay" type="text" placeholder="123 Đường ABC, Phường XYZ, Quận 1, TP. HCM"/>
-                        <button className="bnt-apply-address" onClick={()=> setIsAddress(false)}>Apply</button>
+                        <button className="bnt-apply-address" onClick={()=> setIsAddress(false)}>Xác nhận</button>
                       </div>
                     ) : (
                       <div className="border-info-cod-pay">
@@ -239,13 +239,13 @@ const Cart = () => {
               )}
               {method === "visa" && (
                 <div className="card-payment-method">
-                  <p className="title-content-card">Name on card</p>
+                  <p className="title-content-card">Tên trên thẻ</p>
                   <input
                     className="input-content"
                     type="text"
                     placeholder="Name"
                   />
-                  <p className="title-content-card">Card Number</p>
+                  <p className="title-content-card">Số thẻ</p>
                   <input
                     className="input-content"
                     type="text"
@@ -253,7 +253,7 @@ const Cart = () => {
                   />
                   <div className="content-date-cvv-card">
                     <div>
-                      <p className="title-content-card">Expiration date</p>
+                      <p className="title-content-card">Ngày hết hạn</p>
                       <input
                         className="input-content-date-cvv"
                         type="text"
@@ -275,7 +275,7 @@ const Cart = () => {
               {method === "qr" && (
                 <div className="border-qr-one">
                   <p className="content-qr-pay">
-                    Use your banking app with QR code support to scan the code
+                    Mở ứng dụng ngân hàng và quét mã QR.
                   </p>
                   <div className="border-qr-two">
                     <div className="border-qr-three">
@@ -283,7 +283,7 @@ const Cart = () => {
                     </div>
                   </div>
                   <p className="payment-amount-qr">
-                    Payment Amount {formatVNDText(total)}
+                    Số tiền thanh toán {formatVNDText(total)}
                   </p>
                 </div>
               )}
@@ -293,18 +293,18 @@ const Cart = () => {
 
             <div className="sub-payment-container">
               <div className="sub-payment">
-                <p>Subtotal</p>
+                <p>Tạm tính</p>
                 <p>{formatVNDText(subtotal)}</p>
               </div>
               <div className="sub-payment">
-                <p>Shipping</p>
+                <p>Phí giao hàng</p>
                 <p>{formatVNDText(shipping)}</p>
               </div>
               <div className="sub-payment">
-                <p>Total (Tax incl.)</p>
+                <p>Tổng (Tax incl.)</p>
                 <p>{formatVNDText(total)}</p>
               </div>
-              <button className="bnt-checkout-payment">Checkout</button>
+              <button className="bnt-checkout-payment">Thanh toán</button>
             </div>
 
             <div></div>

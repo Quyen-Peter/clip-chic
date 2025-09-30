@@ -257,7 +257,7 @@
   margin-top: 10%;
   color: #ffffff;
   font-weight: bold;
-  width: 150px;
+  width: 160px;
   padding-left: 30px;
 }
 
@@ -383,3 +383,8 @@
   border-radius: 10px;
   width: 100%;
 } 
+
+.bnt-apply-address:hover{
+  background-color: #ff3f7f;
+  cursor: pointer;
+}
