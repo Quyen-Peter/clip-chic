@@ -286,6 +286,7 @@ export default function CustomizerPage() {
         }
       };
 
+  
       // TODO: Replace with actual API call to create product
       
       // For now, save as JSON file
@@ -308,7 +309,10 @@ export default function CustomizerPage() {
       alert('Failed to save product. Please try again.');
     }
   };
-
+  const handleSaveAll = async () => {
+    await saveCustomization();  // Lưu file JSON + Screenshot
+    setShowSaveProductModal(true); // Sau đó mở modal Save Product
+};
   return (
     <div>
     <Header />
@@ -382,11 +386,10 @@ export default function CustomizerPage() {
 
         {/* New row with Save and Camera Lock buttons */}
         <ActionButtons 
-          isCameraLocked={isCameraLocked}
-          onToggleCameraLock={() => setIsCameraLocked(!isCameraLocked)}
-          onSaveConfig={saveCustomization}
-          onSaveProduct={() => setShowSaveProductModal(true)}
-        />
+  isCameraLocked={isCameraLocked}
+  onToggleCameraLock={() => setIsCameraLocked(!isCameraLocked)}
+  onSaveAll={handleSaveAll}
+/>
       </div>
     </div>
     

@@ -1,11 +1,11 @@
 // src/features/customizer/components/ActionButtons.jsx
 import React from "react";
+import camera360 from "../../../assest/360.png";
 
 export default function ActionButtons({ 
   isCameraLocked, 
   onToggleCameraLock, 
-  onSaveConfig, 
-  onSaveProduct 
+  onSaveAll
 }) {
   return (
     <div className="customizer-layout-bottom-row">
@@ -14,23 +14,19 @@ export default function ActionButtons({
           onClick={onToggleCameraLock}
           className={`customizer-layout-bottom-button ${isCameraLocked ? 'camera-locked' : 'camera-unlocked'}`}
         >
-          {isCameraLocked ? '🔒 Camera Locked' : '🔓 Camera Unlocked'}
+          <img 
+            src={camera360}
+            alt="Camera Toggle" 
+            className="camera-toggle-icon"
+          />
         </button>
         
         <button
-          onClick={onSaveConfig}
+          onClick={onSaveAll}
           className="customizer-layout-bottom-button save-button"
-          title="Save Customization Configuration"
+          title="Save configuration & product"
         >
-          💾 Save Config
-        </button>
-        
-        <button
-          onClick={onSaveProduct}
-          className="customizer-layout-bottom-button product-button"
-          title="Save as Product to Database"
-        >
-          🛍️ Save Product
+          💾🛍️ Save
         </button>
       </div>
     </div>
