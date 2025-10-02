@@ -5,8 +5,7 @@ import camera360 from "../../../assest/360.png";
 export default function ActionButtons({ 
   isCameraLocked, 
   onToggleCameraLock, 
-  onSaveConfig, 
-  onSaveProduct 
+  onSaveAll
 }) {
   return (
     <div className="customizer-layout-bottom-row">
@@ -23,19 +22,11 @@ export default function ActionButtons({
         </button>
         
         <button
-          onClick={onSaveConfig}
+          onClick={onSaveAll}
           className="customizer-layout-bottom-button save-button"
-          title="Save Customization Configuration"
+          title="Save configuration & product"
         >
-          💾 Save Config
-        </button>
-        
-        <button
-          onClick={onSaveProduct}
-          className="customizer-layout-bottom-button product-button"
-          title="Save as Product to Database"
-        >
-          🛍️ Save Product
+          💾🛍️ Save
         </button>
       </div>
     </div>

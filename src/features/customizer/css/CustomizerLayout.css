@@ -803,9 +803,10 @@
 
 .customizer-layout-bottom-controls {
   display: flex;
-  gap: 1rem;
-  justify-content: center;
+  justify-content: space-between;  
   align-items: center;
+  width: 100%; 
+  padding: 0 2rem; 
 }
 /* style chung cho tất cả button */
 .customizer-layout-bottom-button {
