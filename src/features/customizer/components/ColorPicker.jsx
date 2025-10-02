@@ -16,13 +16,13 @@ export default function ColorPicker({ baseModelColor, onColorChange, onShowMenu 
 
   return (
     <div>
-      <h5 className="customizer-layout-title">Color</h5>
       <div className="customizer-layout-selection-container">
         <div
           className="customizer-layout-selection-trigger"
           onClick={onShowMenu}
         >
           <div className="customizer-layout-product-card-content">
+            <h5 className="customizer-layout-title">Color</h5>
             <div 
               className="customizer-layout-color-preview"
               style={{ backgroundColor: baseModelColor }}
