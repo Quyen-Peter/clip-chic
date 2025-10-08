@@ -2,7 +2,6 @@
   background-color: #173da2;
   margin-left: 70px;
   width: 570px;
-  padding: 30px;
   border-radius: 20px;
 }
 
@@ -116,7 +115,7 @@ p {
   justify-content: center;
   gap: 10px;
   margin-bottom: 20px;
-  margin-left: -23px;
+  margin-left: 23px;
 }
 .social-login a {
   color: #ff8fb4;

@@ -43,7 +43,6 @@ const AppRouter = () => {
       <Route path="/productdetail/:productId" element={<ProductDetail/>} />
       <Route path="/blindboxDetail/:blindboxId" element={<BlindboxDetail/>} />
       <Route path="/SidebarProfile" element={<SidebarProfile />} />
-      
 
 
       <Route path="/Account/*" element={<Account />} >

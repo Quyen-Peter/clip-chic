@@ -1,0 +1,118 @@
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+import { useEffect } from "react";
+import "../css/Login.css";
+
+const LoginWith = () => {
+  const clientId =
+    "239599596531-2baf0u2drokrdalqb2am9lvbt6psg1q1.apps.googleusercontent.com";
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (window.google && window.google.accounts && window.google.accounts.id) {
+        try {
+          window.google.accounts.id.cancel();
+          window.google.accounts.id.disableAutoSelect();
+          clearInterval(interval);
+        } catch (err) {
+          console.log("Google One Tap chưa khởi tạo, thử lại...");
+        }
+      }
+    }, 500);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleGoogleSuccess = (credentialResponse) => {
+    const decoded = jwtDecode(credentialResponse.credential);
+    console.log("Google user:", decoded);
+
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("userName", decoded.name);
+    localStorage.setItem("userEmail", decoded.email);
+    localStorage.setItem("userAvatar", decoded.picture);
+
+    window.location.href = "/Account";
+  };
+
+  const handleGoogleError = () => console.log("Google Login Failed");
+  const appId = "818845790539632";
+
+  useEffect(() => {
+    // Load SDK Facebook
+    window.fbAsyncInit = function () {
+      window.FB.init({
+        appId: appId,
+        cookie: true,
+        xfbml: true,
+        version: "v19.0",
+      });
+    };
+
+    // Inject script nếu chưa có
+    if (!document.getElementById("facebook-jssdk")) {
+      const js = document.createElement("script");
+      js.id = "facebook-jssdk";
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      document.body.appendChild(js);
+    }
+  }, []);
+
+  const handleFacebookLogin = () => {
+    window.FB.login(
+      function (response) {
+        if (response.authResponse) {
+          console.log("Facebook login success:", response);
+          window.FB.api("/me", { fields: "name,email,picture" }, function (user) {
+            console.log("Facebook user:", user);
+            localStorage.setItem("isLoggedIn", "true");
+            localStorage.setItem("userName", user.name);
+            localStorage.setItem("userEmail", user.email);
+            localStorage.setItem("userAvatar", user.picture.data.url);
+            window.location.href = "/Account";
+          });
+        } else {
+          console.log("Facebook login cancelled");
+        }
+      },
+      { scope: "public_profile,email" }
+    );
+  };
+
+  return (
+    <div className="social-login">
+      <button
+        onClick={handleFacebookLogin}
+        style={{
+          backgroundColor: "#4564b5",
+          color: "white",
+          border: "none",
+          borderRadius: "20px",
+          padding: "9px 20px",
+          cursor: "pointer",
+          fontWeight: "bold",
+          width: "200px",
+        }}
+      >
+        Facebook
+      </button>
+
+      <a style={{ margin: "0 10px" }}>|</a>
+
+      <GoogleOAuthProvider clientId={clientId}>
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={handleGoogleError}
+          ux_mode="popup"
+          auto_select={false}
+          useOneTap={false}
+          prompt="select_account"
+          text="signin_with"
+          shape="pill"
+          width="200"
+        />
+      </GoogleOAuthProvider>
+    </div>
+  );
+};
+
+export default LoginWith;
