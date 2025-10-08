@@ -1,6 +1,6 @@
 import "../../css/Profile.css";
 import avata from "../../assest/avata.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import profile from "../../assest/profile.png";
 
@@ -9,7 +9,29 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [edit, setEdit] = useState(false);
   const [show, setShow] = useState(false);
-  const password = "mySecret123";
+
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    avatar: "",
+    birth: "",
+    phone:"",
+    address: "",
+    provider: "", 
+  });
+
+
+  useEffect(() => {
+    const name = localStorage.getItem("userName") || "";
+    const email = localStorage.getItem("userEmail") || "";
+    const avatar = localStorage.getItem("userAvatar") || "";
+    const provider = localStorage.getItem("authProvider") || ""; 
+    const birth = ""; 
+    const phone = ""; 
+    const address = ""; 
+
+    setUser({ name, email, avatar, provider, birth, phone, address });
+  }, []);
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -17,6 +39,8 @@ const Profile = () => {
       setImage(URL.createObjectURL(file));
     }
   };
+
+  
 
   const isHandleChange = () => {
     setIsEditing(true);
@@ -49,7 +73,7 @@ const Profile = () => {
         <div className="content-info">
           <p>Profile Picture</p>
           <div className="profile-actions">
-            <img src={image} />
+            <img src={user.avatar} />
             <div className="chooce-action">
               <label htmlFor="upload" className="upload-text">
                 Upload new picture
@@ -74,13 +98,13 @@ const Profile = () => {
           <div>
             {!isEditing ? (
               <div>
-                <p className="text-p-content-name">Nguyen Thi A</p>
+                <p className="text-p-content-name">{user.name}</p>
               </div>
             ) : (
               <div>
                 <input
                   type="text"
-                  placeholder="Nguyen Thi A"
+                  placeholder={user.name}
                   className="bnt-input-info text-p-content-name"
                 />
               </div>
@@ -95,13 +119,13 @@ const Profile = () => {
           <div>
             {!isEditing ? (
               <div className="text-p-content-date">
-                <p>31/02/2003</p>
+                <p>{user.birth}</p>
               </div>
             ) : (
               <div>
                 <input
                   type="date"
-                  defaultValue="20/8/2003"
+                  defaultValue={user.birth}
                   className="bnt-input-info text-p-content-date"
                 />
               </div>
@@ -116,14 +140,15 @@ const Profile = () => {
           <div>
             {!isEditing ? (
               <div>
-                <p className="text-p-content-email">nguyenthia3102@gmail.com</p>
+                <p className="text-p-content-email">{user.email}</p>
               </div>
             ) : (
               <div>
                 <input
                   type="text"
-                  placeholder="nguyenthia3102@gmail.com"
+                  placeholder={user.email}
                   className="bnt-input-info text-p-content-email"
+                  readOnly
                 />
               </div>
             )}
@@ -137,13 +162,13 @@ const Profile = () => {
           <div>
             {!isEditing ? (
               <div>
-                <p className="text-p-content-phone">+84 122313616</p>
+                <p className="text-p-content-phone">+84 {user.phone}</p>
               </div>
             ) : (
               <div>
                 <input
                   type="text"
-                  placeholder="122313616"
+                  placeholder={user.phone}
                   className="bnt-input-info text-p-content-phone"
                 />
               </div>
@@ -159,14 +184,14 @@ const Profile = () => {
             {!isEditing ? (
               <div>
                 <p className="text-p-content-address">
-                  14/7 Street 3, Tan Uyen, Binh Duong
+                  {user.address}
                 </p>
               </div>
             ) : (
               <div>
                 <input
                   type="text"
-                  placeholder="14/7 Street 3, Tan Uyen, Binh Duong"
+                  placeholder={user.address}
                   className="bnt-input-info text-p-content-address"
                 />
               </div>
@@ -177,7 +202,7 @@ const Profile = () => {
         <div className="line-info"></div>
       </div>
 
-      <div className="footer-info">
+      {/* <div className="footer-info">
         <h3 className="account-info">ACCOUNT INFO</h3>
         <div className="user-name-container">
           <p>User Name</p>
@@ -206,7 +231,7 @@ const Profile = () => {
           </Link>
         </div>
         <div className="line-info"></div>
-      </div>
+      </div> */}
     </div>
   );
 };

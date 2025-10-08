@@ -24,13 +24,11 @@ const LoginWith = () => {
 
   const handleGoogleSuccess = (credentialResponse) => {
     const decoded = jwtDecode(credentialResponse.credential);
-    console.log("Google user:", decoded);
 
     localStorage.setItem("isLoggedIn", "true");
     localStorage.setItem("userName", decoded.name);
     localStorage.setItem("userEmail", decoded.email);
     localStorage.setItem("userAvatar", decoded.picture);
-
     window.location.href = "/Account";
   };
 
@@ -38,7 +36,6 @@ const LoginWith = () => {
   const appId = "818845790539632";
 
   useEffect(() => {
-    // Load SDK Facebook
     window.fbAsyncInit = function () {
       window.FB.init({
         appId: appId,
