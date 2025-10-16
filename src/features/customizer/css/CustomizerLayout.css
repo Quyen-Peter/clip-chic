@@ -793,8 +793,25 @@
 .customizer-layout-button-group {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
   align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  max-height: 40px;
+  overflow-y: auto;
+}
+
+/* Tùy chọn: làm đẹp thanh cuộn */
+.customizer-layout-button-group::-webkit-scrollbar {
+  width: 6px;
+}
+
+.customizer-layout-button-group::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.customizer-layout-button-group::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .customizer-layout-button-group .customizer-layout-button {
