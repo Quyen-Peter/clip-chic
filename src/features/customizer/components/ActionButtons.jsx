@@ -10,6 +10,7 @@ export default function ActionButtons({
   return (
     <div className="customizer-layout-bottom-row">
       <div className="customizer-layout-bottom-controls">
+        <div className="customizer-layout-bottom-left-controls">
         <button
           onClick={onToggleCameraLock}
           className={`customizer-layout-bottom-button ${isCameraLocked ? 'camera-locked' : 'camera-unlocked'}`}
@@ -20,7 +21,9 @@ export default function ActionButtons({
             className="camera-toggle-icon"
           />
         </button>
-        
+        </div>
+
+        <div className="customizer-layout-bottom-right-controls">
         <button
           onClick={onSaveAll}
           className="customizer-layout-bottom-button save-button"
@@ -28,6 +31,13 @@ export default function ActionButtons({
         >
           💾🛍️ Save
         </button>
+        <button
+          className="customizer-layout-bottom-button add-button"
+          title="add to cart"
+        >
+          Add to cart
+        </button>
+        </div>
       </div>
     </div>
   );
