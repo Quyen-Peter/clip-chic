@@ -9,7 +9,7 @@ import Footer from "../component/Footer";
 
 
 const Account = () => {
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
   const location = useLocation();
   const navigate = useNavigate();
 
