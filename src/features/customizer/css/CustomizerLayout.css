@@ -1,22 +1,26 @@
 /* Use completely unique prefixes to avoid conflicts */
 .customizer-layout-container {
   width: 80vw;   /* chiếm 80% chiều ngang */
-  min-height: 80vh;  /* minimum height instead of fixed height */
+  min-height: 65vh;
   margin: auto;  /* căn giữa ngang */
   margin-top: 6rem;
   display: flex;
   flex-direction: column;
   background: #f9fafb;     /* màu nền nhẹ để dễ thấy (tùy chọn) */
   border-radius: 0.75rem;  /* bo góc container */
+  border-style: solid;
+  border-width: 1px;
+  border-color:  rgba(0, 0, 0, 0.1);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* đổ bóng đẹp */
   overflow: visible; /* Allow content to be visible */
 }
 
 .customizer-layout-main {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   padding: 1rem;
-  min-height: 60vh; /* Set minimum height for main content */
-  overflow: visible; /* Allow content overflow */
 }
 
 .customizer-layout-row {
@@ -35,6 +39,7 @@
 
 .customizer-layout-preview {
   width: 80%; /* 8 parts of 1:8:1 ratio */
+  max-height: 80vh;
   flex-shrink: 0;
   min-height: 0;
   display: flex;
@@ -60,7 +65,6 @@
 .customizer-layout-card-preview {
   background: #f9fafb;
   border-radius: 0.5rem;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   height: 100%;
   padding: 0;
   position: relative;
@@ -754,7 +758,8 @@
 }
 
 .customizer-layout-button {
-  width: 100%;
+  width: fit-content;
+  aspect-ratio: 1/1;
   padding: 0.5rem 0.75rem;
   border-radius: 0.375rem;
   background: #f9fafb;
@@ -788,7 +793,25 @@
 .customizer-layout-button-group {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 0.25rem;
+  max-height: 40px;
+  overflow-y: auto;
+}
+
+/* Tùy chọn: làm đẹp thanh cuộn */
+.customizer-layout-button-group::-webkit-scrollbar {
+  width: 6px;
+}
+
+.customizer-layout-button-group::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.customizer-layout-button-group::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .customizer-layout-button-group .customizer-layout-button {
@@ -798,7 +821,6 @@
 /* Bottom row styles */
 .customizer-layout-bottom-row {
   background: #f9fafb; 
-  padding-top: 1rem;
 }
 
 .customizer-layout-bottom-controls {
@@ -838,25 +860,25 @@
 }
 
 /* ===== LOCKED  ===== */
-.customizer-layout-bottom-button.camera-locked .camera-toggle-icon {
+.customizer-layout-bottom-button.camera-unlocked .camera-toggle-icon {
   /* xanh lá: rgb(0, 200, 0) */
   filter: invert(51%) sepia(97%) saturate(513%) hue-rotate(86deg) brightness(95%) contrast(94%);
 }
 
-.customizer-layout-bottom-button.camera-locked:hover .camera-toggle-icon {
+.customizer-layout-bottom-button.camera-unlocked:hover .camera-toggle-icon {
   filter: invert(61%) sepia(87%) saturate(700%) hue-rotate(90deg) brightness(80%) contrast(105%);
 }
 
 /* ===== UNLOCKED  ===== */
-.customizer-layout-bottom-button.camera-unlocked .camera-toggle-icon {
+.customizer-layout-bottom-button.camera-locked .camera-toggle-icon {
   filter: none; /* giữ nguyên màu icon gốc */
 }
 
-.customizer-layout-bottom-button.camera-unlocked:hover .camera-toggle-icon {
+.customizer-layout-bottom-button.camera-locked:hover .camera-toggle-icon {
   filter: brightness(85%); 
 }
-/* ===== SAVE CONFIG BUTTON ===== */
-.customizer-layout-bottom-button.save-button {
+
+.customizer-layout-bottom-button.add-button {
   padding: 0.6rem 1.2rem;
   border-radius: 40px;
   background-color: rgb(255,143,180); 
@@ -866,11 +888,10 @@
   transition: background-color 0.3s ease;
 }
 
-.customizer-layout-bottom-button.save-button:hover {
+.customizer-layout-bottom-button.add-button:hover {
   background-color: rgb(230,120,160);
 }
 
-/* ===== SAVE PRODUCT BUTTON ===== */
 .customizer-layout-bottom-button.product-button {
   padding: 0.6rem 1.2rem;
   border-radius: 40px;
@@ -883,4 +904,54 @@
 
 .customizer-layout-bottom-button.product-button:hover {
   background-color:  rgb(215, 106, 106);
+}
+
+.customizer-layout-bottom-right-controls {
+  display: flex;
+  justify-content: right;  
+  align-items: center;
+  gap: 2rem;
+  width: 100%; 
+  padding: 0 2rem; 
+}
+
+.customizer-layout-bottom-button.save-button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 40px;
+  background-color: rgb(255, 255, 255); 
+  color: rgb(255,143,180);
+  font-weight: normal;
+  font-size: 2rem;
+  transition: background-color 0.3s ease;
+  border-color: rgb(255,143,180);
+  border-style: solid;
+  border-width: 2px;
+}
+
+.customizer-layout-bottom-button.save-button:hover {
+  background-color: rgb(255,143,180);
+  color: white;
+}
+.customizer-layout-right-button.transform-button {
+  width: 40px;      /* hình vuông */
+  height: 40px;     /* bằng chiều rộng */
+  padding: 0;       /* bỏ padding */
+  border-radius: 8px; /* nhẹ hoặc 0 nếu muốn góc vuông */
+  background: transparent; /* nền trong suốt */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.customizer-layout-right-button.transform-button:hover {
+  background: rgba(0,0,0,0.05); /* khi hover có nền nhẹ */
+}
+
+.customizer-layout-right-button.transform-button img {
+  width: 100%;   /* fit icon */
+  height: 100%;
+  object-fit: contain;
 }

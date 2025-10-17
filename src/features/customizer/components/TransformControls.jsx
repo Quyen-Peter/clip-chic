@@ -1,5 +1,7 @@
 // src/features/customizer/components/TransformControls.jsx
 import React, { useMemo } from "react";
+import MoveIcon from "../../../assest/move-icon.png";
+import RotateIcon from "../../../assest/rotate-icon.png";
 
 export default function TransformControls({ 
   transformMode, 
@@ -20,27 +22,25 @@ export default function TransformControls({
     }));
   }, [charmsList.length, charmsList.map(c => c.id).join(',')]);
   const transformModes = [
-    { mode: "translate", label: "Move", title: "Move (Translate)" },
-    { mode: "rotate", label: "Rotate", title: "Rotate" },
-    { mode: "scale", label: "Scale", title: "Scale" }
+    { mode: "translate", label: MoveIcon, title: "Move (Translate)" },
+    { mode: "rotate", label: RotateIcon, title: "Rotate" },
   ];
 
   return (
-    <div className="customizer-layout-info-panel">
-      <h5 className="customizer-layout-info-title">Transform Controls</h5>
-      
+    <div className="customizer-layout-info-panel">      
       {/* Transform Mode Buttons */}
-      <div className="customizer-layout-control-group">
-        <h6 className="customizer-layout-control-title">Transform Mode</h6>
+      <div className="customizer-layout-control-group" tiletle="Transform Mode">
         <div className="customizer-layout-button-group">
           {transformModes.map((modeItem) => (
             <button
               key={modeItem.mode}
               onClick={() => onTransformModeChange(modeItem.mode)}
-              className={`customizer-layout-button ${transformMode === modeItem.mode ? 'active' : ''}`}
+              className={`customizer-layout-bottom-button transform-button ${transformMode === modeItem.mode ? 'active' : ''}`}
               title={modeItem.title}
             >
-              {modeItem.label}
+              <img
+                height={40} width={40}
+                src={modeItem.label} alt={modeItem.mode} />
             </button>
           ))}
         </div>
@@ -54,15 +54,18 @@ export default function TransformControls({
             <button
               onClick={onDeselectCharm}
               className="customizer-layout-button"
+              title="Deselect charm"
+              style={{ fontSize: '1.2rem' }}
             >
-              Deselect
+              ❌
             </button>
             <button
               onClick={() => onRemoveCharm(selectedCharm)}
               className="customizer-layout-button inactive"
               title="Remove selected charm"
+              style={{ fontSize: '1.2rem' }}
             >
-              🗑️ Remove
+              🗑️
             </button>
           </div>
         </div>
@@ -83,27 +86,10 @@ export default function TransformControls({
                 className={`customizer-layout-button ${selectedCharm === charm.id ? 'active' : ''}`}
                 title={`Select Charm ${index + 1}`}
               >
-                💎 Charm {index + 1}
+                💎{index + 1}
               </button>
             ))}
           </div>
-        </div>
-      )}
-      
-      {/* Instructions */}
-      {!selectedCharm && stableCharmsList.length === 0 && (
-        <div className="customizer-layout-control-group">
-          <p className="customizer-layout-info-text">
-            💡 Add charms first, then select them from the list above or click in 3D view
-          </p>
-        </div>
-      )}
-      
-      {!selectedCharm && stableCharmsList.length > 0 && (
-        <div className="customizer-layout-control-group">
-          <p className="customizer-layout-info-text">
-            💡 Select a charm from the list above or click on it in the 3D view
-          </p>
         </div>
       )}
     </div>
