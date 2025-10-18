@@ -1,5 +1,4 @@
 .login-main-container {
-  background-color: #173da2;
   margin-left: 70px;
   width: 570px;
   border-radius: 20px;
@@ -139,4 +138,18 @@ p {
   text-decoration: none;
   font-weight: bold;
   color: #ffffff;
+}
+
+.error-create-user {
+  margin-top: 10px;
+  min-height: 20px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-create-user p {
+  color: red;
+  font-size: 13px;
+  margin: 0;
 }

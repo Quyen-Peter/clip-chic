@@ -2,6 +2,7 @@ import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import { useEffect } from "react";
 import "../css/Login.css";
+const API_URL = process.env.REACT_APP_HOST_API;
 
 const LoginWith = () => {
   const clientId =
@@ -22,15 +23,33 @@ const LoginWith = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleGoogleSuccess = (credentialResponse) => {
-    const decoded = jwtDecode(credentialResponse.credential);
+const handleGoogleSuccess = async (credentialResponse) => {
+  const decoded = jwtDecode(credentialResponse.credential);
 
-    localStorage.setItem("isLoggedIn", "true");
-    localStorage.setItem("userName", decoded.name);
-    localStorage.setItem("userEmail", decoded.email);
-    localStorage.setItem("userAvatar", decoded.picture);
-    window.location.href = "/Account";
-  };
+  try {
+    const response = await fetch(`${API_URL}/api/Auth/google-login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        idToken: credentialResponse.credential,
+      }),
+    });
+
+    const data = await response.json();
+    console.log("Server response:", data);
+
+    if (response.ok) {
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("isLoggedIn", "true");
+      window.location.href = "/Account";
+    } else {
+      console.error("Login failed:", data);
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
+  }
+};
+
 
   const handleGoogleError = () => console.log("Google Login Failed");
   const appId = "818845790539632";
@@ -45,7 +64,6 @@ const LoginWith = () => {
       });
     };
 
-    // Inject script nếu chưa có
     if (!document.getElementById("facebook-jssdk")) {
       const js = document.createElement("script");
       js.id = "facebook-jssdk";
@@ -61,10 +79,10 @@ const LoginWith = () => {
           console.log("Facebook login success:", response);
           window.FB.api("/me", { fields: "name,email,picture" }, function (user) {
             console.log("Facebook user:", user);
-            localStorage.setItem("isLoggedIn", "true");
-            localStorage.setItem("userName", user.name);
-            localStorage.setItem("userEmail", user.email);
-            localStorage.setItem("userAvatar", user.picture.data.url);
+            sessionStorage.setItem("isLoggedIn", "true");
+            sessionStorage.setItem("userName", user.name);
+            sessionStorage.setItem("userEmail", user.email);
+            sessionStorage.setItem("userAvatar", user.picture.data.url);
             window.location.href = "/Account";
           });
         } else {

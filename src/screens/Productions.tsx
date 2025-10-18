@@ -168,9 +168,9 @@ const Productions = () => {
         </div>
       </div>
 
-      <footer className="site-footer">
+      {/* <footer className="site-footer">
         <Footer />
-      </footer>
+      </footer> */}
     </div>
   );
 };
