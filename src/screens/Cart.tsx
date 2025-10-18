@@ -12,6 +12,7 @@ import mastercard from "../assest/Mastercard.png";
 import qrPay from "../assest/QRPay.png";
 import address from "../assest/address.png";
 import iconchange from "../assest/icon-out-cart.png";
+import { OrbitProgress, ThreeDot } from "react-loading-indicators";
 
 type Product = {
   id: number;
@@ -23,10 +24,14 @@ type Product = {
 };
 
 const Cart = () => {
+  const acc = "108885490245";
+  const bank = "VietinBank";
+
   const Navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [method, setMethod] = useState("cod");
   const [isAddress, setIsAddress] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const mockData: Product[] = [
@@ -110,6 +115,41 @@ const Cart = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (method === "qr") {
+      const interval = setInterval(async () => {
+        try {
+          const res = await fetch(
+            `https://localhost:7169/api/Payment/check?account=${acc}`
+          );
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+          const data = await res.json();
+
+          const transactions = Array.isArray(data.transactions)
+            ? data.transactions
+            : data.data?.transactions || [];
+
+          const transaction = transactions.find(
+            (t: any) =>
+              t.transaction_content?.toLowerCase().includes("don hang 9") &&
+              parseFloat(t.amount_in) >= 3000
+          );
+
+          if (transaction) {
+            clearInterval(interval);
+            alert("Thanh toán thành công!");
+            setLoading(false);
+          }
+        } catch (err) {
+          console.error("Lỗi khi kiểm tra thanh toán:", err);
+        }
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [method, total]);
+
   return (
     <div className="cart-page">
       <div className="main-content-cart">
@@ -126,7 +166,7 @@ const Cart = () => {
           <p>Bạn có {products.length} sản phẩm trong giỏ hàng</p>
 
           {products.map((p) => (
-            <div className="product-container">
+            <div className="product-container" key={p.id}>
               <div className="left-container">
                 <div className="border-img-product">
                   <img src="https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg" />
@@ -210,11 +250,27 @@ const Cart = () => {
                   <div className="info-cod-pay">
                     {isAddress ? (
                       <div className="border-info-cod-pay-address-edit">
-
-                        <input className="input-address-cod-pay" type="text" placeholder="Trịnh Trọng Quyền"/>
-                        <input className="input-address-cod-pay" type="text" placeholder="(+84) 123 456 789"/>
-                        <input className="input-address-cod-pay" type="text" placeholder="123 Đường ABC, Phường XYZ, Quận 1, TP. HCM"/>
-                        <button className="bnt-apply-address" onClick={()=> setIsAddress(false)}>Xác nhận</button>
+                        <input
+                          className="input-address-cod-pay"
+                          type="text"
+                          placeholder="Trịnh Trọng Quyền"
+                        />
+                        <input
+                          className="input-address-cod-pay"
+                          type="text"
+                          placeholder="(+84) 123 456 789"
+                        />
+                        <input
+                          className="input-address-cod-pay"
+                          type="text"
+                          placeholder="123 Đường ABC, Phường XYZ, Quận 1, TP. HCM"
+                        />
+                        <button
+                          className="bnt-apply-address"
+                          onClick={() => setIsAddress(false)}
+                        >
+                          Xác nhận
+                        </button>
                       </div>
                     ) : (
                       <div className="border-info-cod-pay">
@@ -279,7 +335,10 @@ const Cart = () => {
                   </p>
                   <div className="border-qr-two">
                     <div className="border-qr-three">
-                      <img src={qrPay} />
+                      <img
+                        src={`https://qr.sepay.vn/img?acc=${acc}&bank=${bank}&amount=${3000}&des=${"SEVQR thanh toan don hang 9"}`}
+                        alt="QR thanh toán"
+                      />
                     </div>
                   </div>
                   <p className="payment-amount-qr">
@@ -304,7 +363,37 @@ const Cart = () => {
                 <p>Tổng (Tax incl.)</p>
                 <p>{formatVNDText(total)}</p>
               </div>
-              <button className="bnt-checkout-payment">Thanh toán</button>
+              {method === "qr" && (
+                <button className="bnt-checkout-payment">
+                  {loading ? (
+                    <ThreeDot
+                      color="#ffffffff"
+                      size="small"
+                      text=""
+                      textColor=""
+                    />
+                  ) : (
+                    "Đặt hàng"
+                  )}
+                </button>
+              )}
+              {method === "visa" && (
+                <button className="bnt-checkout-payment">
+                  {loading ? (
+                    <ThreeDot
+                      color="#ffffffff"
+                      size="small"
+                      text=""
+                      textColor=""
+                    />
+                  ) : (
+                    "Đặt hàng"
+                  )}
+                </button>
+              )}
+              {method === "cod" && (
+                <button className="bnt-checkout-payment">Đặt hàng</button>
+              )}
             </div>
 
             <div></div>

@@ -9,7 +9,7 @@ const SidebarProfile = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem("isLoggedIn");
-    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token");
     navigate("/Account/Login");
   };
 

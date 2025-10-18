@@ -23,6 +23,7 @@
     "react-facebook-login": "^4.1.1",
     "react-i18next": "^16.0.0",
     "react-icons": "^5.5.0",
+    "react-loading-indicators": "^1.0.1",
     "react-router-dom": "^7.7.1",
     "react-scripts": "^5.0.1",
     "three": "^0.179.1",

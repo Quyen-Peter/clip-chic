@@ -5,20 +5,18 @@ import { Link } from "react-router-dom";
 import profile from "../../assest/profile.png";
 const API_URL = process.env.REACT_APP_HOST_API;
 
-
 export interface User {
-  id: number;           
-  email: string;        
-  password?: string;    
-  phone?: string;      
-  birthday?: string;   
-  name: string;         
-  address?: string;     
-  image?: string;       
-  createDate: string;  
-  status: string;      
+  id: number;
+  email: string;
+  password?: string;
+  phone?: string;
+  birthday?: string;
+  name: string;
+  address?: string;
+  image?: string;
+  createDate: string;
+  status: string;
 }
-
 
 const Profile = () => {
   const [image, setImage] = useState(avata);
@@ -27,31 +25,31 @@ const Profile = () => {
   const [show, setShow] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const token = sessionStorage.getItem("token");
-      try {
-        const response = await fetch(`${API_URL}/api/Users/me`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        });
+  const fetchUser = async () => {
+    const token = sessionStorage.getItem("token");
+    try {
+      const response = await fetch(`${API_URL}/api/Users/me`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.message || "Không lấy được thông tin người dùng!");
-        }
-
-        setUser(data);                  
-        setImage(data.image || avata); 
-      } catch (err) {
-        console.error("Lỗi khi lấy thông tin người dùng:", err);
+      if (!response.ok) {
+        throw new Error(data.message || "Không lấy được thông tin người dùng!");
       }
-    };
 
+      setUser(data);
+      setImage(data.image || avata);
+    } catch (err) {
+      console.error("Lỗi khi lấy thông tin người dùng:", err);
+    }
+  };
+
+  useEffect(() => {
     fetchUser();
   }, []);
 
@@ -66,37 +64,68 @@ const Profile = () => {
     setIsEditing(true);
   };
 
-  const handleChange = () => {
-    setIsEditing(false);
-  };
-
   const handleRemove = () => {
     setImage(profile);
+  };
+
+  const handleUpdate = async () => {
+    if (!user) return;
+
+    try {
+      const token = sessionStorage.getItem("token");
+
+      const payload = {
+        name: user.name,
+        phone: user.phone,
+        birthday: user.birthday ? new Date(user.birthday).toISOString() : null,
+        address: user.address,
+        image: user.image,
+      };
+
+      const response = await fetch(`${API_URL}/api/Users/me`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) throw new Error("Cập nhật thất bại");
+
+      const updated = await response.json();
+      setUser(updated);
+      alert("Cập nhật thành công!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Lỗi cập nhật:", error);
+      alert("Lỗi khi cập nhật thông tin người dùng");
+    }
   };
 
   return (
     <div className="container-profile">
       <div>
         <div className="header-info">
-          <h3 className="basic-infor">BASIC INFO</h3>
+          <h3 className="basic-infor">Thông tin người dùng</h3>
           {!isEditing ? (
             <button onClick={isHandleChange} className="bnt-handle-change-edit">
-              Edit
+              Cập nhật
             </button>
           ) : (
-            <button onClick={handleChange} className="bnt-handle-change-apply">
-              Apply
+            <button onClick={handleUpdate} className="bnt-handle-change-apply">
+              Áp dụng
             </button>
           )}
         </div>
 
         <div className="content-info">
-          <p>Profile Picture</p>
+          <p>Ảnh đại diện</p>
           <div className="profile-actions">
             <img src={image} alt="Avatar" />
             <div className="chooce-action">
               <label htmlFor="upload" className="upload-text">
-                Upload new picture
+                Thêm ảnh mới
               </label>
               <input
                 id="upload"
@@ -105,7 +134,7 @@ const Profile = () => {
                 onChange={handleUpload}
               />
               <button className="remove-text" onClick={handleRemove}>
-                Remove
+                Xóa ảnh
               </button>
             </div>
           </div>
@@ -114,7 +143,7 @@ const Profile = () => {
         <div className="line-info"></div>
 
         <div className="content-info-change">
-          <p>Name</p>
+          <p>Tên</p>
           <div>
             {!isEditing ? (
               <div>
@@ -126,6 +155,11 @@ const Profile = () => {
                   type="text"
                   placeholder={user?.name}
                   className="bnt-input-info text-p-content-name"
+                  onChange={(e) =>
+                    setUser((prev) =>
+                      prev ? { ...prev, name: e.target.value } : null
+                    )
+                  }
                 />
               </div>
             )}
@@ -135,7 +169,7 @@ const Profile = () => {
         <div className="line-info"></div>
 
         <div className="content-info-change">
-          <p>Date of Birth</p>
+          <p>Sinh nhật</p>
           <div>
             {!isEditing ? (
               <div className="text-p-content-date">
@@ -147,6 +181,11 @@ const Profile = () => {
                   type="date"
                   defaultValue={user?.birthday}
                   className="bnt-input-info text-p-content-date"
+                  onChange={(e) =>
+                    setUser((prev) =>
+                      prev ? { ...prev, birthday: e.target.value } : null
+                    )
+                  }
                 />
               </div>
             )}
@@ -178,13 +217,11 @@ const Profile = () => {
         <div className="line-info"></div>
 
         <div className="content-info-change">
-          <p>Phone Number</p>
+          <p>Số điện thoại</p>
           <div>
             {!isEditing ? (
               <div>
-                <p className="text-p-content-phone">
-                  +84 {user?.phone}
-                </p>
+                <p className="text-p-content-phone">+84 {user?.phone}</p>
               </div>
             ) : (
               <div>
@@ -192,6 +229,11 @@ const Profile = () => {
                   type="text"
                   placeholder={user?.phone}
                   className="bnt-input-info text-p-content-phone"
+                  onChange={(e) =>
+                    setUser((prev) =>
+                      prev ? { ...prev, phone: e.target.value } : null
+                    )
+                  }
                 />
               </div>
             )}
@@ -201,7 +243,7 @@ const Profile = () => {
         <div className="line-info"></div>
 
         <div className="content-info-change">
-          <p>Address</p>
+          <p>Địa chỉ</p>
           <div>
             {!isEditing ? (
               <div>
@@ -213,13 +255,16 @@ const Profile = () => {
                   type="text"
                   placeholder={user?.address}
                   className="bnt-input-info text-p-content-address"
+                  onChange={(e) =>
+                    setUser((prev) =>
+                      prev ? { ...prev, address: e.target.value } : null
+                    )
+                  }
                 />
               </div>
             )}
           </div>
         </div>
-
-        <div className="line-info"></div>
       </div>
     </div>
   );

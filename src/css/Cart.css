@@ -225,7 +225,7 @@
   text-align: center;
   padding-left: 50px;
   padding-right: 50px;
-  padding-top: 20px;
+  padding-top: 10px;
   padding-bottom: 1px;
   width: 70%;
   border-radius: 15px;
@@ -236,15 +236,16 @@
 .border-qr-two{
   background-color: #C2D3FF;
   border-radius: 15px;
-  padding: 20px;
+  padding: 10px;
   text-align: center;
   justify-content: center;
 }
 
 .border-qr-three img{
-  width: 90%;
-  height: 90%;
+  width: 100%;
+  height: 100%;
   background-color: #ffffff;
+  border-radius: 10px;
 }
 
 .content-qr-pay{

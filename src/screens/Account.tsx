@@ -31,9 +31,9 @@ const Account = () => {
             <div className="account-content">
               <Outlet />
             </div>
-            <div className="footer-account">
+            {/* <div className="footer-account">
               <Footer/>
-            </div>
+            </div> */}
           </div>
         ) : (
           <div className="account-login-container">
