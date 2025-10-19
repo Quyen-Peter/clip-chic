@@ -140,27 +140,32 @@
   z-index: 100;
   border: 2px solid #ffffff;
   padding: 10px;
-  right: 4%;
-  top: 4%;
+  right: 20px;
+  top: 3%;
   position: fixed;
   border-radius: 10px;
   color: #ffffff;
   max-width: 420px;
   min-width: 420px;
+  background-color: #FF6EA5;
 }
 
 .title-payment-info{
   color: #dcdada;
   font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
 }
 
 .bnt-payment{
   margin-right: 10px;
   min-height: 40px;
-  margin-left: 10px;
+  margin-left: 5%;
   border: none;
   background-color: #ffffffa5;
-  padding: 10px;
+  padding: 5px;
   border-radius: 10px;
 }
 
@@ -173,15 +178,15 @@
 }
 
 .img-payment-bnt{
-  width: 50%;
+  width: 40%;
 }
 
 .img-payment-bnt-visa{
-  width: 30%;
+  width: 25%;
 }
 
 .content-payment-method{
-  margin-top: 5%;
+  margin-top: 3%;
   max-height: 320px;
   min-height: 320px;
   justify-items: center;
@@ -285,6 +290,10 @@
   margin-top: -7px;
 }
 
+.sub-payment p{
+  font-size: 15px;
+}
+
 .bnt-checkout-payment{
   width: 100%;
   padding: 8px;
@@ -354,11 +363,11 @@
 
 .bnt-change-address{
   border: none;
-  background-color: #FF6EA5;
   color: #ffffff;
   padding: 5px;
   border-radius: 10px;
   margin-right: -5px;
+  background-color: #FF6EA5;
 }
 
 .border-info-cod-pay-address-edit{
@@ -388,4 +397,89 @@
 .bnt-apply-address:hover{
   background-color: #ff3f7f;
   cursor: pointer;
+}
+
+.null-cart{
+  color: #173DA2;
+  margin-left: 10%;
+  margin-top: 15%;
+  margin-bottom: 20%;
+  text-decoration: underline;
+}
+
+
+.ship-options {
+  margin-left: 3%;
+  margin-top: -7px;
+  margin-bottom: 20px;
+}
+
+.ship-option {
+  display: block;
+  margin-bottom: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.ship-option input {
+  margin-right: 8px;
+  width: 15px;
+  height: 15px;
+}
+
+
+/* === Hiệu ứng mượt khi footer hiển thị === */
+.info-payment {
+  flex: 1;
+  position: relative;
+  transition: all 0.6s ease;
+}
+
+.right-backgrount {
+  width: 40%;
+  position: fixed;
+  right: 0;
+  top: 0;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transition: all 0.8s ease;
+}
+
+/* .payment-show {
+  position: fixed;
+  z-index: 100;
+  border: 2px solid #ffffff;
+  padding: 10px;
+  right: 4%;
+  top: 4%;
+  border-radius: 10px;
+  color: #ffffff;
+  max-width: 420px;
+  min-width: 420px;
+  background-color: rgba(255, 143, 180, 0.95);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.5s ease, opacity 0.5s ease;
+} */
+
+.info-payment.shrink {
+  transform: translateY(120px);
+  opacity: 0.9;
+}
+
+.payment-show.shrink {
+  transform: translateY(100px);
+  opacity: 0.6;
+}
+
+.right-backgrount.shrink-bg {
+  filter: blur(4px) brightness(0.7);
+  opacity: 0.5;
+  transform: scale(1.03);
+}
+
+.payment-show,
+.right-backgrount,
+.info-payment {
+  will-change: transform, opacity, filter;
 }

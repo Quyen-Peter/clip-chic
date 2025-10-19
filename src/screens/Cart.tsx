@@ -2,17 +2,17 @@ import "../css/Cart.css";
 import Footer from "../component/Footer";
 import RightBackgrount from "../assest/RightBackgrount.png";
 import { useEffect, useRef, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import icon_out_cart from "../assest/icon-out-cart.png";
 import trast from "../assest/trast-cart.png";
 import cod from "../assest/COD.png";
 import qr from "../assest/QAPayment.png";
 import visa from "../assest/VISA.png";
 import mastercard from "../assest/Mastercard.png";
-import qrPay from "../assest/QRPay.png";
 import address from "../assest/address.png";
 import iconchange from "../assest/icon-out-cart.png";
-import { OrbitProgress, ThreeDot } from "react-loading-indicators";
+import { ThreeDot } from "react-loading-indicators";
+const API_URL = process.env.REACT_APP_HOST_API;
 
 type Product = {
   id: number;
@@ -21,6 +21,12 @@ type Product = {
   price: number;
   img: string;
   qty: number;
+};
+
+type Ship = {
+  id: number;
+  name: string;
+  price: number;
 };
 
 const Cart = () => {
@@ -32,47 +38,13 @@ const Cart = () => {
   const [method, setMethod] = useState("cod");
   const [isAddress, setIsAddress] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const mockData: Product[] = [
-      {
-        id: 1,
-        name: "Flutterbelle",
-        desc: "Hair Clips",
-        price: 85000,
-        img: "https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg",
-        qty: 1,
-      },
-      {
-        id: 2,
-        name: "Summer Box",
-        desc: "Blind box",
-        price: 150000,
-        img: "https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg",
-        qty: 1,
-      },
-      {
-        id: 3,
-        name: "Back To School Box",
-        desc: "Blind box",
-        price: 150000,
-        img: "https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg",
-        qty: 1,
-      },
-      {
-        id: 4,
-        name: "Back To School Box",
-        desc: "Blind box",
-        price: 150000,
-        img: "https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg",
-        qty: 1,
-      },
-    ];
-    setProducts(mockData);
-  }, []);
+  const footerRef = useRef<HTMLDivElement>(null);
+  const [shrinkPayment, setShrinkPayment] = useState(false);
+  const [shipList, setShipList] = useState<Ship[]>([]);
+  const [selectedShip, setSelectedShip] = useState<Ship | null>(null);
 
   const subtotal = products.reduce((sum, p) => sum + p.price * p.qty, 0);
-  const shipping = 10000;
+  const shipping = selectedShip ? selectedShip.price : 0;
   const total = subtotal + shipping;
   const formatVNDText = (value: number) => {
     return value.toLocaleString("vi-VN") + " vnd";
@@ -82,37 +54,53 @@ const Cart = () => {
       prev.map((p) => (p.id === id ? { ...p, qty: p.qty + 1 } : p))
     );
   };
-
   const decrease = (id: number) => {
     setProducts((prev) =>
       prev.map((p) => (p.id === id ? { ...p, qty: Math.max(1, p.qty - 1) } : p))
     );
   };
 
-  const footerRef = useRef<HTMLDivElement>(null);
-  const [shrinkPayment, setShrinkPayment] = useState(false);
+  const handleShip = async () => {
+    try {
+      const res = await fetch(`${API_URL}/Ship/GetAll`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
+      if (!res.ok) throw new Error("Không thể tải danh sách ship");
+
+      const data = await res.json();
+      setShipList(data);
+      if (data.length > 0) setSelectedShip(data[0]);
+    } catch (error) {
+      console.error("Lỗi khi tải danh sách ship:", error);
+    }
+  };
+
+  // Theo dõi footer hiển thị
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
-          setShrinkPayment(true);
-        } else {
-          setShrinkPayment(false);
-        }
+        setShrinkPayment(entries[0].isIntersecting);
       },
       { threshold: 0.1 }
     );
 
-    if (footerRef.current) {
-      observer.observe(footerRef.current);
-    }
-
+    if (footerRef.current) observer.observe(footerRef.current);
     return () => {
-      if (footerRef.current) {
-        observer.unobserve(footerRef.current);
-      }
+      if (footerRef.current) observer.unobserve(footerRef.current);
     };
+  }, []);
+
+  const handleOrrder = async () =>{
+
+  }
+
+
+  useEffect(() => {
+    handleShip();
   }, []);
 
   useEffect(() => {
@@ -164,51 +152,72 @@ const Cart = () => {
           <div className="line-cart"></div>
           <h4 className="title-cart-info-product">Giỏ hàng</h4>
           <p>Bạn có {products.length} sản phẩm trong giỏ hàng</p>
-
-          {products.map((p) => (
-            <div className="product-container" key={p.id}>
-              <div className="left-container">
-                <div className="border-img-product">
-                  <img src="https://media.vov.vn/sites/default/files/styles/large/public/2021-05/doaremon_wdyw.jpg" />
-                </div>
-
-                <div className="product-info-left-container">
-                  <h5>Flutterbelle</h5>
-                  <p>Hair Clips</p>
-                </div>
-              </div>
-
-              <div className="right-container">
-                <div className="quantity-container-cart">
-                  <span className="qty">{p.qty}</span>
-                  <div className="quantity-control">
-                    <button className="btn-qty" onClick={() => increase(p.id)}>
-                      ▲
-                    </button>
-                    <button className="btn-qty" onClick={() => decrease(p.id)}>
-                      ▼
-                    </button>
+          <div>
+            {products.length ? (
+              <div>
+                {products.map((p) => (
+                  <div className="product-container" key={p.id}>
+                    <div className="left-container">
+                      <div className="border-img-product">
+                        <img src={p.img} alt={p.name} />
+                      </div>
+                      <div className="product-info-left-container">
+                        <h5>{p.name}</h5>
+                        <p>{p.desc}</p>
+                      </div>
+                    </div>
+                    <div className="right-container">
+                      <div className="quantity-container-cart">
+                        <span className="qty">{p.qty}</span>
+                        <div className="quantity-control">
+                          <button
+                            className="btn-qty"
+                            onClick={() => increase(p.id)}
+                          >
+                            ▲
+                          </button>
+                          <button
+                            className="btn-qty"
+                            onClick={() => decrease(p.id)}
+                          >
+                            ▼
+                          </button>
+                        </div>
+                      </div>
+                      <p className="price">
+                        {(p.price * p.qty).toLocaleString("vi-VN")} vnd
+                      </p>
+                      <button className="bnt-delete-cart">
+                        <img src={trast} alt="delete" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <p className="price">
-                  {(p.price * p.qty).toLocaleString("vi-VN")} vnd
-                </p>
-                <button className="bnt-delete-cart">
-                  <img src={trast} />
-                </button>
+                ))}
               </div>
-            </div>
-          ))}
+            ) : (
+              <button
+                onClick={() => Navigate("/")}
+                className="shoping-continue-btn null-cart"
+              >
+                Bạn chưa có sản phẩm nào trong giỏ hàng. Tiếp tục mua sắm tại
+                đây!
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="info-payment">
-          <img src={RightBackgrount} className="right-backgrount" />
+        {/* === Phần thanh toán bên phải === */}
+        <div className={`info-payment ${shrinkPayment ? "shrink" : ""}`}>
+          {/* <img
+            src={RightBackgrount}
+            className={`right-backgrount ${shrinkPayment ? "shrink-bg" : ""}`}
+          /> */}
 
-          <div className={`payment-show ${shrinkPayment ? "shrink" : ""}`}>
-            <h4>Thanh toán</h4>
+          <div className={`payment-show`}>
             <p className="title-payment-info">
               Mọi giao dịch đều được bảo mật và mã hóa.
             </p>
+
             <div className="bnt-payment-container">
               <button
                 className={`bnt-payment ${
@@ -232,7 +241,7 @@ const Cart = () => {
                 }`}
                 onClick={() => setMethod("visa")}
               >
-                <img src={visa} className="img-payment-bnt-visa" />{" "}
+                <img src={visa} className="img-payment-bnt-visa" />
                 <img className="img-payment-bnt-visa" src={mastercard} />
               </button>
             </div>
@@ -293,40 +302,6 @@ const Cart = () => {
                   </div>
                 </div>
               )}
-              {method === "visa" && (
-                <div className="card-payment-method">
-                  <p className="title-content-card">Tên trên thẻ</p>
-                  <input
-                    className="input-content"
-                    type="text"
-                    placeholder="Name"
-                  />
-                  <p className="title-content-card">Số thẻ</p>
-                  <input
-                    className="input-content"
-                    type="text"
-                    placeholder="1111 2222 3333 4444"
-                  />
-                  <div className="content-date-cvv-card">
-                    <div>
-                      <p className="title-content-card">Ngày hết hạn</p>
-                      <input
-                        className="input-content-date-cvv"
-                        type="text"
-                        placeholder="mm/yy"
-                      />
-                    </div>
-                    <div className="cvv-card">
-                      <p className="title-content-card">CVV</p>
-                      <input
-                        className="input-content-date-cvv"
-                        type="text"
-                        placeholder="123"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {method === "qr" && (
                 <div className="border-qr-one">
@@ -356,8 +331,24 @@ const Cart = () => {
                 <p>{formatVNDText(subtotal)}</p>
               </div>
               <div className="sub-payment">
-                <p>Phí giao hàng</p>
-                <p>{formatVNDText(shipping)}</p>
+                <p>Phương thức giao hàng</p>
+              </div>
+              <div className="ship-options">
+                {shipList.length > 0 ? (
+                  shipList.map((ship) => (
+                    <label key={ship.id} className="ship-option">
+                      <input
+                        type="radio"
+                        name="ship"
+                        checked={selectedShip?.id === ship.id}
+                        onChange={() => setSelectedShip(ship)}
+                      />
+                      {ship.name} – {ship.price.toLocaleString("vi-VN")}₫
+                    </label>
+                  ))
+                ) : (
+                  <p>Đang tải phương thức giao hàng...</p>
+                )}
               </div>
               <div className="sub-payment">
                 <p>Tổng (Tax incl.)</p>
@@ -365,6 +356,7 @@ const Cart = () => {
               </div>
               {method === "qr" && (
                 <button className="bnt-checkout-payment">
+                  {" "}
                   {loading ? (
                     <ThreeDot
                       color="#ffffffff"
@@ -374,11 +366,12 @@ const Cart = () => {
                     />
                   ) : (
                     "Đặt hàng"
-                  )}
+                  )}{" "}
                 </button>
-              )}
+              )}{" "}
               {method === "visa" && (
                 <button className="bnt-checkout-payment">
+                  {" "}
                   {loading ? (
                     <ThreeDot
                       color="#ffffffff"
@@ -388,15 +381,13 @@ const Cart = () => {
                     />
                   ) : (
                     "Đặt hàng"
-                  )}
+                  )}{" "}
                 </button>
-              )}
+              )}{" "}
               {method === "cod" && (
                 <button className="bnt-checkout-payment">Đặt hàng</button>
               )}
             </div>
-
-            <div></div>
           </div>
         </div>
       </div>

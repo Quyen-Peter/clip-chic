@@ -25,12 +25,12 @@ const MyDesign = () => {
 
   return (
     <div className="my-design-container">
-      <h3 className="history-title">HISTORY WORK</h3>
+      <h3 className="history-title">Thiết kế của tôi</h3>
       <div>
         <form className="my-design-form">
           <input
             type="text"
-            placeholder="Search in browsing history"
+            placeholder="Tìm kiếm..."
             className="my-design-input"
           />
           <button type="submit" className="my-design-button">
@@ -40,7 +40,7 @@ const MyDesign = () => {
       </div>
 
       <div className="my-design-content">
-        <h5 className="history-work-title">HISTORY WORK</h5>
+        <h5 className="history-work-title">Thiết kế của tôi</h5>
         <div className="my-design-list">
           {design.map((item) => (
             <div className="my-design-item" key={item.id}>

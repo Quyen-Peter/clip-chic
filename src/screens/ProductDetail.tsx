@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import {
   fetchProductById,
   fetchProducts,
-  ProductDetail as ProductDetailType, // 👈 đổi tên kiểu dữ liệu
+  ProductDetail as ProductDetailType,
   ProductListItem,
 } from "../services/productService";
 
@@ -63,7 +63,7 @@ useEffect(() => {
       </div>
       <div className="product-detail-container">
         <div className="img-left-container">
-          {product?.images?.slice(1).map((img) => (
+          {product?.images?.slice(0).map((img) => (
             <img key={img.id} src={img.url} alt={img.name || "Product image"} className="img-left" />
           ))}
         </div>

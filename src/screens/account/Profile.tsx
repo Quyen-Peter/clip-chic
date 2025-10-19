@@ -53,10 +53,39 @@ const Profile = () => {
     fetchUser();
   }, []);
 
-  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setImage(URL.createObjectURL(file));
+    if (!file || !user) return;
+
+    setImage(URL.createObjectURL(file));
+
+    try {
+      const token = sessionStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("name", user.name);
+      formData.append("phone", user.phone || "");
+      formData.append(
+        "birthday",
+        user.birthday ? new Date(user.birthday).toISOString() : ""
+      );
+      formData.append("address", user.address || "");
+      formData.append("image", file);
+
+      const response = await fetch(`${API_URL}/api/Users/me`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("Lỗi khi upload ảnh");
+      const updatedUser = await response.json();
+      setUser(updatedUser);
+      alert("Cập nhật ảnh đại diện thành công!");
+    } catch (error) {
+      console.error("Lỗi upload ảnh:", error);
+      alert("Không thể cập nhật ảnh!");
     }
   };
 
@@ -64,8 +93,29 @@ const Profile = () => {
     setIsEditing(true);
   };
 
-  const handleRemove = () => {
-    setImage(profile);
+  const handleRemove = async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) return;
+    try {
+      const response = await fetch(`${API_URL}/api/Users/me/delete_picture`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Lỗi khi xóa ảnh đại diện");
+      }
+
+      const updatedUser = await response.json();
+      setUser(updatedUser);
+      setImage(profile);
+      alert("Xóa ảnh đại diện thành công!");
+    } catch (error) {
+      console.error("Lỗi khi xóa ảnh:", error);
+      alert("Không thể xóa ảnh đại diện!");
+    }
   };
 
   const handleUpdate = async () => {
@@ -73,22 +123,26 @@ const Profile = () => {
 
     try {
       const token = sessionStorage.getItem("token");
+      const formData = new FormData();
 
-      const payload = {
-        name: user.name,
-        phone: user.phone,
-        birthday: user.birthday ? new Date(user.birthday).toISOString() : null,
-        address: user.address,
-        image: user.image,
-      };
+      formData.append("name", user.name);
+      formData.append("phone", user.phone || "");
+      formData.append(
+        "birthday",
+        user.birthday ? new Date(user.birthday).toISOString() : ""
+      );
+      formData.append("address", user.address || "");
+      const fileInput = document.getElementById("upload") as HTMLInputElement;
+      if (fileInput?.files?.[0]) {
+        formData.append("image", fileInput.files[0]);
+      }
 
       const response = await fetch(`${API_URL}/api/Users/me`, {
         method: "PUT",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       if (!response.ok) throw new Error("Cập nhật thất bại");
@@ -173,13 +227,25 @@ const Profile = () => {
           <div>
             {!isEditing ? (
               <div className="text-p-content-date">
-                <p>{user?.birthday}</p>
+                <p>
+                  {user?.birthday
+                    ? new Date(user.birthday).toLocaleDateString("vi-VN", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })
+                    : "N/N"}
+                </p>
               </div>
             ) : (
               <div>
                 <input
                   type="date"
-                  defaultValue={user?.birthday}
+                  defaultValue={
+                    user?.birthday
+                      ? new Date(user.birthday).toISOString().split("T")[0]
+                      : ""
+                  }
                   className="bnt-input-info text-p-content-date"
                   onChange={(e) =>
                     setUser((prev) =>
