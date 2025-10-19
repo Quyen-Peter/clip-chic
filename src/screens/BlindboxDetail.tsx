@@ -101,7 +101,7 @@ const BlindboxDetail = () => {
             <div className="img-left-container">
               {sideImages.length > 0 ? (
                 sideImages.map((img) => (
-                  <img
+<img
                     key={img.id}
                     src={img.url}
                     alt={img.name || blindbox.name || "Blindbox image"}
@@ -176,7 +176,7 @@ const BlindboxDetail = () => {
         <div className="you-may-also-like-products-container">
           {relatedBoxes.map((p) => (
             <article key={p.id} className="you-may-also-like-products">
-              <div className="you-may-also-like-products-thumb">
+<div className="you-may-also-like-products-thumb">
                 <img
                   src={p.image || "https://via.placeholder.com/300"}
                   alt={p.name}
