@@ -66,11 +66,11 @@
   font-weight: bold;
 }
 
-.produc-description {
+.product-description {
   max-width: 600px;
 }
 
-.produc-description,
+.product-description,
 .product-demention,
 .product-color,
 .availability {
@@ -286,4 +286,33 @@
 
 .footer-product-detail-container{
     margin-top: 100px;
+}
+.product-collection-title {
+  font-weight: bold;
+  font-size: 16px;
+  color: #1a237e;
+  margin-bottom: 5px;
+}
+
+.product-collection {
+  font-size: 15px;
+  color: #3f51b5;
+  margin-bottom: 5px;
+}
+
+.product-collection-description {
+  font-size: 14px;
+  color: #616161;
+  margin-bottom: 15px;
+}
+
+.product-unavailable {
+  text-align: center;
+  padding: 40px;
+  font-size: 20px;
+  color: #d32f2f;
+  background-color: #fff3f3;
+  border-radius: 10px;
+  margin: 60px auto;
+  max-width: 600px;
 }

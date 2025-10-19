@@ -1,92 +1,132 @@
-.header-bindbox {
+.blindbox-page {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.blindbox-site-header {
   position: fixed;
-  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-.main-bindbox-container {
+.blindbox-page-body {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 24px;
+  padding: 96px 32px 64px;
+}
+
+.blindbox-sidebar-wrapper {
+  position: sticky;
+  top: 96px;
+  align-self: start;
+}
+
+.blindbox-content {
+  position: relative;
+  padding-right: 50px;
+}
+
+.blindbox-count {
+  position: absolute;
+  right: 32px;
+  top: -32px;
+  color: #173da2;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.blindbox-list {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.bindbox-container {
-  margin-top: 80px;
-  width: 100%;
-  margin-left: 30%;
-}
-
-.bindbox-item {
+.blindbox-item {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
   border: 2px solid #ff6ea5;
-  margin: 10px;
-  padding: 20px;
-  width: 93%;
-  border-radius: 20px;
-  margin-bottom: 50px;
+  border-radius: 16px;
+  padding: 18px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(255, 142, 180, 0.12);
 }
 
 .bindbox-link {
-  text-decoration: none;
   display: flex;
-  justify-content: space-between;
-  width: 100%;
+  flex: 1;
+  gap: 24px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .img-blindbox-container {
+  width: 220px;
+  min-width: 220px;
   border: 2px solid #ff6ea5;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fbf3d5;
-  aspect-ratio: 1/1;
   display: grid;
   place-items: center;
   overflow: hidden;
-  width: 30%;
 }
+
 .img-blindbox {
   width: 90%;
+  height: 90%;
+  object-fit: contain;
 }
 
 .bindbox-info {
   display: flex;
-  width: 55%;
   flex-direction: column;
+  gap: 10px;
+  color: #ff8fb4;
 }
 
 .bindbox-info h3 {
-  font-size: 27px;
-  color: #ff8fb4;
+  font-size: 24px;
   font-weight: bold;
-  margin-bottom: 15px;
+  margin: 0;
 }
 
 .bindbox-info p {
-  color: #ff8fb4;
-  font-size: 17px;
+  font-size: 15px;
+  margin: 0;
+}
+
+.blindbox-collection,
+.blindbox-status {
+  font-size: 13px;
+  color: #6f48c9;
+  font-weight: 600;
 }
 
 .bindbox-info h4 {
-  color: #ff8fb4;
-  font-weight: bold;
-  font-size: 22px;
   margin-top: auto;
+  font-weight: bold;
+  font-size: 20px;
 }
 
 .btn-buy-blindbox {
-  height: 50px;
+  align-self: center;
   border: none;
   background: none;
+  cursor: pointer;
 }
 
 .btn-buy-blindbox-img {
-  width: 90%;
+  width: 48px;
+  height: 48px;
 }
 
-.blindbox-count {
-  text-align: right;
-  margin-right: 67px;
-  margin-top: 8px;
-  margin-bottom: 20px;
-  color: #173da2;
-  font-size: 14px;
-  font-weight: bold;
-  text-decoration: none;
-  display: block;
+.blindbox-site-footer {
+  margin-top: 32px;
 }

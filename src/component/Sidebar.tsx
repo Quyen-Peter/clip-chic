@@ -1,70 +1,95 @@
 import "../css/Sidebar.css";
-import BSidebar from "../assest/Sidebar.png";
 import { useEffect, useState } from "react";
 import iconRight from "../assest/IconRightWhile.png";
 import iconDown from "../assest/IconRightDown.png";
 import BackgroundNavbar from "../assest/backgroundNavbar.png";
-
+import {
+  fetchCollections,
+  CollectionSummary,
+} from "../services/collectionService";
 
 type TopFilter = "best" | "new" | null;
 
-type Query = {
+export type ProductFilterQuery = {
   top: TopFilter;
-  collection: string | null;
+  collectionId: number | null;
   color: string | null;
   price: string | null;
 };
 
-export default function Sidebar({
-  onChange,
-}: {
-  onChange?: (q: Query) => void;
-}) {
+interface SidebarProps {
+  onChange?: (query: ProductFilterQuery) => void;
+}
+
+const colorOptions = [
+  "Trắng",
+  "Hồng",
+  "Xanh nhạt",
+  "Xanh đậm",
+  "Xanh lá nhạt",
+  "Xanh lá đậm",
+  "Đỏ",
+  "Vàng",
+  "Tím",
+];
+
+const priceOptions = [
+  { value: "under-100k", label: "Dưới 100.000 VND" },
+  { value: "100k-200k", label: "100.000 - 200.000 VND" },
+  { value: ">=200k", label: "Từ 200.000 VND" },
+];
+
+const Sidebar = ({ onChange }: SidebarProps) => {
   const [showCollection, setShowCollection] = useState(true);
   const [showColor, setShowColor] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
 
   const [top, setTop] = useState<TopFilter>(null);
-  const [collection, setCollection] = useState<string | null>(null);
+  const [collectionId, setCollectionId] = useState<number | null>(null);
   const [color, setColor] = useState<string | null>(null);
   const [price, setPrice] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   onChange?.({ top, collection, color, price });
-  // }, []);
+  const [collections, setCollections] = useState<CollectionSummary[]>([]);
+  const [isLoadingCollections, setIsLoadingCollections] = useState(false);
+  const [collectionsError, setCollectionsError] = useState<string | null>(null);
 
   useEffect(() => {
-    onChange?.({ top, collection, color, price });
-  }, [top, collection, color, price]);
+    onChange?.({ top, collectionId, color, price });
+  }, [top, collectionId, color, price, onChange]);
 
-  const collections = [
-    "Tất cả",
-    "Bộ sưu tập năm mới",
-    "Bộ sưu tập mùa hè",
-  ];
+  useEffect(() => {
+    let isMounted = true;
+    const loadCollections = async () => {
+      setIsLoadingCollections(true);
+      setCollectionsError(null);
+      try {
+        const data = await fetchCollections();
+        if (isMounted) {
+          setCollections(data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          const message =
+            err instanceof Error
+              ? err.message
+              : "Không thể tải danh sách bộ sưu tập.";
+          setCollectionsError(message);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingCollections(false);
+        }
+      }
+    };
 
-  const colors = [
-    "Trắng",
-    "Hồng",
-    "Xanh nhạt",
-    "Xanh đậm",
-    "Xanh lá nhạt",
-    "Xanh lá đậm",
-    "Đỏ",
-    "Vàng",
-    "Tím",
-  ];
+    loadCollections();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  const prices = [
-    { value: "under-100k", label: "Nhỏ hơn 100,000vnd" },
-    { value: "100k-200k", label: "100,000vnd - 200,000vnd" },
-    { value: ">=200k", label: "Nhỏ hơn 200,000vnd" },
-  ];
-
-  // helper: chọn collection, map "All" -> null
-  const selectCollection = (c: string) => {
-    const v = c === "All" ? null : c;
-    setCollection(collection === v ? null : v);
+  const toggleCollection = (id: number | null) => {
+    setCollectionId((current) => (current === id ? null : id));
   };
 
   return (
@@ -90,7 +115,7 @@ export default function Sidebar({
 
         <button
           className="category-toggle"
-          onClick={() => setShowCollection(!showCollection)}
+          onClick={() => setShowCollection((prev) => !prev)}
         >
           <img
             className="arrow-icon"
@@ -101,64 +126,37 @@ export default function Sidebar({
         </button>
         {showCollection && (
           <div className="submenu">
-            {collections.map((c) => (
+            <button
+              type="button"
+              className={`submenu-item ${collectionId === null ? "active" : ""}`}
+              onClick={() => toggleCollection(null)}
+            >
+              Tất cả
+            </button>
+            {isLoadingCollections && (
+              <div className="submenu-info">Đang tải...</div>
+            )}
+            {collectionsError && (
+              <div className="submenu-info error">{collectionsError}</div>
+            )}
+            {collections.map((collection) => (
               <button
-                key={c}
+                key={collection.id}
                 type="button"
                 className={`submenu-item ${
-                  (collection ?? "All") === c ? "active" : ""
+                  collectionId === collection.id ? "active" : ""
                 }`}
-                onClick={() => selectCollection(c)}
+                onClick={() => toggleCollection(collection.id)}
               >
-                {c}
+                {collection.name}
               </button>
             ))}
-            <button
-              type="button"
-              className="submenu-item deselect"
-              onClick={() => setCollection(null)}
-            >
-              Bỏ chọn
-            </button>
           </div>
         )}
 
         <button
           className="category-toggle"
-          onClick={() => setShowColor(!showColor)}
-        >
-          <img
-            className="arrow-icon"
-            src={showColor ? iconDown : iconRight}
-            alt=""
-          />
-          <span className="title">Màu sắc</span>
-        </button>
-        {showColor && (
-          <div className="submenu">
-            {colors.map((c) => (
-              <button
-                key={c}
-                type="button"
-                className={`submenu-item ${color === c ? "active" : ""}`}
-                onClick={() => setColor(color === c ? null : c)}
-              >
-                {c}
-              </button>
-            ))}
-            <button
-              type="button"
-              className="submenu-item deselect"
-              onClick={() => setColor(null)}
-            >
-              Bỏ chọn
-            </button>
-          </div>
-        )}
-
-        <button
-          className="category-toggle"
-          onClick={() => setShowPrice(!showPrice)}
+          onClick={() => setShowPrice((prev) => !prev)}
         >
           <img
             className="arrow-icon"
@@ -169,14 +167,16 @@ export default function Sidebar({
         </button>
         {showPrice && (
           <div className="submenu">
-            {prices.map((p) => (
+            {priceOptions.map((option) => (
               <button
-                key={p.value}
+                key={option.value}
                 type="button"
-                className={`submenu-item ${price === p.value ? "active" : ""}`}
-                onClick={() => setPrice(price === p.value ? null : p.value)}
+                className={`submenu-item ${price === option.value ? "active" : ""}`}
+                onClick={() =>
+                  setPrice(price === option.value ? null : option.value)
+                }
               >
-                {p.label}
+                {option.label}
               </button>
             ))}
             <button
@@ -184,11 +184,13 @@ export default function Sidebar({
               className="submenu-item deselect"
               onClick={() => setPrice(null)}
             >
-              deselect
+              Bỏ chọn
             </button>
           </div>
         )}
       </nav>
     </aside>
   );
-}
+};
+
+export default Sidebar;
