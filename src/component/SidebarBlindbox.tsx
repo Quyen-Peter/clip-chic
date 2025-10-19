@@ -3,35 +3,66 @@ import "../css/Sidebar.css";
 import BackgroundNavbar from "../assest/backgroundNavbar.png";
 import iconRight from "../assest/IconRightWhile.png";
 import iconDown from "../assest/IconRightDown.png";
-
+import {
+  fetchCollections,
+  CollectionSummary,
+} from "../services/collectionService";
 
 type TopFilter = "best" | "new" | null;
 
-type QueryBlindbox = {
+export type BlindboxFilterQuery = {
   top: TopFilter;
-  collection: string | null;
+  collectionId: number | null;
 };
 
-const SidebarBlindbox = ({ onChange }: { onChange?: (q: QueryBlindbox) => void }) => {
+interface SidebarBlindboxProps {
+  onChange?: (query: BlindboxFilterQuery) => void;
+}
+
+const SidebarBlindbox = ({ onChange }: SidebarBlindboxProps) => {
   const [showCollection, setShowCollection] = useState(true);
-
   const [top, setTop] = useState<TopFilter>(null);
-  const [collection, setCollection] = useState<string | null>(null);
-
-//   useEffect(() => {
-//     onChange?.({ top, collection });
-//   }, []);
+  const [selectedCollectionId, setSelectedCollectionId] = useState<number | null>(null);
+  const [collections, setCollections] = useState<CollectionSummary[]>([]);
+  const [isLoadingCollections, setIsLoadingCollections] = useState(false);
+  const [collectionsError, setCollectionsError] = useState<string | null>(null);
 
   useEffect(() => {
-    onChange?.({ top, collection });
-  }, [top, collection]);
+    onChange?.({ top, collectionId: selectedCollectionId });
+  }, [top, selectedCollectionId, onChange]);
 
-  const collections = ["Tất cả", "Bộ sưu tập năm mới", "Bộ sưu tập mùa hè"];
+  useEffect(() => {
+    let isMounted = true;
+    const loadCollections = async () => {
+      setIsLoadingCollections(true);
+      setCollectionsError(null);
+      try {
+        const data = await fetchCollections();
+        if (isMounted) {
+          setCollections(data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          const message =
+            err instanceof Error
+              ? err.message
+              : "Không thể tải danh sách bộ sưu tập.";
+          setCollectionsError(message);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingCollections(false);
+        }
+      }
+    };
+    loadCollections();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  // helper: chọn collection, map "All" -> null
-  const selectCollection = (c: string) => {
-    const v = c === "All" ? null : c;
-    setCollection(collection === v ? null : v);
+  const toggleCollection = (id: number | null) => {
+    setSelectedCollectionId((current) => (current === id ? null : id));
   };
 
   return (
@@ -57,7 +88,7 @@ const SidebarBlindbox = ({ onChange }: { onChange?: (q: QueryBlindbox) => void }
 
         <button
           className="category-toggle"
-          onClick={() => setShowCollection(!showCollection)}
+          onClick={() => setShowCollection((prev) => !prev)}
         >
           <img
             className="arrow-icon"
@@ -68,29 +99,36 @@ const SidebarBlindbox = ({ onChange }: { onChange?: (q: QueryBlindbox) => void }
         </button>
         {showCollection && (
           <div className="submenu">
-            {collections.map((c) => (
-              <button
-                key={c}
-                type="button"
-                className={`submenu-item ${
-                  (collection ?? "All") === c ? "active" : ""
-                }`}
-                onClick={() => selectCollection(c)}
-              >
-                {c}
-              </button>
-            ))}
             <button
               type="button"
-              className="submenu-item deselect"
-              onClick={() => setCollection(null)}
+              className={`submenu-item ${selectedCollectionId === null ? "active" : ""}`}
+              onClick={() => toggleCollection(null)}
             >
-              Bỏ chọn
+              Tất cả
             </button>
+            {isLoadingCollections && (
+              <div className="submenu-info">Đang tải...</div>
+            )}
+            {collectionsError && (
+              <div className="submenu-info error">{collectionsError}</div>
+            )}
+            {collections.map((collection) => (
+              <button
+                key={collection.id}
+                type="button"
+                className={`submenu-item ${
+                  selectedCollectionId === collection.id ? "active" : ""
+                }`}
+                onClick={() => toggleCollection(collection.id)}
+              >
+                {collection.name}
+              </button>
+            ))}
           </div>
         )}
       </nav>
     </aside>
   );
 };
+
 export default SidebarBlindbox;

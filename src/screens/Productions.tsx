@@ -5,17 +5,7 @@ import "../css/Productions.css";
 import { useMemo, useState, useEffect } from "react";
 import cart from "../assest/shoppingCart.png";
 import { Link } from "react-router-dom";
-
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-  color: string;
-  collection: string;
-  bestSeller: boolean;
-  newArrival: boolean;
-  image: string;
-};
+import { fetchProducts, ProductListItem } from "../services/productService";
 
 type Query = {
   top: "best" | "new" | null;
@@ -54,21 +44,39 @@ function matchPrice(price: number, filter: string) {
 }
 
 const Productions = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-
+const [products, setProducts] = useState<ProductListItem[]>([]);
+const [isLoading, setIsLoading] = useState<boolean>(false);
+const [error, setError] = useState<string | null>(null);
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch("/products.json");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data: Product[] = await res.json();
+  let isMounted = true;
+
+  const loadProducts = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await fetchProducts();
+      if (isMounted) {
         setProducts(data);
-      } catch (e) {
-        console.error("Fetch products failed:", e);
       }
-    };
-    fetchProducts();
-  }, []);
+    } catch (err) {
+      if (isMounted) {
+        const message =
+          err instanceof Error ? err.message : "Unable to load products.";
+        setError(message);
+      }
+    } finally {
+      if (isMounted) {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  loadProducts();
+
+  return () => {
+    isMounted = false;
+  };
+}, []);
 
   const [query, setQuery] = useState<Query>({
     top: null,
@@ -85,19 +93,12 @@ const Productions = () => {
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
-      if (query.top === "best" && !p.bestSeller) return false;
-      if (query.top === "new" && !p.newArrival) return false;
-      if (
-        query.collection &&
-        p.collection.toLowerCase() !== query.collection.toLowerCase()
-      )
-        return false;
-      if (query.color && p.color.toLowerCase() !== query.color.toLowerCase())
+      if (query.collection && p.collectionName?.toLowerCase() !== query.collection.toLowerCase())
         return false;
       if (query.price && !matchPrice(p.price, query.price)) return false;
       if (
         query.search &&
-        !p.name.toLowerCase().includes(query.search.toLowerCase())
+        !p.title.toLowerCase().includes(query.search.toLowerCase())
       )
         return false;
       return true;
@@ -130,12 +131,12 @@ const Productions = () => {
                     className="link-product"
                   >
                     <div className="production-thumb">
-                      <img src={p.image} alt={p.name} />
+                      <img src={p.image} alt={p.title} />
                     </div>
                     <div className="production-sub">
                       <p className="production-title">
-                        <a className="collection">{p.collection}</a>
-                        <a className="name-product"> - {p.name}</a>
+                        <a className="collection">{p.collectionName}</a>
+                        <a className="name-product"> - {p.title}</a>
                       </p>
                     </div>
                     <div className="buttom-production">
