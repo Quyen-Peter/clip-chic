@@ -21,6 +21,7 @@ const BlindboxDetail = () => {
   const [stock, setStock] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!blindboxId) {
@@ -37,7 +38,7 @@ const BlindboxDetail = () => {
       return;
     }
 
-    const loadData = async () => {
+        const loadData = async () => {
       setIsLoading(true);
       setError(null);
       try {
@@ -49,6 +50,7 @@ const BlindboxDetail = () => {
         if (!isMounted) return;
         setBlindbox(detail);
         setStock(detail.stock);
+        setSelectedImage(detail.images?.[0]?.url || null);
         setRelatedBoxes(list.filter((item) => item.id !== detail.id).slice(0, 4));
       } catch (e) {
         if (!isMounted) return;
@@ -56,9 +58,7 @@ const BlindboxDetail = () => {
           e instanceof Error ? e.message : "Không thể tải dữ liệu blindbox.";
         setError(message);
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     };
 
@@ -77,12 +77,8 @@ const BlindboxDetail = () => {
     setQuantity((prev) => Math.max(1, prev - 1));
   };
 
-  const mainImage = blindbox?.images?.[0]?.url ?? "https://via.placeholder.com/600";
-  const mainImageAlt =
-    blindbox?.images?.[0]?.name ?? blindbox?.name ?? "Blindbox image";
-
   const sideImages = useMemo(
-    () => blindbox?.images?.slice(1) ?? [],
+    () => blindbox?.images ?? [],
     [blindbox?.images]
   );
 
@@ -97,12 +93,11 @@ const BlindboxDetail = () => {
           <div className="product-feedback">Đang tải thông tin blindbox...</div>
         )}
 
-        {error && (
-          <div className="product-feedback error">{error}</div>
-        )}
+        {error && <div className="product-feedback error">{error}</div>}
 
         {!isLoading && !error && blindbox && (
           <>
+            {/* Ảnh nhỏ bên trái */}
             <div className="img-left-container">
               {sideImages.length > 0 ? (
                 sideImages.map((img) => (
@@ -110,7 +105,10 @@ const BlindboxDetail = () => {
                     key={img.id}
                     src={img.url}
                     alt={img.name || blindbox.name || "Blindbox image"}
-                    className="img-left"
+                    className={`img-left ${
+                      selectedImage === img.url ? "active-thumbnail" : ""
+                    }`}
+                    onClick={() => setSelectedImage(img.url)}
                   />
                 ))
               ) : (
@@ -122,10 +120,16 @@ const BlindboxDetail = () => {
               )}
             </div>
 
+            {/* Ảnh chính */}
             <div className="img-main-container">
-              <img src={mainImage} alt={mainImageAlt} className="img-main" />
+              <img
+                src={selectedImage || "https://via.placeholder.com/600"}
+                alt={blindbox.name || "Main blindbox image"}
+                className="img-main"
+              />
             </div>
 
+            {/* Thông tin Blindbox */}
             <div className="product-info-container">
               <div className="product-collection-container">
                 <p className="product-collection-title">Collection:</p>
@@ -153,13 +157,9 @@ const BlindboxDetail = () => {
                     <p className="availability"> {stock} in stock</p>
                   </div>
                   <div className="quantity-container">
-                    <button className="quantity-button" onClick={decrease}>
-                      -
-                    </button>
+                    <button className="quantity-button" onClick={decrease}>-</button>
                     <span className="quantity">{quantity}</span>
-                    <button className="quantity-button" onClick={increase}>
-                      +
-                    </button>
+                    <button className="quantity-button" onClick={increase}>+</button>
                   </div>
                 </div>
 
@@ -170,6 +170,7 @@ const BlindboxDetail = () => {
         )}
       </div>
 
+      {/* Gợi ý Blindbox */}
       <div className="you-may-also-like-container">
         <h2>You may also like</h2>
         <div className="you-may-also-like-products-container">
@@ -192,9 +193,7 @@ const BlindboxDetail = () => {
               <div className="you-may-also-like-products-buttom">
                 <div className="you-may-also-like-products-price">
                   {formatVND(p.price)}{" "}
-                  <span className="you-may-also-like-products-currency">
-                    vnd
-                  </span>
+                  <span className="you-may-also-like-products-currency">vnd</span>
                 </div>
                 <div className="you-may-also-like-products-actions">
                   <Link
