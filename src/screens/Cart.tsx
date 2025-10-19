@@ -23,6 +23,27 @@ type Product = {
   qty: number;
 };
 
+type OrderDetail = {
+  id: number;
+  orderId: number;
+  productId: number;
+  quantity: number;
+  price: number;
+};
+
+type Order = {
+  id: number;
+  name: string;
+  address: string;
+  phone: string;
+  createDate: string;
+  shipPrice: number;
+  payPrice: number;
+  totalPrice: number;
+  status: string;
+  orderDetails: OrderDetail[];
+};
+
 type Ship = {
   id: number;
   name: string;
@@ -35,6 +56,13 @@ const Cart = () => {
 
   const Navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
+  const [orderID, setOrderID] = useState<number>(0);
+  const [orderName, setOrderName] = useState<string>("");
+  const [orderAddress, setOrderAddress] = useState<string>("");
+  const [orderPhone, setOrderPhone] = useState<string>("");
+  const [orderTotal, setOrderTotal] = useState<number>(0);
+  const [orderShip, setOrderShip] = useState<number>(0);
+  const [orderPay, setOrderPay] = useState<number>(0);
   const [method, setMethod] = useState("cod");
   const [isAddress, setIsAddress] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -79,32 +107,87 @@ const Cart = () => {
     }
   };
 
-  // Theo dõi footer hiển thị
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        setShrinkPayment(entries[0].isIntersecting);
-      },
-      { threshold: 0.1 }
-    );
+ useEffect(() => {
+  const handleScroll = () => {
+    if (!footerRef.current) return;
+    const rect = footerRef.current.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    if (rect.top > windowHeight) {
+      setShrinkPayment(false);
+    } else {
+      setShrinkPayment(true);
+    }
+  };
 
-    if (footerRef.current) observer.observe(footerRef.current);
-    return () => {
-      if (footerRef.current) observer.unobserve(footerRef.current);
-    };
-  }, []);
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
 
-  const handleOrrder = async () =>{
 
-  }
+  const handleGetPendingOrder = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const userId = sessionStorage.getItem("userID");
+
+      if (!token) {
+        alert("Vui lòng đăng nhập lại!");
+        Navigate("/Account/Login");
+        return;
+      }
+
+      if (!userId) {
+        alert("Không tìm thấy thông tin người dùng!");
+        return;
+      }
+
+      const url = `${API_URL}/api/Order/pending/${userId}`;
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          accept: "*/*",
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error(`Lỗi HTTP ${res.status}`);
+      const data = await res.json();
+      console.log("✅ Đơn hàng đang chờ:", data);
+
+      setOrderID(data.id);
+      setOrderName(data.name);
+      setOrderAddress(data.address);
+      setOrderPhone(data.phone);
+      setOrderShip(data.shipPrice);
+      setOrderPay(data.payPrice);
+      setOrderTotal(data.totalPrice);
+
+      const mappedProducts: Product[] = data.orderDetails.map((d: any) => ({
+        id: d.product.id,
+        name: d.product.title,
+        desc: d.product.descript,
+        price: d.price,
+        qty: d.quantity,
+        img:
+          d.product.images?.[0]?.address ||
+          "https://via.placeholder.com/150x150?text=No+Image",
+      }));
+
+      setProducts(mappedProducts);
+    } catch (error) {
+      console.error("❌ Lỗi khi lấy đơn hàng pending:", error);
+    }
+  };
 
 
   useEffect(() => {
     handleShip();
+    handleGetPendingOrder();
   }, []);
 
   useEffect(() => {
     if (method === "qr") {
+      setLoading(true);
       const interval = setInterval(async () => {
         try {
           const res = await fetch(
@@ -120,8 +203,10 @@ const Cart = () => {
 
           const transaction = transactions.find(
             (t: any) =>
-              t.transaction_content?.toLowerCase().includes("don hang 9") &&
-              parseFloat(t.amount_in) >= 3000
+              t.transaction_content
+                ?.toLowerCase()
+                .includes("don hang " + orderID) &&
+              parseFloat(t.amount_in) == total
           );
 
           if (transaction) {
@@ -138,6 +223,8 @@ const Cart = () => {
     }
   }, [method, total]);
 
+
+  
   return (
     <div className="cart-page">
       <div className="main-content-cart">
@@ -163,7 +250,9 @@ const Cart = () => {
                       </div>
                       <div className="product-info-left-container">
                         <h5>{p.name}</h5>
-                        <p>{p.desc}</p>
+                        <p className="product-info-left-product-cart-desc">
+                          {p.desc}
+                        </p>
                       </div>
                     </div>
                     <div className="right-container">
@@ -212,181 +301,182 @@ const Cart = () => {
             src={RightBackgrount}
             className={`right-backgrount ${shrinkPayment ? "shrink-bg" : ""}`}
           /> */}
+          <div className="payment-wrapper">
+            <div className={`payment-show ${shrinkPayment ? "shrink" : ""}`}>
+              <p className="title-payment-info">
+                Mọi giao dịch đều được bảo mật và mã hóa.
+              </p>
 
-          <div className={`payment-show`}>
-            <p className="title-payment-info">
-              Mọi giao dịch đều được bảo mật và mã hóa.
-            </p>
+              <div className="bnt-payment-container">
+                <button
+                  className={`bnt-payment ${
+                    method === "cod" ? "bnt-payment-active" : ""
+                  }`}
+                  onClick={() => setMethod("cod")}
+                >
+                  <img className="img-payment-bnt" src={cod} />
+                </button>
+                <button
+                  className={`bnt-payment ${
+                    method === "qr" ? "bnt-payment-active" : ""
+                  }`}
+                  onClick={() => setMethod("qr")}
+                >
+                  <img className="img-payment-bnt" src={qr} />
+                </button>
+                <button
+                  className={`bnt-payment ${
+                    method === "visa" ? "bnt-payment-active" : ""
+                  }`}
+                  onClick={() => setMethod("visa")}
+                >
+                  <img src={visa} className="img-payment-bnt-visa" />
+                  <img className="img-payment-bnt-visa" src={mastercard} />
+                </button>
+              </div>
 
-            <div className="bnt-payment-container">
-              <button
-                className={`bnt-payment ${
-                  method === "cod" ? "bnt-payment-active" : ""
-                }`}
-                onClick={() => setMethod("cod")}
-              >
-                <img className="img-payment-bnt" src={cod} />
-              </button>
-              <button
-                className={`bnt-payment ${
-                  method === "qr" ? "bnt-payment-active" : ""
-                }`}
-                onClick={() => setMethod("qr")}
-              >
-                <img className="img-payment-bnt" src={qr} />
-              </button>
-              <button
-                className={`bnt-payment ${
-                  method === "visa" ? "bnt-payment-active" : ""
-                }`}
-                onClick={() => setMethod("visa")}
-              >
-                <img src={visa} className="img-payment-bnt-visa" />
-                <img className="img-payment-bnt-visa" src={mastercard} />
-              </button>
-            </div>
+              <div className="content-payment-method">
+                {method === "cod" && (
+                  <div className="cod-payment-method">
+                    <div className="title-cod-pay">
+                      <img src={address} className="img-address-cod" />
+                      <h5 className="delivery-information">
+                        Thông tin giao hàng
+                      </h5>
+                    </div>
 
-            <div className="content-payment-method">
-              {method === "cod" && (
-                <div className="cod-payment-method">
-                  <div className="title-cod-pay">
-                    <img src={address} className="img-address-cod" />
-                    <h5 className="delivery-information">
-                      Thông tin giao hàng
-                    </h5>
-                  </div>
-
-                  <div className="info-cod-pay">
-                    {isAddress ? (
-                      <div className="border-info-cod-pay-address-edit">
-                        <input
-                          className="input-address-cod-pay"
-                          type="text"
-                          placeholder="Trịnh Trọng Quyền"
-                        />
-                        <input
-                          className="input-address-cod-pay"
-                          type="text"
-                          placeholder="(+84) 123 456 789"
-                        />
-                        <input
-                          className="input-address-cod-pay"
-                          type="text"
-                          placeholder="123 Đường ABC, Phường XYZ, Quận 1, TP. HCM"
-                        />
-                        <button
-                          className="bnt-apply-address"
-                          onClick={() => setIsAddress(false)}
-                        >
-                          Xác nhận
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="border-info-cod-pay">
-                        <div>
-                          <p className="content-cod-pay">
-                            Trịnh Trọng Quyền (+84) 123 456 789
-                          </p>
-                          <p className="address-cod-pay">
-                            123 Đường ABC, Phường XYZ, Quận 1, TP. HCM
-                          </p>
+                    <div className="info-cod-pay">
+                      {isAddress ? (
+                        <div className="border-info-cod-pay-address-edit">
+                          <input
+                            className="input-address-cod-pay"
+                            type="text"
+                            placeholder={orderName}
+                          />
+                          <input
+                            className="input-address-cod-pay"
+                            type="text"
+                            placeholder={`(84+)` + orderPhone}
+                          />
+                          <input
+                            className="input-address-cod-pay"
+                            type="text"
+                            placeholder={orderAddress}
+                          />
+                          <button
+                            className="bnt-apply-address"
+                            onClick={() => setIsAddress(false)}
+                          >
+                            Xác nhận
+                          </button>
                         </div>
-                        <button
-                          className="bnt-change-address"
-                          onClick={() => setIsAddress(true)}
-                        >
-                          <img src={iconchange} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {method === "qr" && (
-                <div className="border-qr-one">
-                  <p className="content-qr-pay">
-                    Mở ứng dụng ngân hàng và quét mã QR.
-                  </p>
-                  <div className="border-qr-two">
-                    <div className="border-qr-three">
-                      <img
-                        src={`https://qr.sepay.vn/img?acc=${acc}&bank=${bank}&amount=${3000}&des=${"SEVQR thanh toan don hang 9"}`}
-                        alt="QR thanh toán"
-                      />
+                      ) : (
+                        <div className="border-info-cod-pay">
+                          <div>
+                            <p className="content-cod-pay">
+                              {orderName} (84+) {orderPhone}
+                            </p>
+                            <p className="address-cod-pay">{orderAddress}</p>
+                          </div>
+                          <button
+                            className="bnt-change-address"
+                            onClick={() => setIsAddress(true)}
+                          >
+                            <img src={iconchange} />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <p className="payment-amount-qr">
-                    Số tiền thanh toán {formatVNDText(total)}
-                  </p>
-                </div>
-              )}
-            </div>
+                )}
 
-            <div className="line-payment-amount"></div>
-
-            <div className="sub-payment-container">
-              <div className="sub-payment">
-                <p>Tạm tính</p>
-                <p>{formatVNDText(subtotal)}</p>
-              </div>
-              <div className="sub-payment">
-                <p>Phương thức giao hàng</p>
-              </div>
-              <div className="ship-options">
-                {shipList.length > 0 ? (
-                  shipList.map((ship) => (
-                    <label key={ship.id} className="ship-option">
-                      <input
-                        type="radio"
-                        name="ship"
-                        checked={selectedShip?.id === ship.id}
-                        onChange={() => setSelectedShip(ship)}
-                      />
-                      {ship.name} – {ship.price.toLocaleString("vi-VN")}₫
-                    </label>
-                  ))
-                ) : (
-                  <p>Đang tải phương thức giao hàng...</p>
+                {method === "qr" && (
+                  <div className="border-qr-one">
+                    <p className="content-qr-pay">
+                      Mở ứng dụng ngân hàng và quét mã QR.
+                    </p>
+                    <div className="border-qr-two">
+                      <div className="border-qr-three">
+                        <img
+                          src={`https://qr.sepay.vn/img?acc=${acc}&bank=${bank}&amount=${total}&des=${
+                            "SEVQR thanh toan don hang" + orderID
+                          }`}
+                          alt="QR thanh toán"
+                        />
+                      </div>
+                    </div>
+                    <p className="payment-amount-qr">
+                      Số tiền thanh toán {formatVNDText(total)}
+                    </p>
+                  </div>
                 )}
               </div>
-              <div className="sub-payment">
-                <p>Tổng (Tax incl.)</p>
-                <p>{formatVNDText(total)}</p>
+
+              <div className="line-payment-amount"></div>
+
+              <div className="sub-payment-container">
+                <div className="sub-payment">
+                  <p>Tạm tính</p>
+                  <p>{formatVNDText(subtotal)}</p>
+                </div>
+                <div className="sub-payment">
+                  <p>Phương thức giao hàng</p>
+                </div>
+                <div className="ship-options">
+                  {shipList.length > 0 ? (
+                    shipList.map((ship) => (
+                      <label key={ship.id} className="ship-option">
+                        <input
+                          type="radio"
+                          name="ship"
+                          checked={selectedShip?.id === ship.id}
+                          onChange={() => setSelectedShip(ship)}
+                        />
+                        {ship.name} – {ship.price.toLocaleString("vi-VN")}₫
+                      </label>
+                    ))
+                  ) : (
+                    <p>Đang tải phương thức giao hàng...</p>
+                  )}
+                </div>
+                <div className="sub-payment">
+                  <p>Tổng (Tax incl.)</p>
+                  <p>{formatVNDText(total)}</p>
+                </div>
+                {method === "qr" && (
+                  <button className="bnt-checkout-payment">
+                    {" "}
+                    {loading ? (
+                      <ThreeDot
+                        color="#ffffffff"
+                        size="small"
+                        text=""
+                        textColor=""
+                      />
+                    ) : (
+                      "Đặt hàng"
+                    )}{" "}
+                  </button>
+                )}{" "}
+                {method === "visa" && (
+                  <button className="bnt-checkout-payment">
+                    {" "}
+                    {loading ? (
+                      <ThreeDot
+                        color="#ffffffff"
+                        size="small"
+                        text=""
+                        textColor=""
+                      />
+                    ) : (
+                      "Đặt hàng"
+                    )}{" "}
+                  </button>
+                )}{" "}
+                {method === "cod" && (
+                  <button className="bnt-checkout-payment">Đặt hàng</button>
+                )}
               </div>
-              {method === "qr" && (
-                <button className="bnt-checkout-payment">
-                  {" "}
-                  {loading ? (
-                    <ThreeDot
-                      color="#ffffffff"
-                      size="small"
-                      text=""
-                      textColor=""
-                    />
-                  ) : (
-                    "Đặt hàng"
-                  )}{" "}
-                </button>
-              )}{" "}
-              {method === "visa" && (
-                <button className="bnt-checkout-payment">
-                  {" "}
-                  {loading ? (
-                    <ThreeDot
-                      color="#ffffffff"
-                      size="small"
-                      text=""
-                      textColor=""
-                    />
-                  ) : (
-                    "Đặt hàng"
-                  )}{" "}
-                </button>
-              )}{" "}
-              {method === "cod" && (
-                <button className="bnt-checkout-payment">Đặt hàng</button>
-              )}
             </div>
           </div>
         </div>

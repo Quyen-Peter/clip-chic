@@ -3,19 +3,20 @@ import Header from "../component/Header";
 import { useEffect, useState } from "react";
 import cart from "../assest/shoppingCart.png";
 import Footer from "../component/Footer";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   fetchProductById,
   fetchProducts,
-  ProductDetail as ProductDetailType, // 👈 đổi tên kiểu dữ liệu
+  ProductDetail as ProductDetailType,
   ProductListItem,
 } from "../services/productService";
+const API_URL = process.env.REACT_APP_HOST_API;
 
 const formatVND = (n: number) => `${n.toLocaleString("vi-VN")}`;
 
 const ProductDetail = () => {
   const { productId } = useParams();
-
+  const navigate = useNavigate();
   const [product, setProduct] = useState<ProductDetailType | null>(null);
   const [suggestions, setSuggestions] = useState<ProductListItem[]>([]);
   const [quantity, setQuantity] = useState(1);
@@ -30,32 +31,92 @@ const ProductDetail = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
 
-useEffect(() => {
-  let isMounted = true;
+  useEffect(() => {
+    let isMounted = true;
 
-  const loadData = async () => {
-    try {
-      if (!productId) return;
+    const loadData = async () => {
+      try {
+        if (!productId) return;
 
-      const detail = await fetchProductById(Number(productId));
-      const all = await fetchProducts();
+        const detail = await fetchProductById(Number(productId));
+        const all = await fetchProducts();
 
-      if (isMounted) {
-        setProduct(detail);
-        setStock(detail.stock);
-        setSuggestions(all.filter(p => p.id !== detail.id).slice(0, 5)); // gợi ý 5 sản phẩm khác
+        if (isMounted) {
+          setProduct(detail);
+          setStock(detail.stock);
+          setSuggestions(all.filter((p) => p.id !== detail.id).slice(0, 5));
+        }
+      } catch (err) {
+        console.error("Lỗi khi tải dữ liệu:", err);
       }
-    } catch (err) {
-      console.error("Lỗi khi tải dữ liệu:", err);
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [productId]);
+
+  const handleAddOrderDetail = async () => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (token == null) {
+        navigate("/Account/Login");
+      }
+      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${product?.price}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Lỗi HTTP: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("Kết quả thêm chi tiết đơn hàng:", data);
+    } catch (error) {
+      console.error("Lỗi khi thêm chi tiết đơn hàng:", error);
     }
   };
 
-  loadData();
+  const handleAddOrderDetailLike = async (
+    productId: number,
+    quantity: number,
+    price: number
+  ) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (token == null) {
+        navigate("/Account/Login");
+      }
+      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${price}`;
 
-  return () => {
-    isMounted = false;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Lỗi HTTP: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("Kết quả thêm chi tiết đơn hàng:", data);
+    } catch (error) {
+      console.error("Lỗi khi thêm chi tiết đơn hàng:", error);
+    }
   };
-}, [productId]);
 
   return (
     <div>
@@ -80,7 +141,11 @@ useEffect(() => {
 
         <div className="img-main-container">
           <img
-            src={selectedImage || product?.images?.[0]?.url || "https://via.placeholder.com/600"}
+            src={
+              selectedImage ||
+              product?.images?.[0]?.url ||
+              "https://via.placeholder.com/600"
+            }
             alt={product?.images?.[0]?.name || "Main product image"}
             className="img-main"
           />
@@ -88,7 +153,9 @@ useEffect(() => {
 
         <div className="product-info-container">
           <h2 className="product-title">{product?.title || "Loading..."}</h2>
-          <p className="product-description">{product?.description || "Loading..."}</p>
+          <p className="product-description">
+            {product?.description || "Loading..."}
+          </p>
 
           <div className="product-detail-info-container">
             <h2 className="product-price">
@@ -100,12 +167,24 @@ useEffect(() => {
                 <p className="availability">{stock} in stock</p>
               </div>
               <div className="quantity-container">
-                <button className="quantity-button" onClick={decrease}>-</button>
+                <button className="quantity-button" onClick={decrease}>
+                  -
+                </button>
                 <span className="quantity">{quantity}</span>
-                <button className="quantity-button" onClick={increase}>+</button>
+                <button className="quantity-button" onClick={increase}>
+                  +
+                </button>
               </div>
             </div>
-            <button className="add-to-cart-button">Add to Cart</button>
+            <button
+              className="add-to-cart-button"
+              onClick={(e) => {
+                e.preventDefault();
+                handleAddOrderDetail();
+              }}
+            >
+              Add to Cart
+            </button>
           </div>
         </div>
       </div>
@@ -123,14 +202,27 @@ useEffect(() => {
                   <a className="you-may-also-like-products-collection">
                     {p.collectionName}
                   </a>
-                  <a className="you-may-also-like-products-name"> - {p.title}</a>
+                  <a className="you-may-also-like-products-name">
+                    {" "}
+                    - {p.title}
+                  </a>
                 </p>
               </div>
               <div className="you-may-also-like-products-buttom">
                 <div className="you-may-also-like-products-price">
-                  {formatVND(p.price)} <span className="you-may-also-like-products-currency">vnd</span>
+                  {formatVND(p.price)}{" "}
+                  <span className="you-may-also-like-products-currency">
+                    vnd
+                  </span>
                 </div>
-                <button className="you-may-also-like-products-buttom-cart" aria-label="Add to cart">
+                <button
+                  className="you-may-also-like-products-buttom-cart"
+                  aria-label="Add to cart"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleAddOrderDetailLike(p.id, 1, p.price);
+                  }}
+                >
                   <img src={cart} />
                 </button>
               </div>

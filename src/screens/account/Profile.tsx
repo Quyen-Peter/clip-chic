@@ -43,11 +43,37 @@ const Profile = () => {
       }
 
       setUser(data);
+      handleOrder(data.id);
       setImage(data.image || avata);
+      sessionStorage.setItem("userID", data.id);
     } catch (err) {
       console.error("Lỗi khi lấy thông tin người dùng:", err);
     }
   };
+
+  const handleOrder = async (userId : any) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      const res = await fetch(`${API_URL}/api/Order/pending/${userId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "accept": "*/*",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+  
+      if (!res.ok) {
+        throw new Error(`Lỗi HTTP: ${res.status}`);
+      }
+      const data = await res.json();
+      console.log("Danh sách đơn hàng đang chờ:", data);
+  
+    } catch (error) {
+      console.error("Lỗi khi tải đơn hàng đang chờ:", error);
+    }
+  };
+  
 
   useEffect(() => {
     fetchUser();

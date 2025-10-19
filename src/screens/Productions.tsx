@@ -4,8 +4,9 @@ import Footer from "../component/Footer";
 import "../css/Productions.css";
 import { useMemo, useState, useEffect, useCallback } from "react";
 import cart from "../assest/shoppingCart.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fetchProducts, ProductListItem } from "../services/productService";
+const API_URL = process.env.REACT_APP_HOST_API;
 
 type Query = {
   top: "best" | "new" | null;
@@ -44,39 +45,40 @@ function matchPrice(price: number, filter: string) {
 }
 
 const Productions = () => {
-const [products, setProducts] = useState<ProductListItem[]>([]);
-const [isLoading, setIsLoading] = useState<boolean>(false);
-const [error, setError] = useState<string | null>(null);
+  const [products, setProducts] = useState<ProductListItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
   useEffect(() => {
-  let isMounted = true;
+    let isMounted = true;
 
-  const loadProducts = async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await fetchProducts();
-      if (isMounted) {
-        setProducts(data);
+    const loadProducts = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const data = await fetchProducts();
+        if (isMounted) {
+          setProducts(data);
+        }
+      } catch (err) {
+        if (isMounted) {
+          const message =
+            err instanceof Error ? err.message : "Unable to load products.";
+          setError(message);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
-    } catch (err) {
-      if (isMounted) {
-        const message =
-          err instanceof Error ? err.message : "Unable to load products.";
-        setError(message);
-      }
-    } finally {
-      if (isMounted) {
-        setIsLoading(false);
-      }
-    }
-  };
+    };
 
-  loadProducts();
+    loadProducts();
 
-  return () => {
-    isMounted = false;
-  };
-}, []);
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const [query, setQuery] = useState<Query>({
     top: null,
@@ -113,6 +115,38 @@ const [error, setError] = useState<string | null>(null);
       return true;
     });
   }, [query, products]);
+
+  const handleAddOrderDetail = async (
+    productId: number,
+    quantity: number,
+    price: number
+  ) => {
+    try {
+      const token = sessionStorage.getItem("token");
+      if (token == null) {
+        navigate("/Account/Login");
+      }
+      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${price}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Lỗi HTTP: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log("Kết quả thêm chi tiết đơn hàng:", data);
+    } catch (error) {
+      console.error("Lỗi khi thêm chi tiết đơn hàng:", error);
+    }
+  };
 
   return (
     <div className="page">
@@ -156,6 +190,10 @@ const [error, setError] = useState<string | null>(null);
                       <button
                         className="production-cart"
                         aria-label="Add to cart"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleAddOrderDetail(p.id, 1, p.price);
+                        }}
                       >
                         <img src={cart} />
                       </button>
