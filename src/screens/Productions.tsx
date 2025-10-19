@@ -1,15 +1,15 @@
-import Sidebar from "../component/Sidebar";
+import Sidebar, { ProductFilterQuery } from "../component/Sidebar";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
 import "../css/Productions.css";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import cart from "../assest/shoppingCart.png";
 import { Link } from "react-router-dom";
 import { fetchProducts, ProductListItem } from "../services/productService";
 
 type Query = {
   top: "best" | "new" | null;
-  collection: string | null;
+  collectionId: number | null;
   color: string | null;
   price: string | null;
   search?: string | null;
@@ -80,21 +80,30 @@ const [error, setError] = useState<string | null>(null);
 
   const [query, setQuery] = useState<Query>({
     top: null,
-    collection: null,
+    collectionId: null,
     color: null,
     price: null,
     search: null,
   });
 
-  const handleChange = (q: Query) => {
-    setQuery(q);
-    console.log("query:", q);
-  };
+  const handleChange = useCallback((q: ProductFilterQuery) => {
+    setQuery((prev) => ({
+      ...prev,
+      top: q.top,
+      collectionId: q.collectionId,
+      color: q.color,
+      price: q.price,
+    }));
+  }, []);
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
-      if (query.collection && p.collectionName?.toLowerCase() !== query.collection.toLowerCase())
+      if (
+        query.collectionId !== null &&
+        p.collectionId !== query.collectionId
+      ) {
         return false;
+      }
       if (query.price && !matchPrice(p.price, query.price)) return false;
       if (
         query.search &&
