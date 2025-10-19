@@ -4,26 +4,24 @@ import { useEffect, useState } from "react";
 import cart from "../assest/shoppingCart.png";
 import Footer from "../component/Footer";
 import { useParams } from "react-router-dom";
-
-type Product = {
-  id: string;
-  name: string;
-  price: number;
-  color: string;
-  collection: string;
-  bestSeller: boolean;
-  newArrival: boolean;
-  image: string;
-};
+import {
+  fetchProductById,
+  fetchProducts,
+  ProductDetail as ProductDetailType, // 👈 đổi tên kiểu dữ liệu
+  ProductListItem,
+} from "../services/productService";
 
 const formatVND = (n: number) => `${n.toLocaleString("vi-VN")}`;
 
 const ProductDetail = () => {
   const {productId} = useParams(); 
-  const [quantity, setQuantity] = useState(1);
-  const [stock, setStock] = useState(10);
 
-  const increase = () => {
+const [product, setProduct] = useState<ProductDetailType  | null>(null);
+const [suggestions, setSuggestions] = useState<ProductListItem[]>([]);
+const [quantity, setQuantity] = useState(1);
+const [stock, setStock] = useState(0);
+
+const increase = () => {
     if (quantity < stock) setQuantity(quantity + 1);
   };
 
@@ -31,21 +29,32 @@ const ProductDetail = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
 
-  const [products, setProducts] = useState<Product[]>([]);
+useEffect(() => {
+  let isMounted = true;
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch("/products.json");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data: Product[] = await res.json();
-        setProducts(data);
-      } catch (e) {
-        console.error("Fetch products failed:", e);
+  const loadData = async () => {
+    try {
+      if (!productId) return;
+
+      const detail = await fetchProductById(Number(productId));
+      const all = await fetchProducts();
+
+      if (isMounted) {
+        setProduct(detail);
+        setStock(detail.stock);
+        setSuggestions(all.filter(p => p.id !== detail.id).slice(0, 5)); // gợi ý 5 sản phẩm khác
       }
-    };
-    fetchProducts();
-  }, []);
+    } catch (err) {
+      console.error("Lỗi khi tải dữ liệu:", err);
+    }
+  };
+
+  loadData();
+
+  return () => {
+    isMounted = false;
+  };
+}, [productId]);
 
   return (
     <div>
@@ -54,58 +63,30 @@ const ProductDetail = () => {
       </div>
       <div className="product-detail-container">
         <div className="img-left-container">
-          <img
-            src="https://picsum.photos/seed/clip01/600/600"
-            alt=""
-            className="img-left"
-          />
-          <img
-            src="https://picsum.photos/seed/clip02/600/600"
-            alt=""
-            className="img-left"
-          />
-          <img
-            src="https://picsum.photos/seed/clip03/600/600"
-            alt=""
-            className="img-left"
-          />
-          <img
-            src="https://picsum.photos/seed/clip04/600/600"
-            alt=""
-            className="img-left"
-          />
-          <img
-            src="https://picsum.photos/seed/clip05/600/600"
-            alt=""
-            className="img-left"
-          />
+          {product?.images?.slice(1).map((img) => (
+            <img key={img.id} src={img.url} alt={img.name || "Product image"} className="img-left" />
+          ))}
         </div>
+
         <div className="img-main-container">
           <img
-            src="https://picsum.photos/seed/clip01/600/600"
-            alt=""
+            src={product?.images?.[0]?.url || "https://via.placeholder.com/600"}
+            alt={product?.images?.[0]?.name || "Main product image"}
             className="img-main"
           />
         </div>
         <div className="product-info-container">
-          <h2 className="product-title">Sea Whisper</h2>
-          <p className="produc-description">
-            Dark green clip decorated with shells, star and mermaid tail charms
-            - Dark green clip decorated with shells, star and mermaid tail
-            charms - Dark green clip decorated with shells, star and mermaid
-            tail charms
+          <div className="product-collection-container">
+            <p className="product-collection-title">Collection:</p>
+            <p className="product-collection">{product?.collectionName || "Unknown"}</p>
+            <p className="product-collection-description">{product?.collectionDescription || "No description"}</p>
+          </div>
+          <h2 className="product-title">{product?.title || "Loading..."}</h2>
+          <p className="product-description">
+            {product?.description || "Loading..."}
           </p>
           <div className="product-detail-info-container">
-            <div className="product-demention-container">
-              <p className="product-demention-title">Demention:</p>
-              <p className="product-demention">12 cm</p>
-            </div>
-            <div className="product-color-container">
-              <p className="product-color-title">Color:</p>
-              <p className="product-color">dark green</p>
-            </div>
-
-            <h2 className="product-price">85.000 vnd</h2>
+            <h2 className="product-price">{product?.price ? `${formatVND(product.price)} vnd` : "Updating"}</h2>
             <div className="availability-and-quantity-container">
               <div className="availability-container">
                 <p className="availability-title">Availability:</p>
@@ -129,35 +110,29 @@ const ProductDetail = () => {
       <div className="you-may-also-like-container">
         <h2>You may also like</h2>
         <div className="you-may-also-like-products-container">
-          {products.map((p) => (
-            <article key={p.id} className="you-may-also-like-products">
-              <div className="you-may-also-like-products-thumb">
-                <img src={p.image} alt={p.name} />
-              </div>
-              <div className="you-may-also-like-products-sub">
-                <p className="you-may-also-like-products-title">
-                  <a className="you-may-also-like-products-collection">
-                    {p.collection}
-                  </a>
-                  <a className="you-may-also-like-products-name"> - {p.name}</a>
-                </p>
-              </div>
-              <div className="you-may-also-like-products-buttom">
-                <div className="you-may-also-like-products-price">
-                  {formatVND(p.price)}{" "}
-                  <span className="you-may-also-like-products-currency">
-                    vnd
-                  </span>
-                </div>
-                <button
-                  className="you-may-also-like-products-buttom-cart"
-                  aria-label="Add to cart"
-                >
-                  <img src={cart} />
-                </button>
-              </div>
-            </article>
-          ))}
+          {suggestions.map((p) => (
+  <article key={p.id} className="you-may-also-like-products">
+    <div className="you-may-also-like-products-thumb">
+      <img src={p.image} alt={p.title} />
+    </div>
+    <div className="you-may-also-like-products-sub">
+      <p className="you-may-also-like-products-title">
+        <a className="you-may-also-like-products-collection">
+          {p.collectionName}
+        </a>
+        <a className="you-may-also-like-products-name"> - {p.title}</a>
+      </p>
+    </div>
+    <div className="you-may-also-like-products-buttom">
+      <div className="you-may-also-like-products-price">
+        {formatVND(p.price)} <span className="you-may-also-like-products-currency">vnd</span>
+      </div>
+      <button className="you-may-also-like-products-buttom-cart" aria-label="Add to cart">
+        <img src={cart} />
+      </button>
+    </div>
+  </article>
+))}
         </div>
 
         <div className="view-more-button-container">

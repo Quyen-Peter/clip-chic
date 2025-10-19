@@ -1,152 +1,193 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import Header from "../component/Header";
-import "../css/ProductDetail.css";
-import { useParams } from "react-router-dom";
-import cart from "../assest/shoppingCart.png";
 import Footer from "../component/Footer";
-
-type blindBox = {
-  id: string;
-  slug: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  price: number;
-  currency: string;
-  coverImage: string;
-  gallery: string[];
-  stock: number;
-  maxPerOrder: number;
-  releaseDate: string;
-  status: "active" | "inactive";
-  bestSeller: boolean;
-  newArrival: boolean;
-  collection: string;
-};
-
-
+import "../css/ProductDetail.css";
+import cart from "../assest/shoppingCart.png";
+import {
+  fetchBlindBoxById,
+  fetchBlindBoxes,
+  BlindBoxDetail as BlindBoxDetailType,
+  BlindBoxListItem,
+} from "../services/blindBoxService";
 
 const formatVND = (n: number) => `${n.toLocaleString("vi-VN")}`;
 
 const BlindboxDetail = () => {
-  const {blindboxId} = useParams(); 
+  const { blindboxId } = useParams<{ blindboxId: string }>();
+  const [blindbox, setBlindbox] = useState<BlindBoxDetailType | null>(null);
+  const [relatedBoxes, setRelatedBoxes] = useState<BlindBoxListItem[]>([]);
   const [quantity, setQuantity] = useState(1);
-  const [stock, setStock] = useState(10);
+  const [stock, setStock] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!blindboxId) {
+      setError("Không tìm thấy mã blindbox.");
+      setIsLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+    const id = Number(blindboxId);
+    if (Number.isNaN(id)) {
+      setError("Mã blindbox không hợp lệ.");
+      setIsLoading(false);
+      return;
+    }
+
+    const loadData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const [detail, list] = await Promise.all([
+          fetchBlindBoxById(id),
+          fetchBlindBoxes(),
+        ]);
+
+        if (!isMounted) return;
+        setBlindbox(detail);
+        setStock(detail.stock);
+        setRelatedBoxes(list.filter((item) => item.id !== detail.id).slice(0, 4));
+      } catch (e) {
+        if (!isMounted) return;
+        const message =
+          e instanceof Error ? e.message : "Không thể tải dữ liệu blindbox.";
+        setError(message);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [blindboxId]);
 
   const increase = () => {
-    if (quantity < stock) setQuantity(quantity + 1);
+    setQuantity((prev) => (stock > 0 ? Math.min(prev + 1, stock) : prev + 1));
   };
 
   const decrease = () => {
-    if (quantity > 1) setQuantity(quantity - 1);
+    setQuantity((prev) => Math.max(1, prev - 1));
   };
 
-  const [blindbox, setBlindbox] = useState<blindBox[]>([]);
+  const mainImage = blindbox?.images?.[0]?.url ?? "https://via.placeholder.com/600";
+  const mainImageAlt =
+    blindbox?.images?.[0]?.name ?? blindbox?.name ?? "Blindbox image";
 
-  useEffect(() => {
-      const fetchBlindbox = async () => {
-        try {
-          const res = await fetch("/blindbox.json");
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data: blindBox[] = await res.json();
-          setBlindbox(data);
-        } catch (e) {
-          console.error("Fetch products failed:", e);
-        }
-      };
-      fetchBlindbox();
-    }, []);
+  const sideImages = useMemo(
+    () => blindbox?.images?.slice(1) ?? [],
+    [blindbox?.images]
+  );
 
   return (
     <div>
       <div className="header-container">
         <Header />
       </div>
+
       <div className="product-detail-container">
-        <div className="img-left-container">
-          <img
-            src="https://picsum.photos/seed/clip01/600/600"
-            alt=""
-            className="img-left"
-          />
-          <img
-            src="https://picsum.photos/seed/clip02/600/600"
-            alt=""
-            className="img-left"
-          />
-          <img
-            src="https://picsum.photos/seed/clip03/600/600"
-            alt=""
-            className="img-left"
-          />
-          <img
-            src="https://picsum.photos/seed/clip04/600/600"
-            alt=""
-            className="img-left"
-          />
-          <img
-            src="https://picsum.photos/seed/clip05/600/600"
-            alt=""
-            className="img-left"
-          />
-        </div>
-        <div className="img-main-container">
-          <img
-            src="https://picsum.photos/seed/clip01/600/600"
-            alt=""
-            className="img-main"
-          />
-        </div>
-        <div className="product-info-container">
-          <h2 className="product-title">Sea Whisper</h2>
-          <p className="produc-description">
-            Dark green clip decorated with shells, star and mermaid tail charms
-            - Dark green clip decorated with shells, star and mermaid tail
-            charms - Dark green clip decorated with shells, star and mermaid
-            tail charms
-          </p>
-          <div className="product-detail-info-container">
-            <div className="product-demention-container">
-              <p className="product-demention-title">Demention:</p>
-              <p className="product-demention">12 cm</p>
-            </div>
-            <div className="product-color-container">
-              <p className="product-color-title">Color:</p>
-              <p className="product-color">dark green</p>
+        {isLoading && (
+          <div className="product-feedback">Đang tải thông tin blindbox...</div>
+        )}
+
+        {error && (
+          <div className="product-feedback error">{error}</div>
+        )}
+
+        {!isLoading && !error && blindbox && (
+          <>
+            <div className="img-left-container">
+              {sideImages.length > 0 ? (
+                sideImages.map((img) => (
+                  <img
+                    key={img.id}
+                    src={img.url}
+                    alt={img.name || blindbox.name || "Blindbox image"}
+                    className="img-left"
+                  />
+                ))
+              ) : (
+                <img
+                  src="https://via.placeholder.com/600"
+                  alt="Placeholder"
+                  className="img-left"
+                />
+              )}
             </div>
 
-            <h2 className="product-price">85.000 vnd</h2>
-            <div className="availability-and-quantity-container">
-              <div className="availability-container">
-                <p className="availability-title">Availability:</p>
-                <p className="availability"> {stock} in stock</p>
+            <div className="img-main-container">
+              <img src={mainImage} alt={mainImageAlt} className="img-main" />
+            </div>
+
+            <div className="product-info-container">
+              <div className="product-collection-container">
+                <p className="product-collection-title">Collection:</p>
+                <p className="product-collection">
+                  {blindbox.collectionName || "Unknown"}
+                </p>
+                <p className="product-collection-description">
+                  {blindbox.collectionDescription || "No description"}
+                </p>
               </div>
-              <div className="quantity-container">
-                <button className="quantity-button" onClick={decrease}>
-                  -
-                </button>
-                <span className="quantity">{quantity}</span>
-                <button className="quantity-button" onClick={increase}>
-                  +
-                </button>
+
+              <h2 className="product-title">{blindbox.name}</h2>
+              <p className="product-description">
+                {blindbox.description || "Updating..."}
+              </p>
+
+              <div className="product-detail-info-container">
+                <h2 className="product-price">
+                  {blindbox.price ? `${formatVND(blindbox.price)} vnd` : "Updating"}
+                </h2>
+
+                <div className="availability-and-quantity-container">
+                  <div className="availability-container">
+                    <p className="availability-title">Availability:</p>
+                    <p className="availability"> {stock} in stock</p>
+                  </div>
+                  <div className="quantity-container">
+                    <button className="quantity-button" onClick={decrease}>
+                      -
+                    </button>
+                    <span className="quantity">{quantity}</span>
+                    <button className="quantity-button" onClick={increase}>
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <button className="add-to-cart-button">Add to Cart</button>
               </div>
             </div>
-            <button className="add-to-cart-button">Add to Cart</button>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       <div className="you-may-also-like-container">
         <h2>You may also like</h2>
         <div className="you-may-also-like-products-container">
-          {blindbox.map((p) => (
+          {relatedBoxes.map((p) => (
             <article key={p.id} className="you-may-also-like-products">
               <div className="you-may-also-like-products-thumb">
-                <img src={p.coverImage} alt={p.coverImage} />
+                <img
+                  src={p.image || "https://via.placeholder.com/300"}
+                  alt={p.name}
+                />
               </div>
               <div className="you-may-also-like-products-sub-blindbox">
-                <p className="you-may-also-like-products-collection-blindbox">{p.title}</p>
-                <p className="you-may-also-like-products-name-blindbox you-may-also-like-products-title">{p.subtitle}</p>
+                <p className="you-may-also-like-products-collection-blindbox">
+                  {p.collectionName}
+                </p>
+                <p className="you-may-also-like-products-name-blindbox you-may-also-like-products-title">
+                  {p.name}
+                </p>
               </div>
               <div className="you-may-also-like-products-buttom">
                 <div className="you-may-also-like-products-price">
@@ -155,20 +196,30 @@ const BlindboxDetail = () => {
                     vnd
                   </span>
                 </div>
-                <button
-                  className="you-may-also-like-products-buttom-cart"
-                  aria-label="Add to cart"
-                >
-                  <img src={cart} />
-                </button>
+                <div className="you-may-also-like-products-actions">
+                  <Link
+                    to={`/blindboxDetail/${p.id}`}
+                    className="you-may-also-like-products-view"
+                  >
+                    View
+                  </Link>
+                  <button
+                    className="you-may-also-like-products-buttom-cart"
+                    aria-label="Add to cart"
+                  >
+                    <img src={cart} alt="Add to cart" />
+                  </button>
+                </div>
               </div>
             </article>
           ))}
         </div>
 
-        <div className="view-more-button-container">
-          <button className="view-more-button">view More</button>
-        </div>
+        {relatedBoxes.length > 0 && (
+          <div className="view-more-button-container">
+            <button className="view-more-button">view More</button>
+          </div>
+        )}
       </div>
 
       <div className="footer-product-detail-container">

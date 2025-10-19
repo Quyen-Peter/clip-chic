@@ -1,35 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Header from "../component/Header";
-import SidebarBlindbox from "../component/SidebarBlindbox";
+import SidebarBlindbox, {
+  BlindboxFilterQuery,
+} from "../component/SidebarBlindbox";
+import Footer from "../component/Footer";
 import { Link } from "react-router-dom";
 import "../css/BlindBox.css";
 import cart from "../assest/shoppingCart.png";
-
-type blindBox = {
-  id: string;
-  slug: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  price: number;
-  currency: string;
-  coverImage: string;
-  gallery: string[];
-  stock: number;
-  maxPerOrder: number;
-  releaseDate: string;
-  status: "active" | "inactive";
-  bestSeller: boolean;
-  newArrival: boolean;
-  collection: string;
-};
-
-
+import { fetchBlindBoxes, BlindBoxListItem } from "../services/blindBoxService";
 
 type QueryBlindbox = {
   top: "best" | "new" | null;
-  collection: string | null;
-  search?: string | null;
+  collectionId: number | null;
+  search?: string;
 };
 
 const formatVND = (n: number) => `${n.toLocaleString("vi-VN")}`;
@@ -37,38 +20,42 @@ const formatVND = (n: number) => `${n.toLocaleString("vi-VN")}`;
 const Blindbox = () => {
   const [query, setQuery] = useState<QueryBlindbox>({
     top: null,
-    collection: null,
-    search: null,
+    collectionId: null,
+    search: "",
   });
 
-  const handleChange = (q: QueryBlindbox) => {
-    setQuery(q);
-    console.log("query:", q);
-  };
+  const handleChange = useCallback((filters: BlindboxFilterQuery) => {
+    setQuery((prev) => ({
+      ...prev,
+      top: filters.top,
+      collectionId: filters.collectionId,
+    }));
+  }, []);
 
-  const [blindBox, setBlindBox] = useState<blindBox[]>([]);
-
+  const [blindBox, setBlindBox] = useState<BlindBoxListItem[]>([]);
   useEffect(() => {
-    const fetchProducts = async () => {
+    const loadBlindBoxes = async () => {
       try {
-        const res = await fetch("/blindbox.json");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data: blindBox[] = await res.json();
+        const data = await fetchBlindBoxes();
         setBlindBox(data);
       } catch (e) {
-        console.error("Fetch products failed:", e);
+        console.error("Fetch blindboxes failed:", e);
       }
     };
-    fetchProducts();
+    loadBlindBoxes();
   }, []);
 
   const filterBlindbox = useMemo(() => {
     return blindBox.filter((p) => {
-      if (query.top === "best" && !p.bestSeller) return false;
-      if (query.top === "new" && !p.newArrival) return false;
       if (
-        query.collection &&
-        p.collection.toLowerCase() !== query.collection.toLowerCase()
+        query.collectionId !== null &&
+        p.collectionId !== query.collectionId
+      ) {
+        return false;
+      }
+      if (
+        query.search &&
+        !p.name.toLowerCase().includes(query.search.toLowerCase())
       )
         return false;
       return true;
@@ -76,43 +63,67 @@ const Blindbox = () => {
   }, [query, blindBox]);
 
   return (
-    <div>
-      <div className="header-bindbox">
+    <div className="blindbox-page">
+      <header className="blindbox-site-header">
         <Header />
-      </div>
-      <div className="main-bindbox-container">
-        <div className="sidebar-bindbox">
+      </header>
+
+      <div className="blindbox-page-body">
+        <div className="blindbox-sidebar-wrapper">
           <SidebarBlindbox onChange={handleChange} />
         </div>
-        <div className="bindbox-container">
-          <a className="blindbox-count">{filterBlindbox.length} products</a>
-          
-          {filterBlindbox.map((item) => (
-            <div key={item.id} className="bindbox-item">
-              <Link to={`/blindboxDetail/${item.id}`} className="bindbox-link">
-                <div className="img-blindbox-container">
-                  <img
-                    src={item.coverImage}
-                    alt={item.coverImage}
-                    className="img-blindbox"
-                  />
-                </div>
 
-                <div className="bindbox-info">
-                  <h3>{item.title}</h3>
-                  <p>{item.subtitle}</p>
-                  <p>{item.description}</p>
-                  <p>{item.slug}</p>
-                  <h4>{formatVND(item.price)} VND</h4>
-                </div>
-                <button className="btn-buy-blindbox">
-                  <img src={cart} className="btn-buy-blindbox-img"/>
+        <main className="blindbox-content">
+          <span className="blindbox-count">
+            {filterBlindbox.length} blindboxes
+          </span>
+
+          <div className="blindbox-list">
+            {filterBlindbox.map((item) => (
+              <div key={item.id} className="blindbox-item">
+                <Link
+                  to={`/blindboxDetail/${item.id}`}
+                  className="bindbox-link"
+                >
+                  <div className="img-blindbox-container">
+                    <img
+                      src={item.image || "https://via.placeholder.com/300"}
+                      alt={item.name}
+                      className="img-blindbox"
+                    />
+                  </div>
+
+                  <div className="bindbox-info">
+                    <h3>{item.name}</h3>
+                    <p>{item.description}</p>
+                    {item.collectionName && (
+                      <p className="blindbox-collection">
+                        Collection: {item.collectionName}
+                      </p>
+                    )}
+                    {item.status && (
+                      <p className="blindbox-status">Status: {item.status}</p>
+                    )}
+                    <h4>{formatVND(item.price)} VND</h4>
+                  </div>
+                </Link>
+
+                <button className="btn-buy-blindbox" type="button">
+                  <img
+                    src={cart}
+                    className="btn-buy-blindbox-img"
+                    alt="Add to cart"
+                  />
                 </button>
-              </Link>
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        </main>
       </div>
+
+      {/* <footer className="site-footer">
+        <Footer />
+      </footer> */}
     </div>
   );
 };
