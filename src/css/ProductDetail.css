@@ -16,22 +16,50 @@
 .img-left-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 2vh;
+  width: 6vw;
+  margin-right: 30px;
 }
 
 .img-left {
-  width: 14%;
-  border-radius: 6px;
+  width: 100%;
+  aspect-ratio: 1/1;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background-color: #FBF3D5;
+  object-fit: cover; 
+  object-position: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, border 0.2s ease;
+}
+
+.img-left:hover {
+  transform: scale(1.05);
+}
+
+.active-thumbnail {
+  border: 2px solid #FF6EA5;
+  transform: scale(1.05);
 }
 
 .img-main-container {
-  margin-right: 0;
-  margin-left: -30%;
+  height: 70vh;
+  aspect-ratio: 1/1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #FF6EA5;
+  margin-right: 5%;
+  border-radius: 12px;
+  background-color: #FBF3D5; /* màu nền nhẹ cho khung */
+  overflow: hidden;          /* để ảnh không tràn */
 }
 
 .img-main {
-  width: 77.8%;
-  border-radius: 15px;
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover; 
+  object-position: center;
 }
 
 .product-info-container {
