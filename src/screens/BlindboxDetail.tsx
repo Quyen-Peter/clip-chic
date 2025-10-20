@@ -205,8 +205,15 @@ const BlindboxDetail = () => {
 
             {/* Thông tin Blindbox */}
             <div className="product-info-container">
-              <div className="product-collection-container"></div>
-
+              {/* <div className="product-collection-container">
+                <p className="product-collection-title">Collection:</p>
+                <p className="product-collection">
+                  {blindbox.collectionName || "Unknown"}
+                </p>
+                <p className="product-collection-description">
+                  {blindbox.collectionDescription || "No description"}
+                </p>
+              </div> */}
               <h2 className="product-title">{blindbox.name}</h2>
               <p className="product-description">
                 {blindbox.description || "Updating..."}
