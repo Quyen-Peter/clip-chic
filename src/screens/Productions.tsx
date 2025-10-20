@@ -6,6 +6,8 @@ import { useMemo, useState, useEffect, useCallback } from "react";
 import cart from "../assest/shoppingCart.png";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchProducts, ProductListItem } from "../services/productService";
+import { flyToCart } from "../services/flyToCart";
+
 const API_URL = process.env.REACT_APP_HOST_API;
 
 type Query = {
@@ -117,34 +119,37 @@ const Productions = () => {
   }, [query, products]);
 
   const handleAddOrderDetail = async (
+    e: React.MouseEvent<HTMLButtonElement>,
     productId: number,
     quantity: number,
-    price: number
+    price: number,
+    img: string
   ) => {
+    e.preventDefault();
     try {
       const token = sessionStorage.getItem("token");
-      if (token == null) {
+      if (!token) {
         navigate("/Account/Login");
+        return;
       }
-      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${price}`;
 
+      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${price}`;
       const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           accept: "*/*",
-          ...(token && { Authorization: `Bearer ${token}` }),
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!res.ok) {
-        throw new Error(`Lỗi HTTP: ${res.status}`);
-      }
-
+      if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status}`);
       const data = await res.json();
-      console.log("Kết quả thêm chi tiết đơn hàng:", data);
+
+      console.log("✅ Đã thêm vào giỏ hàng:", data);
+      flyToCart(e.nativeEvent as MouseEvent, img);
     } catch (error) {
-      console.error("Lỗi khi thêm chi tiết đơn hàng:", error);
+      console.error("❌ Lỗi khi thêm chi tiết đơn hàng:", error);
     }
   };
 
@@ -192,10 +197,17 @@ const Productions = () => {
                         aria-label="Add to cart"
                         onClick={(e) => {
                           e.preventDefault();
-                          handleAddOrderDetail(p.id, 1, p.price);
+                          e.stopPropagation();
+                          handleAddOrderDetail(
+                            e,
+                            p.id,
+                            1,
+                            p.price,
+                            p.image ?? ""
+                          );
                         }}
                       >
-                        <img src={cart} />
+                        <img src={cart} alt="Add to cart" />
                       </button>
                     </div>
                   </Link>

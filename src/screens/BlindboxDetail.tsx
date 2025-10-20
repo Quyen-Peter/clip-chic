@@ -38,7 +38,7 @@ const BlindboxDetail = () => {
       return;
     }
 
-        const loadData = async () => {
+    const loadData = async () => {
       setIsLoading(true);
       setError(null);
       try {
@@ -51,7 +51,9 @@ const BlindboxDetail = () => {
         setBlindbox(detail);
         setStock(detail.stock);
         setSelectedImage(detail.images?.[0]?.url || null);
-        setRelatedBoxes(list.filter((item) => item.id !== detail.id).slice(0, 4));
+        setRelatedBoxes(
+          list.filter((item) => item.id !== detail.id).slice(0, 4)
+        );
       } catch (e) {
         if (!isMounted) return;
         const message =
@@ -77,10 +79,7 @@ const BlindboxDetail = () => {
     setQuantity((prev) => Math.max(1, prev - 1));
   };
 
-  const sideImages = useMemo(
-    () => blindbox?.images ?? [],
-    [blindbox?.images]
-  );
+  const sideImages = useMemo(() => blindbox?.images ?? [], [blindbox?.images]);
 
   return (
     <div>
@@ -101,7 +100,7 @@ const BlindboxDetail = () => {
             <div className="img-left-container">
               {sideImages.length > 0 ? (
                 sideImages.map((img) => (
-<img
+                  <img
                     key={img.id}
                     src={img.url}
                     alt={img.name || blindbox.name || "Blindbox image"}
@@ -148,18 +147,24 @@ const BlindboxDetail = () => {
 
               <div className="product-detail-info-container">
                 <h2 className="product-price">
-                  {blindbox.price ? `${formatVND(blindbox.price)} vnd` : "Updating"}
+                  {blindbox.price
+                    ? `${formatVND(blindbox.price)} vnd`
+                    : "Updating"}
                 </h2>
 
                 <div className="availability-and-quantity-container">
                   <div className="availability-container">
-                    <p className="availability-title">Availability:</p>
-                    <p className="availability"> {stock} in stock</p>
+                    <p className="availability-title">Còn:</p>
+                    <p className="availability"> {stock} sản phẩm trong kho</p>
                   </div>
                   <div className="quantity-container">
-                    <button className="quantity-button" onClick={decrease}>-</button>
+                    <button className="quantity-button" onClick={decrease}>
+                      -
+                    </button>
                     <span className="quantity">{quantity}</span>
-                    <button className="quantity-button" onClick={increase}>+</button>
+                    <button className="quantity-button" onClick={increase}>
+                      +
+                    </button>
                   </div>
                 </div>
 
@@ -172,44 +177,45 @@ const BlindboxDetail = () => {
 
       {/* Gợi ý Blindbox */}
       <div className="you-may-also-like-container">
-        <h2>You may also like</h2>
+        <h2>Có thể bạn sẽ thích</h2>
         <div className="you-may-also-like-products-container">
           {relatedBoxes.map((p) => (
             <article key={p.id} className="you-may-also-like-products">
-<div className="you-may-also-like-products-thumb">
-                <img
-                  src={p.image || "https://via.placeholder.com/300"}
-                  alt={p.name}
-                />
-              </div>
-              <div className="you-may-also-like-products-sub-blindbox">
-                <p className="you-may-also-like-products-collection-blindbox">
-                  {p.collectionName}
-                </p>
-                <p className="you-may-also-like-products-name-blindbox you-may-also-like-products-title">
-                  {p.name}
-                </p>
-              </div>
-              <div className="you-may-also-like-products-buttom">
-                <div className="you-may-also-like-products-price">
-                  {formatVND(p.price)}{" "}
-                  <span className="you-may-also-like-products-currency">vnd</span>
+              <Link
+                to={`/blindboxDetail/${p.id}`}
+                className="link-product"
+              >
+                <div className="you-may-also-like-products-thumb">
+                  <img
+                    src={p.image || "https://via.placeholder.com/300"}
+                    alt={p.name}
+                  />
                 </div>
-                <div className="you-may-also-like-products-actions">
-                  <Link
-                    to={`/blindboxDetail/${p.id}`}
-                    className="you-may-also-like-products-view"
-                  >
-                    View
-                  </Link>
-                  <button
-                    className="you-may-also-like-products-buttom-cart"
-                    aria-label="Add to cart"
-                  >
-                    <img src={cart} alt="Add to cart" />
-                  </button>
+                <div className="you-may-also-like-products-sub-blindbox">
+                  <p className="you-may-also-like-products-collection-blindbox">
+                    {p.collectionName}
+                  </p>
+                  <p className="you-may-also-like-products-name-blindbox you-may-also-like-products-title">
+                    {p.name}
+                  </p>
                 </div>
-              </div>
+                <div className="you-may-also-like-products-buttom">
+                  <div className="you-may-also-like-products-price">
+                    {formatVND(p.price)}{" "}
+                    <span className="you-may-also-like-products-currency">
+                      vnd
+                    </span>
+                  </div>
+                  <div className="you-may-also-like-products-actions">
+                    <button
+                      className="you-may-also-like-products-buttom-cart"
+                      aria-label="Add to cart"
+                    >
+                      <img src={cart} alt="Add to cart" />
+                    </button>
+                  </div>
+                </div>
+              </Link>
             </article>
           ))}
         </div>

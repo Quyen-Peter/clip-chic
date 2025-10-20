@@ -127,12 +127,18 @@
   cursor: pointer;
   background-color: #ffffff;
   border: #ffffff;
+  width: 40px;
+  height: 40px;
 }
 
 .production-cart img{
   width: 23px;
 }
 
+.production-cart:hover{
+  border: 1px solid #FF6EA5;
+  border-radius: 20px;
+}
 
 .empty{
   margin-top: 120px;
