@@ -163,8 +163,12 @@ const ProductDetail = () => {
             className="img-main"
           />
         </div>
-
         <div className="product-info-container">
+            {/* <div className="product-collection-container">
+            <p className="product-collection-title">Collection:</p>
+            <p className="product-collection">{product?.collectionName || "Unknown"}</p>
+            <p className="product-collection-description">{product?.collectionDescription || "No description"}</p>
+            </div> */}
           <h2 className="product-title">{product?.title || "Loading..."}</h2>
           <p className="product-description">
             {product?.description || "Loading..."}
