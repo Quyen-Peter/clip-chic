@@ -145,8 +145,6 @@ const Productions = () => {
 
       if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status}`);
       const data = await res.json();
-
-      console.log("✅ Đã thêm vào giỏ hàng:", data);
       flyToCart(e.nativeEvent as MouseEvent, img);
     } catch (error) {
       console.error("❌ Lỗi khi thêm chi tiết đơn hàng:", error);
@@ -168,7 +166,7 @@ const Productions = () => {
 
         <div>
           <main className="content">
-            <a className="products-count">{filtered.length} products</a>
+            <a className="products-count">{filtered.length} Sản phẩm</a>
 
             <div className="products-grid">
               {filtered.map((p) => (

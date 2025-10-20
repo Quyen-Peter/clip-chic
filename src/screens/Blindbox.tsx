@@ -4,20 +4,22 @@ import SidebarBlindbox, {
   BlindboxFilterQuery,
 } from "../component/SidebarBlindbox";
 import Footer from "../component/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../css/BlindBox.css";
 import cart from "../assest/shoppingCart.png";
 import { fetchBlindBoxes, BlindBoxListItem } from "../services/blindBoxService";
+import { flyToCart } from "../services/flyToCart";
+const API_URL = process.env.REACT_APP_HOST_API;
 
 type QueryBlindbox = {
   top: "best" | "new" | null;
   collectionId: number | null;
   search?: string;
 };
-
 const formatVND = (n: number) => `${n.toLocaleString("vi-VN")}`;
 
 const Blindbox = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState<QueryBlindbox>({
     top: null,
     collectionId: null,
@@ -62,6 +64,38 @@ const Blindbox = () => {
     });
   }, [query, blindBox]);
 
+  const handleAddOrderDetail = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    productId: number,
+    quantity: number,
+    price: number,
+    img: string
+  ) => {
+    e.preventDefault();
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        navigate("/Account/Login");
+        return;
+      }
+      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${price}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status}`);
+      const data = await res.json();
+      flyToCart(e.nativeEvent as MouseEvent, img);
+    } catch (error) {
+      console.error("❌ Lỗi khi thêm chi tiết đơn hàng:", error);
+    }
+  };
+
   return (
     <div className="blindbox-page">
       <header className="blindbox-site-header">
@@ -75,9 +109,8 @@ const Blindbox = () => {
 
         <main className="blindbox-content">
           <span className="blindbox-count">
-            {filterBlindbox.length} blindboxes
+            {filterBlindbox.length} Sản phẩm
           </span>
-
           <div className="blindbox-list">
             {filterBlindbox.map((item) => (
               <div key={item.id} className="blindbox-item">
@@ -98,17 +131,28 @@ const Blindbox = () => {
                     <p>{item.description}</p>
                     {item.collectionName && (
                       <p className="blindbox-collection">
-                        Collection: {item.collectionName}
+                        {item.collectionName}
                       </p>
-                    )}
-                    {item.status && (
-                      <p className="blindbox-status">Status: {item.status}</p>
                     )}
                     <h4>{formatVND(item.price)} VND</h4>
                   </div>
                 </Link>
 
-                <button className="btn-buy-blindbox" type="button">
+                <button
+                  className="btn-buy-blindbox"
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleAddOrderDetail(
+                      e,
+                      item.id,
+                      1,
+                      item.price,
+                      item.image ?? ""
+                    );
+                  }}
+                >
                   <img
                     src={cart}
                     className="btn-buy-blindbox-img"

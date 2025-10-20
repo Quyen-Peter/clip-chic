@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Header from "../component/Header";
 import Footer from "../component/Footer";
 import "../css/ProductDetail.css";
@@ -10,10 +10,13 @@ import {
   BlindBoxDetail as BlindBoxDetailType,
   BlindBoxListItem,
 } from "../services/blindBoxService";
+import { flyToCart } from "../services/flyToCart";
+const API_URL = process.env.REACT_APP_HOST_API;
 
 const formatVND = (n: number) => `${n.toLocaleString("vi-VN")}`;
 
 const BlindboxDetail = () => {
+  const navigate = useNavigate();
   const { blindboxId } = useParams<{ blindboxId: string }>();
   const [blindbox, setBlindbox] = useState<BlindBoxDetailType | null>(null);
   const [relatedBoxes, setRelatedBoxes] = useState<BlindBoxListItem[]>([]);
@@ -81,6 +84,78 @@ const BlindboxDetail = () => {
 
   const sideImages = useMemo(() => blindbox?.images ?? [], [blindbox?.images]);
 
+  const handleAddOrderDetailWithAnimation = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+    const button = e.currentTarget;
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        navigate("/Account/Login");
+        return;
+      }
+
+      const url = `${API_URL}/api/Order/add-detail?productId=${blindboxId}&quantity=${quantity}&price=${blindbox?.price}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status}`);
+
+      const data = await res.json();
+      console.log("Kết quả thêm chi tiết đơn hàng:", data);
+      button.classList.add("clicked");
+      setTimeout(() => {
+        button.classList.remove("clicked");
+      }, 1500);
+    } catch (error) {
+      console.error("Lỗi khi thêm chi tiết đơn hàng:", error);
+    }
+  };
+
+  const handleAddOrderDetailLike = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    productId: number,
+    quantity: number,
+    price: number,
+    img: string
+  ) => {
+    e.preventDefault();
+    try {
+      const token = sessionStorage.getItem("token");
+      if (token == null) {
+        navigate("/Account/Login");
+      }
+      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${price}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`Lỗi HTTP: ${res.status}`);
+      }
+
+      const data = await res.json();
+      flyToCart(e.nativeEvent as MouseEvent, img);
+      console.log("Kết quả thêm chi tiết đơn hàng:", data);
+    } catch (error) {
+      console.error("Lỗi khi thêm chi tiết đơn hàng:", error);
+    }
+  };
+
   return (
     <div>
       <div className="header-container">
@@ -130,15 +205,7 @@ const BlindboxDetail = () => {
 
             {/* Thông tin Blindbox */}
             <div className="product-info-container">
-              <div className="product-collection-container">
-                <p className="product-collection-title">Collection:</p>
-                <p className="product-collection">
-                  {blindbox.collectionName || "Unknown"}
-                </p>
-                <p className="product-collection-description">
-                  {blindbox.collectionDescription || "No description"}
-                </p>
-              </div>
+              <div className="product-collection-container"></div>
 
               <h2 className="product-title">{blindbox.name}</h2>
               <p className="product-description">
@@ -168,7 +235,17 @@ const BlindboxDetail = () => {
                   </div>
                 </div>
 
-                <button className="add-to-cart-button">Add to Cart</button>
+                <button
+                  className="cart-button"
+                  onClick={(e) => handleAddOrderDetailWithAnimation(e)}
+                >
+                  <span className="add-to-cart">Thêm vào giỏ hàng</span>
+                  <span className="added">
+                    <i className="fas fa-check"></i>
+                  </span>
+                  <i className="fas fa-shopping-cart"></i>
+                  <i className="fas fa-box"></i>
+                </button>
               </div>
             </div>
           </>
@@ -181,10 +258,7 @@ const BlindboxDetail = () => {
         <div className="you-may-also-like-products-container">
           {relatedBoxes.map((p) => (
             <article key={p.id} className="you-may-also-like-products">
-              <Link
-                to={`/blindboxDetail/${p.id}`}
-                className="link-product"
-              >
+              <Link to={`/blindboxDetail/${p.id}`} className="link-product">
                 <div className="you-may-also-like-products-thumb">
                   <img
                     src={p.image || "https://via.placeholder.com/300"}
@@ -210,6 +284,17 @@ const BlindboxDetail = () => {
                     <button
                       className="you-may-also-like-products-buttom-cart"
                       aria-label="Add to cart"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAddOrderDetailLike(
+                          e,
+                          p.id,
+                          1,
+                          p.price,
+                          p.image ?? ""
+                        );
+                      }}
                     >
                       <img src={cart} alt="Add to cart" />
                     </button>

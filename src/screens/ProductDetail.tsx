@@ -59,44 +59,41 @@ const ProductDetail = () => {
     };
   }, [productId]);
 
- const handleAddOrderDetailWithAnimation = async (
-  e: React.MouseEvent<HTMLButtonElement>
-) => {
-  e.preventDefault();
-  const button = e.currentTarget;
-  try {
-    const token = sessionStorage.getItem("token");
-    if (!token) {
-      navigate("/Account/Login");
-      return;
+  const handleAddOrderDetailWithAnimation = async (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    e.preventDefault();
+    const button = e.currentTarget;
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        navigate("/Account/Login");
+        return;
+      }
+
+      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${product?.price}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      });
+
+      if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status}`);
+
+      const data = await res.json();
+      console.log("Kết quả thêm chi tiết đơn hàng:", data);
+      button.classList.add("clicked");
+      setTimeout(() => {
+        button.classList.remove("clicked");
+      }, 1500);
+    } catch (error) {
+      console.error("Lỗi khi thêm chi tiết đơn hàng:", error);
     }
-
-    const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${product?.price}`;
-
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        accept: "*/*",
-        ...(token && { Authorization: `Bearer ${token}` }),
-      },
-    });
-
-    if (!res.ok) throw new Error(`Lỗi HTTP: ${res.status}`);
-
-    const data = await res.json();
-    console.log("Kết quả thêm chi tiết đơn hàng:", data);
-    button.classList.add("clicked");
-    setTimeout(() => {
-      button.classList.remove("clicked");
-    }, 1500);
-
-  } catch (error) {
-    console.error("Lỗi khi thêm chi tiết đơn hàng:", error);
-  }
-};
-
-
+  };
 
   const handleAddOrderDetailLike = async (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -197,7 +194,9 @@ const ProductDetail = () => {
               onClick={(e) => handleAddOrderDetailWithAnimation(e)}
             >
               <span className="add-to-cart">Thêm vào giỏ hàng</span>
-              <span className="added"><i className="fas fa-check"></i></span>
+              <span className="added">
+                <i className="fas fa-check"></i>
+              </span>
               <i className="fas fa-shopping-cart"></i>
               <i className="fas fa-box"></i>
             </button>

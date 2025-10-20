@@ -18,7 +18,7 @@
 .blindbox-page-body {
   display: grid;
   grid-template-columns: 280px 1fr;
-  gap: 24px;
+  gap: 40px;
   padding: 96px 32px 64px;
 }
 
@@ -31,11 +31,13 @@
 .blindbox-content {
   position: relative;
   padding-right: 50px;
+  top: 10%;
+  margin-left: 5%;
 }
 
 .blindbox-count {
   position: absolute;
-  right: 32px;
+  right: 55px;
   top: -32px;
   color: #173da2;
   font-weight: 600;
@@ -45,16 +47,17 @@
 .blindbox-list {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
+  
 }
 
 .blindbox-item {
   display: flex;
   align-items: stretch;
-  gap: 24px;
+  gap: 20px;
   border: 2px solid #ff6ea5;
   border-radius: 16px;
-  padding: 18px;
+  padding: 10px;
   background: #ffffff;
   box-shadow: 0 6px 18px rgba(255, 142, 180, 0.12);
 }
@@ -100,6 +103,7 @@
 .bindbox-info p {
   font-size: 15px;
   margin: 0;
+  color: #ff8fb4;
 }
 
 .blindbox-collection,
@@ -120,11 +124,19 @@
   border: none;
   background: none;
   cursor: pointer;
+  margin-right: 2px;
+}
+
+.btn-buy-blindbox:hover{
+   border: 1px solid #ff6ea5;
+   width: 40px;
+   height: 40px;
+   border-radius: 20px;
 }
 
 .btn-buy-blindbox-img {
-  width: 48px;
-  height: 48px;
+  width: 25px;
+  height: 25px;
 }
 
 .blindbox-site-footer {

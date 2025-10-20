@@ -67,7 +67,7 @@ const SidebarBlindbox = ({ onChange }: SidebarBlindboxProps) => {
 
   return (
     <aside className="sidebar">
-      <img className="background-sidebar" src={BackgroundNavbar} alt="" />
+      <img className="background-sidebar" style={{marginLeft:"-30px"}} src={BackgroundNavbar} alt="" />
 
       <nav className="sidebar-menu">
         <button

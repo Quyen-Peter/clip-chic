@@ -34,6 +34,7 @@ export interface BlindBoxListItem {
   status?: string;
   collectionId?: number;
   collectionName?: string;
+  collectionDes?: string;
   image?: string;
 }
 
@@ -89,7 +90,7 @@ const mapBlindBox = (blindBox: BackendBlindBox): BlindBoxListItem => {
     stock: Number(blindBox.stock ?? 0),
     status: blindBox.status ?? undefined,
     collectionId: blindBox.collectId ?? blindBox.collection?.id ?? undefined,
-    collectionName: blindBox.collection?.name ?? undefined,
+    collectionName: blindBox.collection?.descript ?? undefined,
     image: images[0]?.url,
   };
 };
