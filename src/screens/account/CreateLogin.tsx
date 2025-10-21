@@ -2,6 +2,7 @@ import "../../css/CreateLogin.css";
 import { Link, useNavigate } from "react-router-dom";
 import LoginWith from "../../component/LoginWith";
 import { useState } from "react";
+import { ThreeDot } from "react-loading-indicators";
 
 const CreateLogin = () => {
   const API_URL = process.env.REACT_APP_HOST_API;
@@ -11,13 +12,17 @@ const CreateLogin = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPass, setConfirmPass] = useState<string>("");
   const [error, setError] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     if (password !== confirmPass) {
       setError("Mật khẩu xác nhận không khớp!");
+      setLoading(false);
       return;
     }
 
@@ -32,16 +37,19 @@ const CreateLogin = () => {
         }),
       });
 
-     const data = await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
+        setLoading(false);
         setError(data.message);
+      } else {
+        setLoading(false);
+        setShowPopup(true);
+        console.log("Tạo tài khoản thành công:", data);
+        // navigate("/Account/Login");
       }
-      console.log("Tạo tài khoản thành công:", data);
-      alert("Tạo tài khoản thành công!");
-      navigate("/Account/Login");
     } catch (err) {
-      console.error(err);
+      setLoading(false);
       setError("Có lỗi xảy ra khi đăng ký tài khoản.");
     }
   };
@@ -108,8 +116,32 @@ const CreateLogin = () => {
           <div className="error-create-user">
             <p>{error}</p>
           </div>
-          <button type="submit">Tạo tài khoản</button>
+          <button type="submit">
+            {" "}
+            {loading ? (
+              <ThreeDot color="#ffffffff" size="small" text="" textColor="" />
+            ) : (
+              "Tạo tài khoản"
+            )}{" "}
+          </button>
         </form>
+
+        {showPopup && (
+          <div className="popup-overlay">
+            <div className="popup-box">
+              <h3>✅ Đăng ký thành công!</h3>
+              <p>Vui lòng kiểm tra email của bạn để xác minh tài khoản.</p>
+              <button
+                onClick={() => {
+                  setShowPopup(false);
+                  navigate("/Account/Login");
+                }}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="or-container">
           <div className="line-coler"></div>

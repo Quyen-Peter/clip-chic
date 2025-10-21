@@ -2,7 +2,9 @@ import { Link, useNavigate } from "react-router-dom";
 import "../../css/Login.css";
 import LoginWith from "../../component/LoginWith";
 import { useEffect, useState } from "react";
+import { ThreeDot } from "react-loading-indicators";
 const API_URL = process.env.REACT_APP_HOST_API;
+
 
 
 
@@ -11,16 +13,19 @@ const Login = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const savedError = sessionStorage.getItem("savedError");
-    if (savedError) setError(savedError);
+    if (savedError){
+      setError(savedError);
+      sessionStorage.removeItem("savedError");
+    } 
   }, []);
 
   const handleLogin = async (e) => {
   e.preventDefault();
-  console.log("Sending:", { username: email, password });
-
+  setLoading(true);
   try {
     const response = await fetch(`${API_URL}/api/Auth/login`, {
       method: "POST",
@@ -35,17 +40,19 @@ const Login = () => {
     const data = await response.json();
 
     if (!response.ok) {
+      setLoading(false);
       setError(data.message);
     }
     else{
       console.log("Kết quả:", data);
-      console.log("Kết quả:", data.token);
       sessionStorage.setItem("token", data.token);
       sessionStorage.setItem("isLoggedIn", "true");
+      setLoading(false);
       navigate("/Account");
     }
     
   } catch (error) {
+    setLoading(false);
     setError("Tài khoản chưa được đăng kí");
   }
 };
@@ -78,7 +85,13 @@ const Login = () => {
             <div className="error-create-user">
             {error && <p style={{ color: "red" }}>{error}</p>}
           </div>
-          <button type="submit">Đăng nhập</button>
+          <button type="submit">{" "}
+            {loading ? (
+              <ThreeDot color="#ffffffff" size="small" text="" textColor="" />
+            ) : (
+              "Đăng nhập"
+            )}{" "}
+          </button>
         </form>
 
         <div className="or-container-login">
