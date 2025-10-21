@@ -16,6 +16,7 @@ import Customizer from '../features/customizer/pages/CustomizerPage.jsx';
 import ProductDetail from "../screens/ProductDetail";
 import BlindboxDetail from "../screens/BlindboxDetail";
 import SidebarProfile from "../component/SidebarProfile";
+import VerifyEmail from "../screens/VerifyEmail";
 
 
 import Profile from "../screens/account/Profile";
@@ -43,6 +44,7 @@ const AppRouter = () => {
       <Route path="/productdetail/:productId" element={<ProductDetail/>} />
       <Route path="/blindboxDetail/:blindboxId" element={<BlindboxDetail/>} />
       <Route path="/SidebarProfile" element={<SidebarProfile />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
 
 
       <Route path="/Account/*" element={<Account />} >
