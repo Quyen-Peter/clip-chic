@@ -96,7 +96,7 @@ const BlindboxDetail = () => {
         return;
       }
 
-      const url = `${API_URL}/api/Order/add-detail?productId=${blindboxId}&quantity=${quantity}&price=${blindbox?.price}`;
+      const url = `${API_URL}/api/Order/add-blindbox-detail?productId=${blindboxId}&quantity=${quantity}&price=${blindbox?.price}`;
 
       const res = await fetch(url, {
         method: "POST",
@@ -133,7 +133,7 @@ const BlindboxDetail = () => {
       if (token == null) {
         navigate("/Account/Login");
       }
-      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${price}`;
+      const url = `${API_URL}/api/Order/add-blindbox-detail?productId=${productId}&quantity=${quantity}&price=${price}`;
 
       const res = await fetch(url, {
         method: "POST",

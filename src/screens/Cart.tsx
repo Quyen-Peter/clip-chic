@@ -223,7 +223,6 @@ const Cart = () => {
     }
   }, [method, total]);
 
-
   
   return (
     <div className="cart-page">

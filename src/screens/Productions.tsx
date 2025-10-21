@@ -151,6 +151,8 @@ const Productions = () => {
     }
   };
 
+  console.log("Product", products)
+
   return (
     <div className="page">
       <header className="site-header">

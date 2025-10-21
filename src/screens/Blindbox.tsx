@@ -78,7 +78,7 @@ const Blindbox = () => {
         navigate("/Account/Login");
         return;
       }
-      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${price}`;
+      const url = `${API_URL}/api/Order/add-blindbox-detail?productId=${productId}&quantity=${quantity}&price=${price}`;
       const res = await fetch(url, {
         method: "POST",
         headers: {

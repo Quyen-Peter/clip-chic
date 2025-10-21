@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import "../../css/Login.css";
 import LoginWith from "../../component/LoginWith";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const API_URL = process.env.REACT_APP_HOST_API;
 
 
@@ -11,6 +11,11 @@ const Login = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const savedError = sessionStorage.getItem("savedError");
+    if (savedError) setError(savedError);
+  }, []);
 
   const handleLogin = async (e) => {
   e.preventDefault();
@@ -41,7 +46,7 @@ const Login = () => {
     }
     
   } catch (error) {
-    setError("Đã xảy ra lỗi:", error);
+    setError("Tài khoản chưa được đăng kí");
   }
 };
 
@@ -71,7 +76,7 @@ const Login = () => {
             </Link>
           </div>
             <div className="error-create-user">
-            <p>{error}</p>
+            {error && <p style={{ color: "red" }}>{error}</p>}
           </div>
           <button type="submit">Đăng nhập</button>
         </form>

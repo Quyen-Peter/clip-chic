@@ -46,10 +46,13 @@ const Profile = () => {
       handleOrder(data.id);
       setImage(data.image || avata);
       sessionStorage.setItem("userID", data.id);
+       console.log(token);
     } catch (err) {
       console.error("Lỗi khi lấy thông tin người dùng:", err);
     }
   };
+
+ 
 
   const handleOrder = async (userId : any) => {
     try {

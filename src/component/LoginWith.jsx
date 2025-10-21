@@ -43,7 +43,8 @@ const handleGoogleSuccess = async (credentialResponse) => {
       sessionStorage.setItem("isLoggedIn", "true");
       window.location.href = "/Account";
     } else {
-      console.error("Login failed:", data);
+      sessionStorage.setItem("savedError", data.message);
+      console.error("Login failed:", data.message);
     }
   } catch (error) {
     console.error("Error during login:", error);
