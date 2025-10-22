@@ -1,61 +1,71 @@
+import { useEffect, useState } from "react";
 import "../../css/OrderHistory.css";
+import { fetchUserOrders, Order } from "../../services/orderService";
+import { getOrderStatus } from "../../utils/orderStatus";
 
 const OrderHistory = () => {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem("token");
+    const userId = Number(sessionStorage.getItem("userID"));
+    if (!token || !userId) {
+      alert("Vui lòng đăng nhập lại!");
+      return;
+    }
+
+    fetchUserOrders(userId, token)
+      .then((data) => {
+        setOrders(data);
+      })
+      .catch((err) => console.error("❌ Lỗi khi lấy đơn hàng:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return <p>Đang tải...</p>;
+
   return (
     <div className="history-container">
       <div className="table-order">
-        <h3 className="order-history-content">ORDER HISTORY</h3>
+        <h3 className="order-history-content">Lịch sử đặt hàng</h3>
         <div className="order-history">
           <table className="table">
             <thead>
               <tr>
-                <th>ORDER ID</th>
-                <th>STATUS</th>
-                <th>DATE</th>
-                <th>TOTAL</th>
-                <th>ACTION</th>
+                <th>MÃ đơn hàng</th>
+                <th>Trạng thái</th>
+                <th>Ngày đặt hàng</th>
+                <th>Tổng</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <a href={`/Account/OrderDtail/${1}`}>#96459761</a>
-                </td>
-                <td className="status in-progress">IN PROGRESS</td>
-                <td>Dec 30, 2019 07:52</td>
-                <td>405.000 vnd (5 Products)</td>
-                <td>
-                  <a href={`/Account/OrderDtail/${1}`} className="view-details">
-                    View Details →
-                  </a>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <a href={`/Account/OrderDtail/${1}`}>#71667167</a>
-                </td>
-                <td className="status completed">COMPLETED</td>
-                <td>Dec 7, 2019 23:26</td>
-                <td>350.000 vnd (4 Products)</td>
-                <td>
-                  <a href={`/Account/OrderDtail/${1}`} className="view-details">
-                    View Details →
-                  </a>
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <a href={`/Account/OrderDtail/${1}`}>#95214362</a>
-                </td>
-                <td className="status canceled">CANCELED</td>
-                <td>Dec 7, 2019 23:26</td>
-                <td>165.000 vnd (2 Products)</td>
-                <td>
-                  <a href={`/Account/OrderDtail/${1}`} className="view-details">
-                    View Details →
-                  </a>
-                </td>
-              </tr>
+              {orders.map((order) => (
+                <tr>
+                  <td>
+                    <a href={`/Account/OrderDetail/${order.id}`}>#{order.id}</a>
+                  </td>
+                  {(() => {
+                    const { text, className } = getOrderStatus(order.status);
+                    return <td className={className}>{text}</td>;
+                  })()}
+
+                  <td>{new Date(order.createDate).toLocaleString("vi-VN")}</td>
+                  <td>
+                    {order.totalPrice?.toLocaleString("vi-VN") || 0}VND (
+                    {order.orderDetails?.length || 0} sản phẩm)
+                  </td>
+                  <td>
+                    <a
+                      href={`/Account/OrderDetail/${order.id}`}
+                      className="view-details"
+                    >
+                      Chi tiết →
+                    </a>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

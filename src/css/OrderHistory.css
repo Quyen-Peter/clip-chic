@@ -52,7 +52,14 @@
 .status {
   font-weight: bold;
 }
-.status.in-progress { color: #173da2; }
-.status.completed   { color: #28a745; }
-.status.canceled    { color: #ff6f91; }
 
+.status.pending { color: #ffb347; }       /* cam nhạt */
+.status.payment { color: #5cb85c; }       /* xanh lá */
+.status.processing { color: #f0ad4e; }    /* vàng đậm */
+.status.shipping { color: #0275d8; }      /* xanh dương */
+.status.delivered { color: #4caf50; }     /* xanh ngọc */
+.status.cancelled { color: #d9534f; }     /* đỏ */
+.status.refunded { color: #6c757d; }      /* xám */
+.status.returned { color: #795548; }      /* nâu */
+.status.failed { color: #b71c1c; }        /* đỏ sẫm */
+.status.unknown { color: #9e9e9e; }       /* xám nhạt */

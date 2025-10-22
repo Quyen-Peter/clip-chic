@@ -72,6 +72,7 @@ const Cart = () => {
   const [selectedShip, setSelectedShip] = useState<Ship | null>(null);
   const [loadOrder, setLoadOrder] = useState(false);
   const [loadUpdate, setLoadUpdate] = useState(false);
+  const [errorPay, setErrorPay] = useState<string | null>(null);
 
   const [showPopup, setShowPopup] = useState(false);
   const [popupState, setPopupState] = useState<
@@ -195,6 +196,13 @@ const Cart = () => {
 
   useEffect(() => {
     if (method === "qr") {
+      
+      if(checkoutDisabled) {
+        setLoading(false);
+        setErrorPay("Vui lòng điền đầy đủ thông tin giao hàng!");
+        return;
+      }
+
       setLoading(true);
       const interval = setInterval(async () => {
         try {
@@ -220,7 +228,6 @@ const Cart = () => {
           if (transaction) {
             clearInterval(interval);
             handlePayment();
-            alert("Thanh toán thành công!");
             setLoading(false);
           }
         } catch (err) {
@@ -343,13 +350,14 @@ const Cart = () => {
       });
       if (!res.ok) {
         setLoadUpdate(false);
+        setErrorPay("Cập nhật thất bại, vui lòng thử lại!");
         throw new Error(`HTTP ${res.status}`);
       }
       if (res.ok) {
+        setErrorPay(null);
         setIsAddress(false);
         const data = await res.json();
         setLoadUpdate(false);
-        console.log("✅ Cập nhật thông tin giao hàng:", data);
       }
     } catch (error) {
       console.error("❌ Lỗi Cập nhật thông tin giao hàng:", error);
@@ -357,6 +365,11 @@ const Cart = () => {
   };
 
   const handlePayment = async () => {
+    if(checkoutDisabled) {
+      setErrorPay("Vui lòng điền đầy đủ thông tin giao hàng!");
+      return;
+    }
+
     const token = sessionStorage.getItem("token");
     if (!token) {
       alert("Vui lòng đăng nhập lại!");
@@ -384,18 +397,22 @@ const Cart = () => {
         }),
       });
       if (!res.ok) {
+        setErrorPay("Thanh toán thất bại, vui lòng thử lại!");
         throw new Error(`HTTP ${res.status}`);
       }
 
       if (res.ok) {
         const data = await res.json();
         setLoadOrder(false);
-        console.log("✅ Cập nhật thanh toán giao hàng:", data);
+        Navigate(`/Account/OrderDetail/${orderID}`);
       }
     } catch (error) {
       console.error("❌ Lỗi thanh toán giao hàng:", error);
     }
   };
+
+
+  const checkoutDisabled = products.length === 0 || !orderName || !orderAddress || !orderPhone;
 
   return (
     <div className="cart-page">
@@ -646,7 +663,7 @@ const Cart = () => {
                         textColor=""
                       />
                     ) : (
-                      "Đặt hàng"
+                      errorPay
                     )}{" "}
                   </button>
                 )}{" "}
@@ -661,7 +678,7 @@ const Cart = () => {
                         textColor=""
                       />
                     ) : (
-                      "Đặt hàng"
+                      errorPay
                     )}{" "}
                   </button>
                 )}{" "}
@@ -670,7 +687,6 @@ const Cart = () => {
                     className="bnt-checkout-payment"
                     onClick={() => handlePayment()}
                   >
-                    {" "}
                     {loadOrder ? (
                       <ThreeDot
                         color="#ffffffff"
@@ -678,9 +694,11 @@ const Cart = () => {
                         text=""
                         textColor=""
                       />
+                    ) : errorPay ? (
+                      errorPay
                     ) : (
                       "Đặt hàng"
-                    )}{" "}
+                    )}
                   </button>
                 )}
               </div>

@@ -1,3 +1,31 @@
-.privacy-help-container{
+
+.privacy-help-container {
     height: 100vh;
+  padding: 40px 80px;
+  color: #333;
+}
+
+.privacy-help-container h2 {
+  color: #ff6699;
+  margin-bottom: 20px;
+}
+
+.privacy-help-container h3 {
+  color: #0d47a1;
+  margin-top: 20px;
+}
+
+.privacy-help-container ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.privacy-help-container li {
+  margin-bottom: 6px;
+}
+
+.privacy-help-container p {
+  line-height: 1.6;
+  margin-bottom: 12px;
+  color: #0d47a1;
 }

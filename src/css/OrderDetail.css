@@ -138,3 +138,20 @@
   margin-right: 10px;
   margin-bottom: 20px;
 } 
+
+.order-detail-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.bnt-canllel{
+  background-color: #ffffff;
+  color: red;
+  border: none;
+  padding: 1px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 5px;
+  border: 1px solid red;
+}
