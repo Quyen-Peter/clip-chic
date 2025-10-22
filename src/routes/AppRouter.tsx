@@ -17,6 +17,7 @@ import ProductDetail from "../screens/ProductDetail";
 import BlindboxDetail from "../screens/BlindboxDetail";
 import SidebarProfile from "../component/SidebarProfile";
 import VerifyEmail from "../screens/VerifyEmail";
+import ComingSoon from "../screens/ComingSoon";
 
 
 import Profile from "../screens/account/Profile";
@@ -40,7 +41,7 @@ const AppRouter = () => {
       <Route path="/Blindbox" element={<Blindbox />} />
       <Route path="/Account" element={<Account />} />
       <Route path="/Cart" element={<Cart />} />
-      <Route path="/Customizer" element={<Customizer/>} />
+      <Route path="/Customizer" element={<ComingSoon/>} />
       <Route path="/productdetail/:productId" element={<ProductDetail/>} />
       <Route path="/blindboxDetail/:blindboxId" element={<BlindboxDetail/>} />
       <Route path="/SidebarProfile" element={<SidebarProfile />} />
@@ -49,7 +50,7 @@ const AppRouter = () => {
 
       <Route path="/Account/*" element={<Account />} >
         <Route index element={<Profile />} />               
-        <Route path="MyDesign" element={<MyDesign />} />            
+        <Route path="MyDesign" element={<ComingSoon />} />            
         <Route path="TrackShipping" element={<TrackShipping />} />  
         <Route path="OrderHistory" element={<OrderHistory />} />     
         <Route path="Privacy" element={<PrivacyHelp />} />  
