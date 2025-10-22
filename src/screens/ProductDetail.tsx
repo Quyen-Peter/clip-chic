@@ -70,8 +70,9 @@ const ProductDetail = () => {
         navigate("/Account/Login");
         return;
       }
+      const totalPrice = (product?.price ?? 0) * quantity;
 
-      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${product?.price}`;
+      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=${quantity}&price=${totalPrice}`;
 
       const res = await fetch(url, {
         method: "POST",

@@ -96,7 +96,9 @@ const BlindboxDetail = () => {
         return;
       }
 
-      const url = `${API_URL}/api/Order/add-blindbox-detail?productId=${blindboxId}&quantity=${quantity}&price=${blindbox?.price}`;
+      const totalPrice = (blindbox?.price ?? 0) * quantity;
+
+      const url = `${API_URL}/api/Order/add-blindbox-detail?productId=${blindboxId}&quantity=${quantity}&price=${totalPrice}`;
 
       const res = await fetch(url, {
         method: "POST",

@@ -15,7 +15,7 @@ import { ThreeDot } from "react-loading-indicators";
 const API_URL = process.env.REACT_APP_HOST_API;
 
 type Product = {
-  id: number;
+  orderDetailId: number;
   name: string;
   desc: string;
   price: number;
@@ -70,6 +70,15 @@ const Cart = () => {
   const [shrinkPayment, setShrinkPayment] = useState(false);
   const [shipList, setShipList] = useState<Ship[]>([]);
   const [selectedShip, setSelectedShip] = useState<Ship | null>(null);
+  const [loadOrder, setLoadOrder] = useState(false);
+  const [loadUpdate, setLoadUpdate] = useState(false);
+
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupState, setPopupState] = useState<
+    "confirm" | "loading" | "success" | "error" | null
+  >(null);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
   const subtotal = products.reduce((sum, p) => sum + p.price * p.qty, 0);
   const shipping = selectedShip ? selectedShip.price : 0;
@@ -77,15 +86,14 @@ const Cart = () => {
   const formatVNDText = (value: number) => {
     return value.toLocaleString("vi-VN") + " vnd";
   };
-  const increase = (id: number) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, qty: p.qty + 1 } : p))
-    );
+  const increase = (orderDetailId: number, currentQty: number) => {
+    const newQty = currentQty + 1;
+    handleUpdateQuantity(orderDetailId, newQty);
   };
-  const decrease = (id: number) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, qty: Math.max(1, p.qty - 1) } : p))
-    );
+
+  const decrease = (orderDetailId: number, currentQty: number) => {
+    const newQty = Math.max(1, currentQty - 1);
+    handleUpdateQuantity(orderDetailId, newQty);
   };
 
   const handleShip = async () => {
@@ -107,22 +115,21 @@ const Cart = () => {
     }
   };
 
- useEffect(() => {
-  const handleScroll = () => {
-    if (!footerRef.current) return;
-    const rect = footerRef.current.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    if (rect.top > windowHeight) {
-      setShrinkPayment(false);
-    } else {
-      setShrinkPayment(true);
-    }
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!footerRef.current) return;
+      const rect = footerRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      if (rect.top > windowHeight) {
+        setShrinkPayment(false);
+      } else {
+        setShrinkPayment(true);
+      }
+    };
 
-  window.addEventListener("scroll", handleScroll);
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
-
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleGetPendingOrder = async () => {
     try {
@@ -134,7 +141,6 @@ const Cart = () => {
         Navigate("/Account/Login");
         return;
       }
-
       if (!userId) {
         alert("Không tìm thấy thông tin người dùng!");
         return;
@@ -149,10 +155,8 @@ const Cart = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
       if (!res.ok) throw new Error(`Lỗi HTTP ${res.status}`);
       const data = await res.json();
-      console.log("✅ Đơn hàng đang chờ:", data);
 
       setOrderID(data.id);
       setOrderName(data.name);
@@ -162,23 +166,27 @@ const Cart = () => {
       setOrderPay(data.payPrice);
       setOrderTotal(data.totalPrice);
 
-      const mappedProducts: Product[] = data.orderDetails.map((d: any) => ({
-        id: d.product.id,
-        name: d.product.title,
-        desc: d.product.descript,
-        price: d.price,
-        qty: d.quantity,
-        img:
-          d.product.images?.[0]?.address ||
-          "https://via.placeholder.com/150x150?text=No+Image",
-      }));
+      const mappedProducts: Product[] = data.orderDetails.map((d: any) => {
+        const isProduct = d.product != null;
+        const item = isProduct ? d.product : d.blindBox;
+
+        return {
+          orderDetailId: d.id,
+          name: isProduct ? item.title : item.name,
+          desc: item.descript || item.description || "(N/N)",
+          price: item.price || d.price,
+          qty: d.quantity,
+          img:
+            item.images?.[0]?.address ||
+            "https://via.placeholder.com/150x150?text=No+Image",
+        };
+      });
 
       setProducts(mappedProducts);
     } catch (error) {
-      console.error("❌ Lỗi khi lấy đơn hàng pending:", error);
+      console.error("Lỗi khi lấy đơn hàng pending:", error);
     }
   };
-
 
   useEffect(() => {
     handleShip();
@@ -211,6 +219,7 @@ const Cart = () => {
 
           if (transaction) {
             clearInterval(interval);
+            handlePayment();
             alert("Thanh toán thành công!");
             setLoading(false);
           }
@@ -223,7 +232,171 @@ const Cart = () => {
     }
   }, [method, total]);
 
-  
+  const handleDeleteProduct = (orderDetailId: number) => {
+    setDeleteTarget(orderDetailId);
+    setPopupState("confirm");
+    setPopupMessage("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?");
+    setShowPopup(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    const token = sessionStorage.getItem("token");
+    const userId = sessionStorage.getItem("userID");
+
+    if (!token || !userId) {
+      setPopupState("error");
+      setPopupMessage("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại.");
+      return;
+    }
+    setPopupState("loading");
+    setPopupMessage("Đang xóa sản phẩm...");
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/Order/delete-detail/${userId}/${deleteTarget}`,
+        {
+          method: "DELETE",
+          headers: {
+            accept: "*/*",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = await res.json();
+
+      setProducts((prev) =>
+        prev.filter((p) => p.orderDetailId !== deleteTarget)
+      );
+      setPopupState("success");
+      setPopupMessage("Đã xóa sản phẩm khỏi giỏ hàng thành công!");
+    } catch (err) {
+      setPopupState("error");
+      setPopupMessage("Xảy ra lỗi khi xóa sản phẩm. Vui lòng thử lại!");
+    }
+  };
+
+  const handleUpdateQuantity = async (
+    orderDetailId: number,
+    newQuantity: number
+  ) => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      alert("Vui lòng đăng nhập lại!");
+      Navigate("/Account/Login");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${API_URL}/api/Order/update-quantity-detail/${orderDetailId}?quantity=${newQuantity}`,
+        {
+          method: "PUT",
+          headers: {
+            accept: "*/*",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const text = await res.text();
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.orderDetailId === orderDetailId ? { ...p, qty: newQuantity } : p
+        )
+      );
+    } catch (error) {
+      console.error("Lỗi khi cập nhật số lượng:", error);
+    }
+  };
+
+  const updateOrderInfo = async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      alert("Vui lòng đăng nhập lại!");
+      Navigate("/Account/Login");
+      return;
+    }
+    try {
+      setLoadUpdate(true);
+      const res = await fetch(`${API_URL}/api/Order/update-order/${orderID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: orderName,
+          phone: orderPhone,
+          address: orderAddress,
+
+          status: "pending",
+          payMethod: null,
+          totalPrice: 0,
+          shipPrice: 0,
+          payPrice: 0,
+        }),
+      });
+      if (!res.ok) {
+        setLoadUpdate(false);
+        throw new Error(`HTTP ${res.status}`);
+      }
+      if (res.ok) {
+        setIsAddress(false);
+        const data = await res.json();
+        setLoadUpdate(false);
+        console.log("✅ Cập nhật thông tin giao hàng:", data);
+      }
+    } catch (error) {
+      console.error("❌ Lỗi Cập nhật thông tin giao hàng:", error);
+    }
+  };
+
+  const handlePayment = async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      alert("Vui lòng đăng nhập lại!");
+      Navigate("/Account/Login");
+      return;
+    }
+    try {
+      setLoadOrder(true);
+      const res = await fetch(`${API_URL}/api/Order/update-order/${orderID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: orderName,
+          phone: orderPhone,
+          address: orderAddress,
+
+          status: "payment",
+          payMethod: method,
+          totalPrice: total,
+          shipPrice: selectedShip ? selectedShip.price : 0,
+          payPrice: total + (selectedShip ? selectedShip.price : 0),
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      if (res.ok) {
+        const data = await res.json();
+        setLoadOrder(false);
+        console.log("✅ Cập nhật thanh toán giao hàng:", data);
+      }
+    } catch (error) {
+      console.error("❌ Lỗi thanh toán giao hàng:", error);
+    }
+  };
+
   return (
     <div className="cart-page">
       <div className="main-content-cart">
@@ -242,7 +415,7 @@ const Cart = () => {
             {products.length ? (
               <div>
                 {products.map((p) => (
-                  <div className="product-container" key={p.id}>
+                  <div className="product-container" key={p.orderDetailId}>
                     <div className="left-container">
                       <div className="border-img-product">
                         <img src={p.img} alt={p.name} />
@@ -260,13 +433,13 @@ const Cart = () => {
                         <div className="quantity-control">
                           <button
                             className="btn-qty"
-                            onClick={() => increase(p.id)}
+                            onClick={() => increase(p.orderDetailId, p.qty)}
                           >
                             ▲
                           </button>
                           <button
                             className="btn-qty"
-                            onClick={() => decrease(p.id)}
+                            onClick={() => decrease(p.orderDetailId, p.qty)}
                           >
                             ▼
                           </button>
@@ -275,7 +448,10 @@ const Cart = () => {
                       <p className="price">
                         {(p.price * p.qty).toLocaleString("vi-VN")} vnd
                       </p>
-                      <button className="bnt-delete-cart">
+                      <button
+                        className="bnt-delete-cart"
+                        onClick={() => handleDeleteProduct(p.orderDetailId)}
+                      >
                         <img src={trast} alt="delete" />
                       </button>
                     </div>
@@ -350,32 +526,49 @@ const Cart = () => {
                           <input
                             className="input-address-cod-pay"
                             type="text"
-                            placeholder={orderName}
+                            placeholder={orderName || "Tên người nhận"}
+                            onChange={(e) => setOrderName(e.target.value)}
                           />
                           <input
                             className="input-address-cod-pay"
                             type="text"
-                            placeholder={`(84+)` + orderPhone}
+                            placeholder={
+                              `(84+)` + orderPhone || "Số điện thoại"
+                            }
+                            onChange={(e) => setOrderPhone(e.target.value)}
                           />
                           <input
                             className="input-address-cod-pay"
                             type="text"
-                            placeholder={orderAddress}
+                            placeholder={orderAddress || "Địa chỉ nhận hàng"}
+                            onChange={(e) => setOrderAddress(e.target.value)}
                           />
                           <button
                             className="bnt-apply-address"
-                            onClick={() => setIsAddress(false)}
+                            onClick={() => updateOrderInfo()}
                           >
-                            Xác nhận
+                            {" "}
+                            {loadUpdate ? (
+                              <ThreeDot
+                                color="#ffffffff"
+                                size="small"
+                                text=""
+                                textColor=""
+                              />
+                            ) : (
+                              "Xác nhận"
+                            )}{" "}
                           </button>
                         </div>
                       ) : (
                         <div className="border-info-cod-pay">
                           <div>
                             <p className="content-cod-pay">
-                              {orderName} (84+) {orderPhone}
+                              {orderName} {" : 84+" + orderPhone}
                             </p>
-                            <p className="address-cod-pay">{orderAddress}</p>
+                            <p className="address-cod-pay">
+                              Địa chỉ:{orderAddress || "N/N"}
+                            </p>
                           </div>
                           <button
                             className="bnt-change-address"
@@ -398,7 +591,7 @@ const Cart = () => {
                       <div className="border-qr-three">
                         <img
                           src={`https://qr.sepay.vn/img?acc=${acc}&bank=${bank}&amount=${total}&des=${
-                            "SEVQR thanh toan don hang" + orderID
+                            "SEVQR thanh toan don hang " + orderID
                           }`}
                           alt="QR thanh toán"
                         />
@@ -473,13 +666,79 @@ const Cart = () => {
                   </button>
                 )}{" "}
                 {method === "cod" && (
-                  <button className="bnt-checkout-payment">Đặt hàng</button>
+                  <button
+                    className="bnt-checkout-payment"
+                    onClick={() => handlePayment()}
+                  >
+                    {" "}
+                    {loadOrder ? (
+                      <ThreeDot
+                        color="#ffffffff"
+                        size="small"
+                        text=""
+                        textColor=""
+                      />
+                    ) : (
+                      "Đặt hàng"
+                    )}{" "}
+                  </button>
                 )}
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-box">
+            {popupState === "confirm" && (
+              <>
+                <h3>Xác nhận xóa</h3>
+                <p>{popupMessage}</p>
+                <div className="popup-buttons">
+                  <button
+                    className="btn-cancel"
+                    onClick={() => setShowPopup(false)}
+                  >
+                    Hủy
+                  </button>
+                  <button className="btn-confirm" onClick={confirmDelete}>
+                    Xác nhận
+                  </button>
+                </div>
+              </>
+            )}
+
+            {popupState === "loading" && (
+              <div className="popup-loading">
+                <ThreeDot color="#FF6EA5" size="small" text="" textColor="" />
+                <p>{popupMessage}</p>
+              </div>
+            )}
+
+            {popupState === "success" && (
+              <>
+                <h3>Thành công</h3>
+                <p>{popupMessage}</p>
+                <button className="btn-ok" onClick={() => setShowPopup(false)}>
+                  OK
+                </button>
+              </>
+            )}
+
+            {popupState === "error" && (
+              <>
+                <h3>Lỗi</h3>
+                <p>{popupMessage}</p>
+                <button className="btn-ok" onClick={() => setShowPopup(false)}>
+                  Đóng
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       <div ref={footerRef} className="cart-footer">
         <Footer />
