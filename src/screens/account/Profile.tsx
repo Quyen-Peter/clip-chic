@@ -3,6 +3,9 @@ import avata from "../../assest/avata.png";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import profile from "../../assest/profile.png";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const API_URL = process.env.REACT_APP_HOST_API;
 
 export interface User {
@@ -70,10 +73,8 @@ const Profile = () => {
         throw new Error(`Lỗi HTTP: ${res.status}`);
       }
       const data = await res.json();
-      console.log("Danh sách đơn hàng đang chờ:", data);
   
     } catch (error) {
-      console.error("Lỗi khi tải đơn hàng đang chờ:", error);
     }
   };
   
@@ -111,10 +112,9 @@ const Profile = () => {
       if (!response.ok) throw new Error("Lỗi khi upload ảnh");
       const updatedUser = await response.json();
       setUser(updatedUser);
-      alert("Cập nhật ảnh đại diện thành công!");
+      toast.success("cập nhật thành công!");
     } catch (error) {
-      console.error("Lỗi upload ảnh:", error);
-      alert("Không thể cập nhật ảnh!");
+      toast.success("Không thể cập nhật ảnh!");
     }
   };
 
@@ -138,12 +138,11 @@ const Profile = () => {
       }
 
       const updatedUser = await response.json();
+      toast.success("Xóa thành công!");
       setUser(updatedUser);
       setImage(profile);
-      alert("Xóa ảnh đại diện thành công!");
     } catch (error) {
-      console.error("Lỗi khi xóa ảnh:", error);
-      alert("Không thể xóa ảnh đại diện!");
+      toast.success("Không thể xóa ảnh đại diện!");
     }
   };
 
@@ -178,11 +177,11 @@ const Profile = () => {
 
       const updated = await response.json();
       setUser(updated);
-      alert("Cập nhật thành công!");
       setIsEditing(false);
+      toast.success("Cập nhật thành công");
     } catch (error) {
       console.error("Lỗi cập nhật:", error);
-      alert("Lỗi khi cập nhật thông tin người dùng");
+      toast.success("Lỗi khi cập nhật thông tin người dùng");
     }
   };
 
@@ -361,8 +360,11 @@ const Profile = () => {
           </div>
         </div>
       </div>
+        <ToastContainer style={{marginTop:"80px"}} position="top-right" autoClose={3000} />
     </div>
+    
   );
+
 };
 
 export default Profile;
