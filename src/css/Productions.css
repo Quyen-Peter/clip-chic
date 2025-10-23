@@ -50,7 +50,7 @@
   text-decoration: none;
 }
 
-.production{
+.production {
   position: relative;
   background: #fff;
   border: 2px solid #FF6EA5;
@@ -186,4 +186,24 @@
 
 .content{
   position: relative;
+}
+
+.production.top-seller {
+  border: 2px solid #FFD700;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+  background: linear-gradient(135deg, #fffef0 0%, #fff 100%);
+}
+
+.top-seller-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
 }

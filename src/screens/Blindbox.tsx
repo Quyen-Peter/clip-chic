@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "../css/BlindBox.css";
 import cart from "../assest/shoppingCart.png";
 import { fetchBlindBoxes, BlindBoxListItem } from "../services/blindBoxService";
+import { fetchTopBlindBoxes, TopSalesItem } from "../services/orderService";
 import { flyToCart } from "../services/flyToCart";
 const API_URL = process.env.REACT_APP_HOST_API;
 
@@ -35,20 +36,28 @@ const Blindbox = () => {
   }, []);
 
   const [blindBox, setBlindBox] = useState<BlindBoxListItem[]>([]);
+  const [topBlindBoxes, setTopBlindBoxes] = useState<TopSalesItem[]>([]);
   useEffect(() => {
-    const loadBlindBoxes = async () => {
+    const loadData = async () => {
       try {
-        const data = await fetchBlindBoxes();
-        setBlindBox(data);
+        const [blindBoxData, topBlindBoxData] = await Promise.all([
+          fetchBlindBoxes(),
+          fetchTopBlindBoxes().catch(() => [])
+        ]);
+        setBlindBox(blindBoxData);
+        setTopBlindBoxes(topBlindBoxData);
       } catch (e) {
         console.error("Fetch blindboxes failed:", e);
       }
     };
-    loadBlindBoxes();
+    loadData();
   }, []);
 
   const filterBlindbox = useMemo(() => {
     return blindBox.filter((p) => {
+      if (query.top === "best") {
+        if (!topBlindBoxes.some(tb => tb.id === p.id)) return false;
+      }
       if (
         query.collectionId !== null &&
         p.collectionId !== query.collectionId
@@ -62,7 +71,11 @@ const Blindbox = () => {
         return false;
       return true;
     });
-  }, [query, blindBox]);
+  }, [query, blindBox, topBlindBoxes]);
+
+  const isTopBlindBox = useCallback((blindBoxId: number) => {
+    return topBlindBoxes.some(tb => tb.id === blindBoxId);
+  }, [topBlindBoxes]);
 
   const handleAddOrderDetail = async (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -113,7 +126,10 @@ const Blindbox = () => {
           </span>
           <div className="blindbox-list">
             {filterBlindbox.map((item) => (
-              <div key={item.id} className="blindbox-item">
+              <div key={item.id} className={`blindbox-item ${isTopBlindBox(item.id) ? 'top-seller' : ''}`}>
+                {isTopBlindBox(item.id) && (
+                  <div className="top-seller-badge">🔥</div>
+                )}
                 <Link
                   to={`/blindboxDetail/${item.id}`}
                   className="bindbox-link"
