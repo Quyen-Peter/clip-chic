@@ -53,13 +53,13 @@
   font-weight: bold;
 }
 
-.status.pending { color: #ffb347; }       /* cam nhạt */
-.status.payment { color: #5cb85c; }       /* xanh lá */
-.status.processing { color: #f0ad4e; }    /* vàng đậm */
-.status.shipping { color: #0275d8; }      /* xanh dương */
-.status.delivered { color: #4caf50; }     /* xanh ngọc */
-.status.cancelled { color: #d9534f; }     /* đỏ */
-.status.refunded { color: #6c757d; }      /* xám */
-.status.returned { color: #795548; }      /* nâu */
-.status.failed { color: #b71c1c; }        /* đỏ sẫm */
-.status.unknown { color: #9e9e9e; }       /* xám nhạt */
+.status.pending { color: #ffb347; }       
+.status.payment { color: #2EC38C; }       
+.status.processing { color: #2EC38C; }    
+.status.shipping { color: #2EC38C; }      
+.status.delivered { color: #2EC38C; }     
+.status.cancelled { color: #CA3030; }     
+.status.refunded { color: #909090; }     
+.status.returned { color: #909090; }      
+.status.failed { color: #CA3030; }        
+.status.unknown { color: #ffb347; }       
