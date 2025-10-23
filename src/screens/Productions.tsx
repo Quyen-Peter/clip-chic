@@ -6,6 +6,7 @@ import { useMemo, useState, useEffect, useCallback } from "react";
 import cart from "../assest/shoppingCart.png";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchProducts, ProductListItem } from "../services/productService";
+import { fetchTopProducts, TopSalesItem } from "../services/orderService";
 import { flyToCart } from "../services/flyToCart";
 
 const API_URL = process.env.REACT_APP_HOST_API;
@@ -48,19 +49,24 @@ function matchPrice(price: number, filter: string) {
 
 const Productions = () => {
   const [products, setProducts] = useState<ProductListItem[]>([]);
+  const [topProducts, setTopProducts] = useState<TopSalesItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   useEffect(() => {
     let isMounted = true;
 
-    const loadProducts = async () => {
+    const loadData = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await fetchProducts();
+        const [productsData, topProductsData] = await Promise.all([
+          fetchProducts(),
+          fetchTopProducts().catch(() => [])
+        ]);
         if (isMounted) {
-          setProducts(data);
+          setProducts(productsData);
+          setTopProducts(topProductsData);
         }
       } catch (err) {
         if (isMounted) {
@@ -75,7 +81,7 @@ const Productions = () => {
       }
     };
 
-    loadProducts();
+    loadData();
 
     return () => {
       isMounted = false;
@@ -102,6 +108,9 @@ const Productions = () => {
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
+      if (query.top === "best") {
+        if (!topProducts.some(tp => tp.id === p.id)) return false;
+      }
       if (
         query.collectionId !== null &&
         p.collectionId !== query.collectionId
@@ -116,7 +125,7 @@ const Productions = () => {
         return false;
       return true;
     });
-  }, [query, products]);
+  }, [query, products, topProducts]);
 
   const handleAddOrderDetail = async (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -151,6 +160,10 @@ const Productions = () => {
     }
   };
 
+  const isTopProduct = useCallback((productId: number) => {
+    return topProducts.some(tp => tp.id === productId);
+  }, [topProducts]);
+
   console.log("Product", products)
 
   return (
@@ -172,7 +185,10 @@ const Productions = () => {
 
             <div className="products-grid">
               {filtered.map((p) => (
-                <article key={p.id} className="production">
+                <article key={p.id} className={`production ${isTopProduct(p.id) ? 'top-seller' : ''}`}>
+                  {isTopProduct(p.id) && (
+                    <div className="top-seller-badge">🔥</div>
+                  )}
                   <Link
                     to={`/productdetail/${p.id}`}
                     key={p.id}

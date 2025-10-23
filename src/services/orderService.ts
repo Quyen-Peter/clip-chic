@@ -86,3 +86,33 @@ export const cancelOrder = async (orderId: number, token: string) => {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return await res.json();
 };
+
+export interface TopSalesItem {
+  id: number;
+  name: string;
+  quantitySold: number;
+}
+
+export const fetchTopProducts = async (): Promise<TopSalesItem[]> => {
+  const res = await fetch(`${API_URL}/api/Order/sales/top-products`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+};
+
+export const fetchTopBlindBoxes = async (): Promise<TopSalesItem[]> => {
+  const res = await fetch(`${API_URL}/api/Order/sales/top-blindboxes`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+};
