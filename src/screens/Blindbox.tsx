@@ -144,7 +144,7 @@ const Blindbox = () => {
 
                   <div className="bindbox-info">
                     <h3>{item.name}</h3>
-                    <p>{item.description}</p>
+                    {/* <p>{item.description}</p> */}
                     {item.collectionName && (
                       <p className="blindbox-collection">
                         {item.collectionName}
