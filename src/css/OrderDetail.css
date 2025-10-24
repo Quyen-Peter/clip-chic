@@ -161,3 +161,68 @@
   margin-bottom: 5px;
   border: 1px solid red;
 }
+
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-box {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px 32px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: popupFadeIn 0.3s ease;
+}
+
+.popup-box h3 {
+  color: #173da2;
+  margin-bottom: 10px;
+}
+
+.popup-box p {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 15px;
+}
+
+.popup-actions {
+  display: flex;
+  justify-content: space-around;
+}
+
+.popup-btn-cancel,
+.popup-btn-confirm {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.popup-btn-cancel {
+  background: #ccc;
+  color: #333;
+}
+
+.popup-btn-confirm {
+  background: #173da2;
+  color: white;
+}
+
+.popup-btn-confirm:hover {
+  background: #102b70;
+}
+
+@keyframes popupFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}

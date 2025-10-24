@@ -8,34 +8,33 @@ import {
 } from "../../services/orderService";
 import { getOrderStatus } from "../../utils/orderStatus";
 import { cancelOrder } from "../../services/orderService";
+import { toast, ToastContainer } from "react-toastify";
 
 const OrderDetail = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const navigate = useNavigate();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showPopup, setShowPopup] = useState(false);
 
+  const handleCancelOrder = async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      alert("Vui lòng đăng nhập lại!");
+      navigate("/Account/Login");
+      return;
+    }
 
- const handleCancelOrder = async () => {
-  const token = sessionStorage.getItem("token");
-  if (!token) {
-    alert("Vui lòng đăng nhập lại!");
-    navigate("/Account/Login");
-    return;
-  }
+    try {
+      await cancelOrder(order.id, token);
+      toast.success("Đơn hàng đã hủy thành công!");
+      window.location.reload();
+    } catch (err) {
+      console.error("❌ Lỗi khi hủy đơn hàng:", err);
+      toast.success("Lỗi khi hủy đơn hàng!");
+    }
+  };
 
-  if (!window.confirm("Bạn có chắc muốn hủy đơn hàng này không?")) return;
-
-  try {
-    await cancelOrder(order.id, token);
-    alert("Đơn hàng đã được hủy thành công!");
-    window.location.reload();
-  } catch (err) {
-    console.error("❌ Lỗi khi hủy đơn hàng:", err);
-    alert("Hủy đơn hàng thất bại!");
-  }
-};
-   
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     if (!token) {
@@ -77,11 +76,40 @@ const OrderDetail = () => {
               marginRight: "90px",
             }}
           >
-            <button className="bnt-canllel" onClick={handleCancelOrder}>Hủy</button>
+            <button className="bnt-canllel" onClick={() => setShowPopup(true)}>
+              Hủy
+            </button>
+
             <p style={{ color: "#173da2" }}>Bạn có thể hủy đơn trước khi </p>
             <p style={{ color: "#173da2", marginTop: "-20px" }}>
-              nhận viên xác nhân đơn.
+              nhận viên xác nhận đơn.
             </p>
+          </div>
+        )}
+
+        {showPopup && (
+          <div className="popup-overlay">
+            <div className="popup-box">
+              <h3>Xác nhận hủy đơn hàng</h3>
+              <p>Bạn có chắc chắn muốn hủy đơn hàng #{order.id} không?</p>
+              <div className="popup-actions">
+                <button
+                  className="popup-btn-cancel"
+                  onClick={() => setShowPopup(false)}
+                >
+                  Không
+                </button>
+                <button
+                  className="popup-btn-confirm"
+                  onClick={async () => {
+                    await handleCancelOrder();
+                    setShowPopup(false);
+                  }}
+                >
+                  Xác nhận
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -195,6 +223,7 @@ const OrderDetail = () => {
           </div>
         </div>
       </div>
+      <ToastContainer style={{marginTop:"80px"}} position="top-right" autoClose={3000} />
     </div>
   );
 };
