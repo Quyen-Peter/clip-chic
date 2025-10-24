@@ -41,7 +41,7 @@ const AppRouter = () => {
       <Route path="/Blindbox" element={<Blindbox />} />
       <Route path="/Account" element={<Account />} />
       <Route path="/Cart" element={<Cart />} />
-      <Route path="/Customizer" element={<Customizer/>} />
+      <Route path="/Customizer" element={<ComingSoon/>} />
       <Route path="/productdetail/:productId" element={<ProductDetail/>} />
       <Route path="/blindboxDetail/:blindboxId" element={<BlindboxDetail/>} />
       <Route path="/SidebarProfile" element={<SidebarProfile />} />

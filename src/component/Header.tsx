@@ -35,7 +35,7 @@ const Header = () => {
       </div>
 
       <div className="header-icon-content">
-        <div className="header-container-search">
+        {/* <div className="header-container-search">
           <input
             type="text"
             value={searchValue}
@@ -43,14 +43,14 @@ const Header = () => {
             placeholder="Search..."
             className="header-text-search"
           />
-        </div>
+        </div> */}
         <div>
-          <img
+          {/* <img
             className="header-icon"
             onClick={() => setShowSearch(!showSearch)}
             src={Search}
             alt="Search"
-          />
+          /> */}
           <img className="header-icon" src={Cart} onClick={() => navigate('/Cart')} alt="Cart" />
           <img
             className="header-icon"

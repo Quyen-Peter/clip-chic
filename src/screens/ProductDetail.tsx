@@ -264,7 +264,7 @@ const ProductDetail = () => {
         </div>
 
         <div className="view-more-button-container">
-          <button className="view-more-button">view More</button>
+          {/* <button className="view-more-button">view More</button> */}
         </div>
       </div>
 

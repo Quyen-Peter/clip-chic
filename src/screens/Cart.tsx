@@ -619,6 +619,15 @@ const Cart = () => {
                     </p>
                   </div>
                 )}
+                
+                {method === "visa" && (
+                  <div className="border-visa-payment">
+                    <p className="content-visa-pay">
+                      Tính năng đang được phát triển. Vui lòng chọn phương thức
+                      thanh toán khác.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div className="line-payment-amount"></div>

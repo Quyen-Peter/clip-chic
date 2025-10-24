@@ -494,3 +494,14 @@
   background-color: #ffffff88;
   color: #173DA2;
 }
+
+.border-visa-payment{
+  border: 2px solid #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  max-height: 300px;
+  min-height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

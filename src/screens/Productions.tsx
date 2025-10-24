@@ -235,11 +235,11 @@ const Productions = () => {
               <div className="empty">No suitable products found!</div>
             )}
 
-            {filtered.length > 0 && (
+            {/* {filtered.length > 0 && (
               <div className="view-more">
                 <button>View more</button>
               </div>
-            )}
+            )} */}
           </main>
         </div>
       </div>
