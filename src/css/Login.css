@@ -114,15 +114,9 @@ p {
   justify-content: center;
   gap: 10px;
   margin-bottom: 20px;
-  margin-left: 23px;
+  margin-left: 30px;
 }
-.social-login a {
-  color: #ff8fb4;
-  font-size: 14px;
-  text-decoration: none;
-  margin-left: 9px;
-  margin-right: 9px;
-}
+
 
 .login-link {
   display: flex;
