@@ -138,7 +138,6 @@ const Cart = () => {
       const userId = sessionStorage.getItem("userID");
 
       if (!token) {
-        alert("Vui lòng đăng nhập lại!");
         Navigate("/Account/Login");
         return;
       }
