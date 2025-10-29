@@ -18,15 +18,15 @@ const SidebarProfile = () => {
       <img className="background-sidebar-profile" src={backgroundSidebar} />
       <div className="content-sidebar-container">
         <div className="sidebar-item">
-          <img src={icon} className="arrow-icon" />
+          {/* <img src={icon} className="arrow-icon" /> */}
           <NavLink end to="/Account" className="link-sidebar-profile">
-            Thông tin cá nhân
+            <button className="link-sidebar-profile-bnt">Thông tin cá nhân</button>
           </NavLink>
         </div>
         <div className="sidebar-item">
-          <img src={icon} className="arrow-icon" />
+          {/* <img src={icon} className="arrow-icon" /> */}
           <NavLink to="/Account/MyDesign" className="link-sidebar-profile">
-            Thiết kế của tôi
+            <button className="link-sidebar-profile-bnt">Thiết kế của tôi</button>
           </NavLink>
         </div>
         {/* <div className="sidebar-item">
@@ -36,21 +36,21 @@ const SidebarProfile = () => {
           </NavLink>
         </div> */}
         <div className="sidebar-item">
-          <img src={icon} className="arrow-icon" />
+          {/* <img src={icon} className="arrow-icon" /> */}
           <NavLink to="/Account/OrderHistory" className="link-sidebar-profile">
-            Lịch sử đặt hàng
+            <button className="link-sidebar-profile-bnt">Lịch sử đặt hàng</button>
           </NavLink>
         </div>
         <div className="sidebar-item">
-          <img src={icon} className="arrow-icon" />
+          {/* <img src={icon} className="arrow-icon" /> */}
           <NavLink to="/Account/Privacy" className="link-sidebar-profile">
-            Bảo mật & Trợ giúp
+            <button className="link-sidebar-profile-bnt">Bảo mật & Trợ giúp</button>
           </NavLink>
         </div>
 
         <div className="sidebar-item buttom-logout">
           <button className="logout" onClick={handleLogout}>
-            Đăng xuất
+            <button className="link-sidebar-profile-bnt">Đăng xuất</button>
           </button>
         </div>
       </div>
