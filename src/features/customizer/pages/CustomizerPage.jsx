@@ -1,7 +1,7 @@
 // src/features/customizer/pages/CustomizerPage.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { bases, charms } from "../mock/mockData";
-import { customProducts } from "../mock/customProductsData";
+import { toast } from "react-toastify";
+import { fetchBases, fetchCharms, fetchUserProducts } from "../services/customizerService";
 import ModelViewer from "../components/ModelViewer";
 import Header from "../../../component/Header";
 import BaseProductSelector from "../components/BaseProductSelector";
@@ -18,7 +18,14 @@ import SaveProductModal from "../components/SaveProductModal";
 import "../css/CustomizerLayout.css";
 
 export default function CustomizerPage() {
-  const [selectedBase, setSelectedBase] = useState(bases[0]);
+  const [bases, setBases] = useState([]);
+  const [charms, setCharms] = useState([]);
+  const [customProducts, setCustomProducts] = useState([]);
+  const [isLoadingBases, setIsLoadingBases] = useState(true);
+  const [isLoadingCharms, setIsLoadingCharms] = useState(true);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
+
+  const [selectedBase, setSelectedBase] = useState(null);
   const [baseModelColor, setBaseModelColor] = useState("#ffffff");
   const [transformMode, setTransformMode] = useState("translate");
   const [isCameraLocked, setIsCameraLocked] = useState(true);
@@ -41,7 +48,71 @@ export default function CustomizerPage() {
   const baseSelectionRef = useRef(null);
   const charmSelectionRef = useRef(null);
   const modelViewerRef = useRef(null);
-  
+
+  // Fetch bases from API
+  useEffect(() => {
+    const loadBases = async () => {
+      try {
+        setIsLoadingBases(true);
+        const data = await fetchBases();
+        setBases(data || []);
+        if (data && data.length > 0) {
+          setSelectedBase(data[0]);
+        }
+      } catch (error) {
+        console.error('Error loading bases:', error);
+        toast.error('Failed to load bases. Please refresh the page.');
+      } finally {
+        setIsLoadingBases(false);
+      }
+    };
+    loadBases();
+  }, []);
+
+  // Fetch charms from API
+  useEffect(() => {
+    const loadCharms = async () => {
+      try {
+        setIsLoadingCharms(true);
+        const data = await fetchCharms();
+        setCharms(data || []);
+      } catch (error) {
+        console.error('Error loading charms:', error);
+        toast.error('Failed to load charms. Please refresh the page.');
+      } finally {
+        setIsLoadingCharms(false);
+      }
+    };
+    loadCharms();
+  }, []);
+
+  // Fetch user's custom products from API
+  useEffect(() => {
+    const loadUserProducts = async () => {
+      try {
+        setIsLoadingProducts(true);
+        const data = await fetchUserProducts();
+        setCustomProducts(data || []);
+        console.log('Custom products loaded successfully:', data);
+      } catch (error) {
+        console.error('Error loading custom products:', error);
+        // Check if error is due to authentication or other issues
+        if (error.message && error.message.includes('401')) {
+          console.log('User not authenticated - custom products unavailable');
+        } else if (error.message && error.message.includes('User identifier')) {
+          console.log('User identifier not in token - custom products unavailable');
+        } else {
+          console.warn('Could not load custom products:', error.message);
+        }
+        // Set to empty array on error - don't show error to user for non-critical feature
+        setCustomProducts([]);
+      } finally {
+        setIsLoadingProducts(false);
+      }
+    };
+    loadUserProducts();
+  }, []);
+
   // Handle clicks outside selection triggers
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -68,13 +139,13 @@ export default function CustomizerPage() {
 
   // Initialize product form when modal opens
   useEffect(() => {
-    if (showSaveProductModal) {
+    if (showSaveProductModal && selectedBase) {
       const currentCharms = modelViewerRef.current ? modelViewerRef.current.getCharms?.() || [] : [];
       setProductTitle(`Custom ${selectedBase.name}`);
       setProductDescription(`Customized hair clip based on ${selectedBase.name} with ${currentCharms.length} charm(s)`);
-      setProductStatus("public");
+      setProductStatus("active");
     }
-  }, [showSaveProductModal, selectedBase.name]);
+  }, [showSaveProductModal, selectedBase]);
 
   // Handle base selection
   const handleBaseSelect = (base) => {
@@ -85,7 +156,8 @@ export default function CustomizerPage() {
   const handleCharmDoubleClick = (charm) => {
     // Call addCharm function on ModelViewer component with charm data
     if (modelViewerRef.current) {
-      modelViewerRef.current.addCharm(charm.modelPath, charm.id);
+      const modelPath = charm.modelPath || (charm.model && charm.model.address);
+      modelViewerRef.current.addCharm(modelPath, charm.id);
       // Update local state immediately to keep UI in sync
       // Use a small delay to ensure ModelViewer state is updated
       setTimeout(() => {
@@ -120,45 +192,73 @@ export default function CustomizerPage() {
   // Handle custom product selection
   const handleCustomProductSelect = async (customProduct) => {
     try {
-      // Load configuration from the JSON file
-      const response = await fetch(customProduct.configurationFile);
-      if (!response.ok) {
-        throw new Error('Failed to load configuration file');
-      }
-      const configData = await response.json();
+      console.log('Loading custom product:', customProduct);
       
-      // Find the base product by ID
-      const foundBase = bases.find(base => base.id === configData.baseId);
-      if (foundBase) {
-        // Set the base product
-        setSelectedBase(foundBase);
+      // Get the model file URL from the API response
+      const modelFileUrl = customProduct.model?.address;
+      if (!modelFileUrl) {
+        throw new Error('No model file URL available for this product');
+      }
+      
+      console.log('Fetching model file from:', modelFileUrl);
+      
+      // Load configuration from the JSON file
+      const response = await fetch(modelFileUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to load configuration file: ${response.status} ${response.statusText}`);
+      }
+      
+      const configData = await response.json();
+      console.log('Configuration loaded:', configData);
+      
+      // Find the base product by ID from the API response
+      const baseFromProduct = customProduct.base;
+      if (!baseFromProduct) {
+        throw new Error('Base product information not found');
+      }
+      
+      // If base ID exists in bases array, use it; otherwise create a temporary reference
+      let foundBase = bases.find(base => base.id === baseFromProduct.id);
+      if (!foundBase) {
+        // Use the base from the API response
+        foundBase = baseFromProduct;
+      }
+      
+      // Set the base product
+      setSelectedBase(foundBase);
+      
+      // Set the base color from config or default
+      if (configData.baseModelColor) {
+        setBaseModelColor(configData.baseModelColor);
+      } else {
+        setBaseModelColor('#ffffff');
+      }
+      
+      // Clear current charms and load new ones
+      if (modelViewerRef.current && configData.charms && configData.charms.length > 0) {
+        // Clear existing charms
+        const currentCharms = modelViewerRef.current.getCharms();
+        currentCharms.forEach(charm => {
+          modelViewerRef.current.removeCharm(charm.id);
+        });
+        setCurrentCharms([]);
         
-        // Set the base color
-        if (configData.baseModelColor) {
-          setBaseModelColor(configData.baseModelColor);
-        }
-        
-        // Clear current charms and load new ones
-        if (modelViewerRef.current && configData.charms) {
-          // Clear existing charms
-          const currentCharms = modelViewerRef.current.getCharms();
-          currentCharms.forEach(charm => {
-            modelViewerRef.current.removeCharm(charm.id);
-          });
+        // Add loaded charms with a delay to ensure base model is loaded
+        setTimeout(() => {
+          // Clear local state first
           setCurrentCharms([]);
           
-          // Add loaded charms with a delay to ensure base model is loaded
-          setTimeout(() => {
-            // Clear local state first
-            setCurrentCharms([]);
+          configData.charms.forEach((charmData, index) => {
+            // Generate a consistent ID for the loaded charm
+            const charmInstanceId = charmData.id || `charm-${charmData.charmId}-${Date.now()}-${index}`;
             
-            configData.charms.forEach((charmData, index) => {
-              // Generate a consistent ID for the loaded charm
-              const charmInstanceId = charmData.id || `charm-${charmData.charmId}-${Date.now()}-${index}`;
-              
+            // Get the charm model path
+            const charmModelPath = charmData.modelPath || (charmData.model?.address);
+            
+            if (charmModelPath) {
               // Add charm to 3D viewer with saved transforms and ID
               modelViewerRef.current.addCharmWithTransforms(
-                charmData.modelPath, 
+                charmModelPath, 
                 charmData.charmId,
                 charmData.position,
                 charmData.rotation,
@@ -170,23 +270,22 @@ export default function CustomizerPage() {
               const newCharm = {
                 id: charmInstanceId,
                 charmId: charmData.charmId,
-                modelPath: charmData.modelPath,
+                modelPath: charmModelPath,
                 position: charmData.position || [0, 0, 0],
                 rotation: charmData.rotation || [0, 0, 0],
                 scale: charmData.scale || [0.5, 0.5, 0.5]
               };
               setCurrentCharms(prev => [...prev, newCharm]);
-            });
-          }, 500);
-        }
-        
-        alert(`Custom product "${customProduct.title}" loaded successfully!`);
-      } else {
-        alert('Base product not found. This custom product may be incompatible.');
+            }
+          });
+        }, 500);
       }
+      
+      toast.success(`Custom product "${customProduct.title}" loaded successfully!`);
+      console.log('Custom product loaded successfully');
     } catch (error) {
       console.error('Error loading custom product:', error);
-      alert('Failed to load custom product configuration. Please try again.');
+      toast.error(`Failed to load custom product: ${error.message}`);
     }
   };
 
@@ -247,67 +346,22 @@ export default function CustomizerPage() {
     }
   };
 
-  // Save as product function (saves to database)
-  const saveAsProduct = async () => {
-    try {
-      const currentCharms = modelViewerRef.current ? modelViewerRef.current.getCharms?.() || [] : [];
-      
-      // Calculate total price
-      const basePrice = parseFloat(selectedBase.price) || 0;
-      const charmsPrice = currentCharms.reduce((total, charm) => {
-        const charmData = charms.find(c => c.modelPath === charm.modelPath);
-        return total + (charmData ? parseFloat(charmData.price) : 0);
-      }, 0);
-      const totalPrice = basePrice + charmsPrice;
-      
-      const productData = {
-        collectId: null, // Could be set based on user selection
-        title: productTitle.trim() || `Custom ${selectedBase.name}`,
-        descript: productDescription.trim() || `Customized hair clip based on ${selectedBase.name}`,
-        baseId: selectedBase.id,
-        price: totalPrice,
-        userId: null, // Should be set from current user session
-        stock: 1,
-        modelId: selectedBase.modelId,
-        createDate: new Date().toISOString(),
-        status: productStatus,
-        charms: currentCharms.map(charm => {
-          const charmData = charms.find(c => c.modelPath === charm.modelPath);
-          return charmData ? charmData.id : null;
-        }).filter(id => id !== null),
-        customizationData: {
-          baseModelColor: baseModelColor,
-          charms: currentCharms.map(charm => ({
-            modelPath: charm.modelPath,
-            position: charm.position,
-            rotation: charm.rotation,
-            scale: charm.scale
-          }))
-        }
+  // Get current charms with full data
+  const getCurrentCharmsData = () => {
+    const currentCharms = modelViewerRef.current ? modelViewerRef.current.getCharms?.() || [] : [];
+    return currentCharms.map(charm => {
+      const charmModelPath = charm.modelPath || (charm.model && charm.model.address);
+      const charmData = charms.find(c => 
+        c.modelPath === charmModelPath || 
+        (c.model && c.model.address) === charmModelPath
+      );
+      return {
+        id: charm.id,
+        name: charmData?.name || 'Unknown',
+        price: charmData?.price || 0,
+        modelPath: charmModelPath
       };
-
-  
-      // TODO: Replace with actual API call to create product
-      
-      // For now, save as JSON file
-      const dataStr = JSON.stringify(productData, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      
-      const url = URL.createObjectURL(dataBlob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `product-${productTitle.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.json`;
-      link.click();
-      
-      URL.revokeObjectURL(url);
-      
-      setShowSaveProductModal(false);
-      alert(`Product "${productTitle}" saved successfully! Total price: $${totalPrice.toFixed(2)}`);
-      
-    } catch (error) {
-      console.error('Error saving product:', error);
-      alert('Failed to save product. Please try again.');
-    }
+    });
   };
   const handleSaveAll = async () => {
     await saveCustomization();  // Lưu file JSON + Screenshot
@@ -328,10 +382,13 @@ export default function CustomizerPage() {
                 selectedBase={selectedBase}
                 onShowMenu={() => setShowBaseMenu(!showBaseMenu)}
                 showMenu={showBaseMenu}
+                isLoading={isLoadingBases}
               />
 
               <CustomProductSelector 
                 onShowMenu={() => setShowCustomProductMenu(!showCustomProductMenu)}
+                customProducts={customProducts}
+                isLoading={isLoadingProducts}
               />
 
               <ColorPicker 
@@ -343,6 +400,8 @@ export default function CustomizerPage() {
               <CharmSelector 
                 onShowMenu={() => setShowCharmMenu(!showCharmMenu)}
                 showMenu={showCharmMenu}
+                charms={charms}
+                isLoading={isLoadingCharms}
               />
             </div>
           </div>
@@ -351,10 +410,10 @@ export default function CustomizerPage() {
           <div className="customizer-layout-preview">
             <div className="customizer-layout-card-preview">
               <div className="customizer-layout-preview-container">
-                {selectedBase && (
+                {selectedBase ? (
                   <ModelViewer
                     ref={modelViewerRef}
-                    modelPath={selectedBase.modelPath}
+                    modelPath={selectedBase.modelPath || (selectedBase.model && selectedBase.model.address)}
                     baseModelColor={baseModelColor}
                     transformMode={transformMode}
                     isCameraLocked={isCameraLocked}
@@ -365,6 +424,10 @@ export default function CustomizerPage() {
                     }}
                     style={{ width: '100%', height: '100%' }}
                   />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <p>{isLoadingBases ? 'Loading bases...' : 'Please select a base'}</p>
+                  </div>
                 )}
               </div>
             </div>
@@ -400,12 +463,15 @@ export default function CustomizerPage() {
       isVisible={showBaseMenu}
       onClose={() => setShowBaseMenu(false)}
       onSelectBase={handleBaseSelect}
+      isLoading={isLoadingBases}
     />
     
     <CharmModal 
       isVisible={showCharmMenu}
       onClose={() => setShowCharmMenu(false)}
       onCharmDoubleClick={handleCharmDoubleClick}
+      charms={charms}
+      isLoading={isLoadingCharms}
     />
     
     <CustomProductModal 
@@ -413,6 +479,7 @@ export default function CustomizerPage() {
       isVisible={showCustomProductMenu}
       onClose={() => setShowCustomProductMenu(false)}
       onSelectCustomProduct={handleCustomProductSelect}
+      isLoading={isLoadingProducts}
     />
     
     <ColorModal 
@@ -426,6 +493,7 @@ export default function CustomizerPage() {
       isVisible={showSaveProductModal}
       onClose={() => setShowSaveProductModal(false)}
       selectedBase={selectedBase}
+      selectedCharms={getCurrentCharmsData()}
       modelViewerRef={modelViewerRef}
       productTitle={productTitle}
       setProductTitle={setProductTitle}
@@ -433,7 +501,11 @@ export default function CustomizerPage() {
       setProductDescription={setProductDescription}
       productStatus={productStatus}
       setProductStatus={setProductStatus}
-      onSaveProduct={saveAsProduct}
+      onSaveComplete={() => {
+        setShowSaveProductModal(false);
+        setProductTitle('');
+        setProductDescription('');
+      }}
     />
     </div>
   );

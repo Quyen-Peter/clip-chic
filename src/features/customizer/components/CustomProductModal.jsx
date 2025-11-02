@@ -1,11 +1,11 @@
-// src/features/customizer/components/CustomProductModal.jsx
 import React from "react";
 
 export default function CustomProductModal({ 
-  customProducts,
+  customProducts = [],
   isVisible, 
   onClose, 
-  onSelectCustomProduct 
+  onSelectCustomProduct,
+  isLoading = false
 }) {
   if (!isVisible) return null;
 
@@ -30,34 +30,53 @@ export default function CustomProductModal({
           Select a saved custom product to load
         </p>
         <div className="customizer-layout-popup-content">
-          {customProducts.map((product) => (
-            <div
-              key={product.id}
-              className="customizer-layout-popup-item"
-              onClick={() => handleCustomProductSelect(product)}
-              title={`Load "${product.title}" - $${product.price}`}
-            >
-              <img
-                src={product.previewImage}
-                alt={product.title}
-                className="customizer-layout-popup-image"
-                onError={(e) => {
-                  // Fallback to a default image or icon if preview image fails to load
-                  e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2Zz4K";
-                }}
-              />
-              <div className="customizer-layout-popup-info">
-                <p className="customizer-layout-popup-name">{product.title}</p>
-                <p className="customizer-layout-popup-price">${product.price}</p>
-                <p className="customizer-layout-popup-description">{product.descript}</p>
-                <p className="customizer-layout-popup-date">
-                  Created: {new Date(product.createDate).toLocaleDateString()}
-                </p>
-              </div>
+          {isLoading ? (
+            <div className="customizer-layout-popup-empty">
+              <p>Loading custom products...</p>
             </div>
-          ))}
-          
-          {customProducts.length === 0 && (
+          ) : customProducts && customProducts.length > 0 ? (
+            customProducts.map((product) => {
+              // Get preview image from the first image in the images array or use fallback
+              const previewImage = product.images && product.images.length > 0
+                ? product.images[0].address
+                : (product.previewImage || (product.image && product.image.address));
+              
+              // Get price from totalprice or price field
+              const price = product.totalprice || product.price || 0;
+              
+              return (
+                <div
+                  key={product.id}
+                  className="customizer-layout-popup-item"
+                  onClick={() => handleCustomProductSelect(product)}
+                  title={`Load "${product.title}" - $${price}`}
+                >
+                  {previewImage ? (
+                    <img
+                      src={previewImage}
+                      alt={product.title}
+                      className="customizer-layout-popup-image"
+                      onError={(e) => {
+                        e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2Zz4K";
+                      }}
+                    />
+                  ) : (
+                    <div className="customizer-layout-popup-placeholder">
+                      No image
+                    </div>
+                  )}
+                  <div className="customizer-layout-popup-info">
+                    <p className="customizer-layout-popup-name">{product.title}</p>
+                    <p className="customizer-layout-popup-price">${(price / 1000).toFixed(2)}</p>
+                    <p className="customizer-layout-popup-description">{product.descript}</p>
+                    <p className="customizer-layout-popup-date">
+                      Created: {new Date(product.createDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
             <div className="customizer-layout-popup-empty">
               <p>No saved custom products found.</p>
               <p>Create and save a custom product to see it here!</p>

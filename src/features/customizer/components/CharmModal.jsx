@@ -1,11 +1,11 @@
-// src/features/customizer/components/CharmModal.jsx
 import React from "react";
-import { charms } from "../mock/mockData";
 
 export default function CharmModal({ 
   isVisible, 
   onClose, 
-  onCharmDoubleClick 
+  onCharmDoubleClick,
+  charms = [],
+  isLoading = false
 }) {
   if (!isVisible) return null;
 
@@ -28,24 +28,34 @@ export default function CharmModal({
         </div>
         <p className="customizer-layout-popup-instruction">Double-click to add to model</p>
         <div className="customizer-layout-popup-content">
-          {charms.map((charm) => (
-            <div
-              key={charm.id}
-              className="customizer-layout-popup-item"
-              onDoubleClick={() => handleCharmDoubleClick(charm)}
-              title="Double-click to add to model"
-            >
-              <img
-                src={charm.previewImage}
-                alt={charm.name}
-                className="customizer-layout-popup-image"
-              />
-              <div className="customizer-layout-popup-info">
-                <p className="customizer-layout-popup-name">{charm.name}</p>
-                <p className="customizer-layout-popup-price">${charm.price}</p>
-              </div>
+          {isLoading ? (
+            <div className="customizer-layout-popup-empty">
+              <p>Loading charms...</p>
             </div>
-          ))}
+          ) : charms && charms.length > 0 ? (
+            charms.map((charm) => (
+              <div
+                key={charm.id}
+                className="customizer-layout-popup-item"
+                onDoubleClick={() => handleCharmDoubleClick(charm)}
+                title="Double-click to add to model"
+              >
+                <img
+                  src={charm.previewImage || charm.image?.address}
+                  alt={charm.name}
+                  className="customizer-layout-popup-image"
+                />
+                <div className="customizer-layout-popup-info">
+                  <p className="customizer-layout-popup-name">{charm.name}</p>
+                  <p className="customizer-layout-popup-price">${charm.price}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="customizer-layout-popup-empty">
+              <p>No charms available.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

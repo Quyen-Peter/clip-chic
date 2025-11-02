@@ -274,8 +274,11 @@
   border-radius: 0.75rem;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
   width: 40rem;
-  height: 20rem;
+  max-height: 80vh;
+  height: auto;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   animation: slideIn 0.2s ease-out;
 }
 
@@ -297,6 +300,7 @@
   padding: 1rem;
   border-bottom: 1px solid #e5e7eb;
   background: #f9fafb;
+  flex-shrink: 0;
 }
 
 .customizer-layout-popup-header h6 {
@@ -334,12 +338,32 @@
   padding: 0.5rem 1rem 0 1rem;
   font-style: italic;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .customizer-layout-popup-content {
-  max-height: 350px;
+  flex: 1;
   overflow-y: auto;
   padding: 0.5rem;
+  min-height: 0;
+}
+
+.customizer-layout-popup-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.customizer-layout-popup-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.customizer-layout-popup-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.customizer-layout-popup-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .customizer-layout-popup-item {
@@ -410,13 +434,34 @@
   width: 90vw;
   max-height: 80vh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
   animation: slideIn 0.2s ease-out;
 }
 
 .customizer-layout-save-form {
   padding: 1.5rem;
-  max-height: 60vh;
   overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.customizer-layout-save-form::-webkit-scrollbar {
+  width: 8px;
+}
+
+.customizer-layout-save-form::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.customizer-layout-save-form::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.customizer-layout-save-form::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .customizer-layout-form-group {
@@ -522,6 +567,10 @@
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  flex-shrink: 0;
 }
 
 .customizer-layout-modal-button {
