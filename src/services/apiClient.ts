@@ -15,6 +15,13 @@ export async function apiRequest<T>(
     : `${API_BASE_URL}/${path.replace(/^\/+/, "")}`;
 
   const headers = new Headers(options.headers);
+  
+  // Add Authorization header if token exists
+  const token = sessionStorage.getItem('token');
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+
   const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
   if (options.body && !headers.has("Content-Type") && !isFormData) {
     headers.set("Content-Type", "application/json");

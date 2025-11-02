@@ -1,12 +1,12 @@
-// src/features/customizer/components/BaseProductModal.jsx
 import React from "react";
 
 export default function BaseProductModal({ 
-  bases, 
+  bases = [], 
   selectedBase, 
   isVisible, 
   onClose, 
-  onSelectBase 
+  onSelectBase,
+  isLoading = false
 }) {
   if (!isVisible) return null;
 
@@ -28,25 +28,44 @@ export default function BaseProductModal({
           </button>
         </div>
         <div className="customizer-layout-popup-content">
-          {bases.map((base) => (
-            <div
-              key={base.id}
-              className={`customizer-layout-popup-item ${
-                selectedBase.id === base.id ? "selected" : ""
-              }`}
-              onClick={() => handleBaseSelect(base)}
-            >
-              <img
-                src={base.previewImage}
-                alt={base.name}
-                className="customizer-layout-popup-image"
-              />
-              <div className="customizer-layout-popup-info">
-                <p className="customizer-layout-popup-name">{base.name}</p>
-                <p className="customizer-layout-popup-price">${base.price}</p>
-              </div>
+          {isLoading ? (
+            <div className="customizer-layout-popup-empty">
+              <p>Loading bases...</p>
             </div>
-          ))}
+          ) : bases && bases.length > 0 ? (
+            bases.map((base) => {
+              const previewImage = base.previewImage || (base.image && base.image.address);
+              return (
+                <div
+                  key={base.id}
+                  className={`customizer-layout-popup-item ${
+                    selectedBase && selectedBase.id === base.id ? "selected" : ""
+                  }`}
+                  onClick={() => handleBaseSelect(base)}
+                >
+                  {previewImage ? (
+                    <img
+                      src={previewImage}
+                      alt={base.name}
+                      className="customizer-layout-popup-image"
+                    />
+                  ) : (
+                    <div className="customizer-layout-popup-placeholder">
+                      No image
+                    </div>
+                  )}
+                  <div className="customizer-layout-popup-info">
+                    <p className="customizer-layout-popup-name">{base.name}</p>
+                    <p className="customizer-layout-popup-price">${base.price}</p>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="customizer-layout-popup-empty">
+              <p>No bases available.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
