@@ -31,6 +31,27 @@
     width: 130px;
 }
 
+.link-sidebar-profile-bnt {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 7px; 
+  width: 150px; 
+  font-family: inherit;
+  text-align: left; 
+  transition: background-color 0.3s ease; 
+  border-radius: 10px;
+  padding-left: 10px;
+}
+
+.link-sidebar-profile-bnt:hover {
+  background-color: #b3c0e13e;
+  border-radius: 10px;
+}
+
+
 .sidebar-item {
   display: flex;
   align-items: center;

@@ -100,7 +100,7 @@ const handleGoogleSuccess = async (credentialResponse) => {
 
   return (
     <div className="social-login">
-      <button
+      {/* <button
         onClick={handleFacebookLogin}
         style={{
           backgroundColor: "#4564b5",
@@ -116,7 +116,7 @@ const handleGoogleSuccess = async (credentialResponse) => {
         Facebook
       </button>
 
-      <a style={{ margin: "0 10px" }}>|</a>
+      <a style={{ margin: "0 10px" }}>|</a> */}
 
       <GoogleOAuthProvider clientId={clientId}>
         <GoogleLogin

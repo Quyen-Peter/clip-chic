@@ -98,7 +98,7 @@ const Login = () => {
           <div className="line-coler"></div>
         </div>
 
-        <div className="social-login">
+        <div className="social-login" style={{marginLeft: "7%"}}>
             <LoginWith/>
         </div>
 
