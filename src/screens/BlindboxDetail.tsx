@@ -135,7 +135,7 @@ const BlindboxDetail = () => {
       if (token == null) {
         navigate("/Account/Login");
       }
-     const url = `${API_URL}/api/Order/add-blindbox-detail?blindBoxId=${productId}&quantity=${quantity}&price=${price}`;
+      const url = `${API_URL}/api/Order/add-blindbox-detail?blindBoxId=${productId}&quantity=${quantity}&price=${price}`;
 
       const res = await fetch(url, {
         method: "POST",
@@ -275,11 +275,11 @@ const BlindboxDetail = () => {
                   />
                 </div>
                 <div className="you-may-also-like-products-sub-blindbox">
-                  <p className="you-may-also-like-products-collection-blindbox">
-                    {p.collectionName}
+                  <p className="you-may-also-like-products-collection-blindbox" >
+                    {p.name}
                   </p>
                   <p className="you-may-also-like-products-name-blindbox you-may-also-like-products-title">
-                    {p.name}
+                    {p.collectionName}
                   </p>
                 </div>
                 <div className="you-may-also-like-products-buttom">
