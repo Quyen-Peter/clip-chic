@@ -390,9 +390,9 @@ const Cart = () => {
 
           status: "payment",
           payMethod: method,
-          totalPrice: total,
+          totalPrice: subtotal,
           shipPrice: selectedShip ? selectedShip.price : 0,
-          payPrice: total + (selectedShip ? selectedShip.price : 0),
+          payPrice: total,
         }),
       });
       if (!res.ok) {
