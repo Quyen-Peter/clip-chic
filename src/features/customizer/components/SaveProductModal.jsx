@@ -55,7 +55,7 @@ export default function SaveProductModal({
         price: totalPrice,
         userId: userId,
         stock: 1,
-        status: productStatus || 'active'
+        status: productStatus || 'private'
       };
 
       // Capture screenshot from 3D viewer as product image
@@ -173,8 +173,8 @@ export default function SaveProductModal({
                 <input
                   type="radio"
                   name="productStatus"
-                  value="active"
-                  checked={productStatus === "active"}
+                  value="public"
+                  checked={productStatus === "public"}
                   onChange={(e) => setProductStatus(e.target.value)}
                   disabled={isSaving}
                 />
@@ -186,8 +186,8 @@ export default function SaveProductModal({
                 <input
                   type="radio"
                   name="productStatus"
-                  value="inactive"
-                  checked={productStatus === "inactive"}
+                  value="private"
+                  checked={productStatus === "private"}
                   onChange={(e) => setProductStatus(e.target.value)}
                   disabled={isSaving}
                 />

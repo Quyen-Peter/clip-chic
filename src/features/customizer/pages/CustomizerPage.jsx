@@ -42,7 +42,7 @@ export default function CustomizerPage() {
   // State for product save form
   const [productTitle, setProductTitle] = useState("");
   const [productDescription, setProductDescription] = useState("");
-  const [productStatus, setProductStatus] = useState("public");
+  const [productStatus, setProductStatus] = useState("private");
   
   // Refs for selection containers and ModelViewer
   const baseSelectionRef = useRef(null);
@@ -143,7 +143,7 @@ export default function CustomizerPage() {
       const currentCharms = modelViewerRef.current ? modelViewerRef.current.getCharms?.() || [] : [];
       setProductTitle(`Custom ${selectedBase.name}`);
       setProductDescription(`Customized hair clip based on ${selectedBase.name} with ${currentCharms.length} charm(s)`);
-      setProductStatus("active");
+      setProductStatus("private");
     }
   }, [showSaveProductModal, selectedBase]);
 
@@ -363,9 +363,9 @@ export default function CustomizerPage() {
       };
     });
   };
-  const handleSaveAll = async () => {
-    await saveCustomization();  // Lưu file JSON + Screenshot
-    setShowSaveProductModal(true); // Sau đó mở modal Save Product
+  const handleSaveAll = () => {
+    // Open the save modal and push the save flow through the API only
+    setShowSaveProductModal(true);
 };
   return (
     <div>
