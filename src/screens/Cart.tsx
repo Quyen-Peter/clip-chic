@@ -73,6 +73,7 @@ const Cart = () => {
   const [loadOrder, setLoadOrder] = useState(false);
   const [loadUpdate, setLoadUpdate] = useState(false);
   const [errorPay, setErrorPay] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<any>(null);
 
   const [showPopup, setShowPopup] = useState(false);
   const [popupState, setPopupState] = useState<
@@ -159,9 +160,9 @@ const Cart = () => {
       const data = await res.json();
 
       setOrderID(data.id);
-      setOrderName(data.name);
-      setOrderAddress(data.address);
-      setOrderPhone(data.phone);
+      // setOrderName(data.name);
+      // setOrderAddress(data.address);
+      // setOrderPhone(data.phone);
       setOrderShip(data.shipPrice);
       setOrderPay(data.payPrice);
       setOrderTotal(data.totalPrice);
@@ -188,15 +189,39 @@ const Cart = () => {
     }
   };
 
+  const fetchUserInfo = async () => {
+    const token = sessionStorage.getItem("token");
+    try {
+      const res = await fetch(`${API_URL}/api/Users/me`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Không lấy được thông tin!");
+
+      setUserInfo(data);
+
+      setOrderName(data.name || "");
+      setOrderPhone(data.phone || "");
+      setOrderAddress(data.address || "");
+    } catch (err) {
+      console.error("Lỗi khi lấy thông tin người dùng:", err);
+    }
+  };
+
   useEffect(() => {
     handleShip();
     handleGetPendingOrder();
+    fetchUserInfo();
   }, []);
 
   useEffect(() => {
     if (method === "qr") {
-      
-      if(checkoutDisabled) {
+      if (checkoutDisabled) {
         setLoading(false);
         setErrorPay("Vui lòng điền đầy đủ thông tin giao hàng!");
         return;
@@ -353,6 +378,17 @@ const Cart = () => {
         throw new Error(`HTTP ${res.status}`);
       }
       if (res.ok) {
+        const formData = new FormData();
+        formData.append("name", orderName);
+        formData.append("phone", orderPhone);
+        formData.append("address", orderAddress);
+
+        await fetch(`${API_URL}/api/Users/me`, {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+
         setErrorPay(null);
         setIsAddress(false);
         const data = await res.json();
@@ -364,7 +400,7 @@ const Cart = () => {
   };
 
   const handlePayment = async () => {
-    if(checkoutDisabled) {
+    if (checkoutDisabled) {
       setErrorPay("Vui lòng điền đầy đủ thông tin giao hàng!");
       return;
     }
@@ -410,8 +446,8 @@ const Cart = () => {
     }
   };
 
-
-  const checkoutDisabled = products.length === 0 || !orderName || !orderAddress || !orderPhone;
+  const checkoutDisabled =
+    products.length === 0 || !orderName || !orderAddress || !orderPhone;
 
   return (
     <div className="cart-page">
@@ -515,7 +551,7 @@ const Cart = () => {
                 >
                   <img className="img-payment-bnt" src={qr} />
                 </button>
-                <button
+                {/* <button
                   className={`bnt-payment ${
                     method === "visa" ? "bnt-payment-active" : ""
                   }`}
@@ -523,7 +559,7 @@ const Cart = () => {
                 >
                   <img src={visa} className="img-payment-bnt-visa" />
                   <img className="img-payment-bnt-visa" src={mastercard} />
-                </button>
+                </button> */}
               </div>
 
               <div className="content-payment-method">
@@ -618,15 +654,15 @@ const Cart = () => {
                     </p>
                   </div>
                 )}
-                
-                {method === "visa" && (
+
+                {/* {method === "visa" && (
                   <div className="border-visa-payment">
                     <p className="content-visa-pay">
                       Tính năng đang được phát triển. Vui lòng chọn phương thức
                       thanh toán khác.
                     </p>
                   </div>
-                )}
+                )} */}
               </div>
 
               <div className="line-payment-amount"></div>
