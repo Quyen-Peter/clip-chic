@@ -3,16 +3,16 @@ import React from "react";
 
 export default function ColorPicker({ baseModelColor, onColorChange, onShowMenu }) {
   const presetColors = [
-    { color: "#ffffff", name: "White" },
-    { color: "#000000", name: "Black" },
-    { color: "#ff0000", name: "Red" },
-    { color: "#00ff00", name: "Green" },
-    { color: "#0000ff", name: "Blue" },
-    { color: "#ffff00", name: "Yellow" }
+    { color: "#ffffff", name: "Trắng" },
+    { color: "#000000", name: "Đen" },
+    { color: "#ff0000", name: "Đỏ" },
+    { color: "#00ff00", name: "Xanh lá" },
+    { color: "#0000ff", name: "Xanh dương" },
+    { color: "#ffff00", name: "Vàng" }
   ];
 
   // Find the current color name
-  const currentColorName = presetColors.find(preset => preset.color === baseModelColor)?.name || "Custom";
+  const currentColorName = presetColors.find(preset => preset.color === baseModelColor)?.name || "Tùy chỉnh";
 
   return (
     <div>
@@ -22,7 +22,7 @@ export default function ColorPicker({ baseModelColor, onColorChange, onShowMenu 
           onClick={onShowMenu}
         >
           <div className="customizer-layout-product-card-content">
-            <h5 className="customizer-layout-title">Color</h5>
+            <h5 className="customizer-layout-title">Màu sắc</h5>
             <div 
               className="customizer-layout-color-preview"
               style={{ backgroundColor: baseModelColor }}

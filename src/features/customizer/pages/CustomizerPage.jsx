@@ -1,23 +1,25 @@
 // src/features/customizer/pages/CustomizerPage.jsx
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { fetchBases, fetchCharms, fetchUserProducts } from "../services/customizerService";
 import ModelViewer from "../components/ModelViewer";
 import Header from "../../../component/Header";
 import BaseProductSelector from "../components/BaseProductSelector";
 import CustomProductSelector from "../components/CustomProductSelector";
-import ColorPicker from "../components/ColorPicker";
 import CharmSelector from "../components/CharmSelector";
 import TransformControls from "../components/TransformControls";
 import ActionButtons from "../components/ActionButtons";
 import BaseProductModal from "../components/BaseProductModal";
 import CharmModal from "../components/CharmModal";
-import ColorModal from "../components/ColorModal";
 import CustomProductModal from "../components/CustomProductModal";
 import SaveProductModal from "../components/SaveProductModal";
 import "../css/CustomizerLayout.css";
 
+const API_URL = process.env.REACT_APP_HOST_API;
+
 export default function CustomizerPage() {
+  const navigate = useNavigate();
   const [bases, setBases] = useState([]);
   const [charms, setCharms] = useState([]);
   const [customProducts, setCustomProducts] = useState([]);
@@ -35,7 +37,6 @@ export default function CustomizerPage() {
   // State for popup menus
   const [showBaseMenu, setShowBaseMenu] = useState(false);
   const [showCharmMenu, setShowCharmMenu] = useState(false);
-  const [showColorMenu, setShowColorMenu] = useState(false);
   const [showCustomProductMenu, setShowCustomProductMenu] = useState(false);
   const [showSaveProductModal, setShowSaveProductModal] = useState(false);
   
@@ -43,11 +44,28 @@ export default function CustomizerPage() {
   const [productTitle, setProductTitle] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productStatus, setProductStatus] = useState("private");
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const [pendingAddToCart, setPendingAddToCart] = useState(false);
+  const [addToCartState, setAddToCartState] = useState({ isSubmitting: false, isSuccess: false });
   
   // Refs for selection containers and ModelViewer
   const baseSelectionRef = useRef(null);
   const charmSelectionRef = useRef(null);
   const modelViewerRef = useRef(null);
+
+  const handleProductTitleChange = (value) => {
+    setProductTitle(value);
+    setIsDirty(true);
+  };
+  const handleProductDescriptionChange = (value) => {
+    setProductDescription(value);
+    setIsDirty(true);
+  };
+  const handleProductStatusChange = (value) => {
+    setProductStatus(value);
+    setIsDirty(true);
+  };
 
   // Fetch bases from API
   useEffect(() => {
@@ -128,7 +146,6 @@ export default function CustomizerPage() {
           setShowCharmMenu(false);
         }
       }
-      // Note: Color menu handled by its own click events, no ref needed
     };
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -141,15 +158,19 @@ export default function CustomizerPage() {
   useEffect(() => {
     if (showSaveProductModal && selectedBase) {
       const currentCharms = modelViewerRef.current ? modelViewerRef.current.getCharms?.() || [] : [];
-      setProductTitle(`Custom ${selectedBase.name}`);
-      setProductDescription(`Customized hair clip based on ${selectedBase.name} with ${currentCharms.length} charm(s)`);
-      setProductStatus("private");
+      if (!editingProduct) {
+        setProductTitle(`Custom ${selectedBase.name}`);
+        setProductDescription(`Customized hair clip based on ${selectedBase.name} with ${currentCharms.length} charm(s)`);
+        setProductStatus("private");
+      }
     }
-  }, [showSaveProductModal, selectedBase]);
+  }, [showSaveProductModal, selectedBase, editingProduct]);
 
   // Handle base selection
   const handleBaseSelect = (base) => {
     setSelectedBase(base);
+    setEditingProduct(null);
+    setIsDirty(true);
   };
 
   // Handle charm double click to add to model
@@ -158,6 +179,7 @@ export default function CustomizerPage() {
     if (modelViewerRef.current) {
       const modelPath = charm.modelPath || (charm.model && charm.model.address);
       modelViewerRef.current.addCharm(modelPath, charm.id);
+      setIsDirty(true);
       // Update local state immediately to keep UI in sync
       // Use a small delay to ensure ModelViewer state is updated
       setTimeout(() => {
@@ -182,6 +204,7 @@ export default function CustomizerPage() {
       modelViewerRef.current.removeCharm(charmId);
       // Update local state immediately to keep UI in sync
       setCurrentCharms(prev => prev.filter(charm => charm.id !== charmId));
+      setIsDirty(true);
       // Deselect if this charm was selected
       if (selectedCharm === charmId) {
         setSelectedCharm(null);
@@ -281,6 +304,14 @@ export default function CustomizerPage() {
         }, 500);
       }
       
+      // Track editing product metadata for updates
+      setEditingProduct(customProduct);
+      setProductTitle(customProduct.title || '');
+      setProductDescription(customProduct.descript || '');
+      const normalizedStatus = (customProduct.status === 'public' || customProduct.status === 'active') ? 'public' : 'private';
+      setProductStatus(normalizedStatus);
+      setIsDirty(false);
+
       toast.success(`Custom product "${customProduct.title}" loaded successfully!`);
       console.log('Custom product loaded successfully');
     } catch (error) {
@@ -363,10 +394,90 @@ export default function CustomizerPage() {
       };
     });
   };
+  const addProductToCart = async (productId, price = 0) => {
+    const normalizedPrice = parseFloat(price) || 0;
+    if (!API_URL) {
+      toast.error('API host is not configured.');
+      return;
+    }
+    if (!productId) {
+      toast.error('No product to add. Please save first.');
+      return;
+    }
+
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      navigate("/Account/Login");
+      return;
+    }
+
+    try {
+      setAddToCartState({ isSubmitting: true, isSuccess: false });
+      const url = `${API_URL}/api/Order/add-detail?productId=${productId}&quantity=1&price=${normalizedPrice}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "*/*",
+          Authorization: `Bearer ${token}`
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      await res.json();
+      toast.success('Added to cart');
+      setAddToCartState({ isSubmitting: false, isSuccess: true });
+      setTimeout(() => setAddToCartState({ isSubmitting: false, isSuccess: false }), 1500);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error('Failed to add to cart');
+      setAddToCartState({ isSubmitting: false, isSuccess: false });
+    }
+  };
+
+  const handleAddToCart = () => {
+    // If no existing product or there are unsaved changes, ask to save first
+    if (!editingProduct || isDirty) {
+      setPendingAddToCart(true);
+      setShowSaveProductModal(true);
+      return;
+    }
+
+    addProductToCart(editingProduct.id, editingProduct.price);
+  };
+
+  const handleCloseSaveModal = () => {
+    setShowSaveProductModal(false);
+    setPendingAddToCart(false);
+  };
+
+  const handleAfterSaveComplete = (savedProduct) => {
+    setShowSaveProductModal(false);
+    setProductTitle('');
+    setProductDescription('');
+    if (savedProduct) {
+      setEditingProduct(savedProduct);
+    }
+    setIsDirty(false);
+
+    if (pendingAddToCart) {
+      const productId = savedProduct?.id || savedProduct?.productId || editingProduct?.id;
+      const price = savedProduct?.price ?? editingProduct?.price ?? 0;
+      if (productId) {
+        addProductToCart(productId, price);
+      } else {
+        toast.error('Could not determine product to add to cart after saving.');
+      }
+      setPendingAddToCart(false);
+    }
+  };
   const handleSaveAll = () => {
     // Open the save modal and push the save flow through the API only
     setShowSaveProductModal(true);
-};
+  };
   return (
     <div>
     <Header />
@@ -391,12 +502,6 @@ export default function CustomizerPage() {
                 isLoading={isLoadingProducts}
               />
 
-              <ColorPicker 
-                baseModelColor={baseModelColor}
-                onColorChange={setBaseModelColor}
-                onShowMenu={() => setShowColorMenu(true)}
-              />
-
               <CharmSelector 
                 onShowMenu={() => setShowCharmMenu(!showCharmMenu)}
                 showMenu={showCharmMenu}
@@ -419,6 +524,7 @@ export default function CustomizerPage() {
                     isCameraLocked={isCameraLocked}
                     selectedCharm={selectedCharm}
                     onSelectedCharmChange={setSelectedCharm}
+                    onSceneChange={() => setIsDirty(true)}
                     onCharmAdd={(charmModel) => {
                       console.log("Charm added:", charmModel);
                     }}
@@ -452,6 +558,8 @@ export default function CustomizerPage() {
   isCameraLocked={isCameraLocked}
   onToggleCameraLock={() => setIsCameraLocked(!isCameraLocked)}
   onSaveAll={handleSaveAll}
+  onAddToCart={handleAddToCart}
+  addToCartState={addToCartState}
 />
       </div>
     </div>
@@ -482,30 +590,20 @@ export default function CustomizerPage() {
       isLoading={isLoadingProducts}
     />
     
-    <ColorModal 
-      baseModelColor={baseModelColor}
-      onColorChange={setBaseModelColor}
-      isVisible={showColorMenu}
-      onClose={() => setShowColorMenu(false)}
-    />
-    
     <SaveProductModal 
       isVisible={showSaveProductModal}
-      onClose={() => setShowSaveProductModal(false)}
+      onClose={handleCloseSaveModal}
       selectedBase={selectedBase}
       selectedCharms={getCurrentCharmsData()}
       modelViewerRef={modelViewerRef}
       productTitle={productTitle}
-      setProductTitle={setProductTitle}
+      setProductTitle={handleProductTitleChange}
       productDescription={productDescription}
-      setProductDescription={setProductDescription}
+      setProductDescription={handleProductDescriptionChange}
       productStatus={productStatus}
-      setProductStatus={setProductStatus}
-      onSaveComplete={() => {
-        setShowSaveProductModal(false);
-        setProductTitle('');
-        setProductDescription('');
-      }}
+      setProductStatus={handleProductStatusChange}
+      editingProduct={editingProduct}
+      onSaveComplete={handleAfterSaveComplete}
     />
     </div>
   );

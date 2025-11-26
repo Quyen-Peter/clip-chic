@@ -9,6 +9,8 @@ export default function CustomProductModal({
 }) {
   if (!isVisible) return null;
 
+  const formatVnd = (value) => Number(value || 0).toLocaleString('vi-VN');
+
   const handleCustomProductSelect = (customProduct) => {
     onSelectCustomProduct(customProduct);
     onClose();
@@ -18,30 +20,28 @@ export default function CustomProductModal({
     <div className="customizer-layout-popup-overlay" onClick={onClose}>
       <div className="customizer-layout-popup-menu" onClick={(e) => e.stopPropagation()}>
         <div className="customizer-layout-popup-header">
-          <h6>Load Custom Product</h6>
+          <h6>Tải sản phẩm tùy chỉnh</h6>
           <button 
             className="customizer-layout-popup-close"
             onClick={onClose}
           >
-            ×
+            A-
           </button>
         </div>
         <p className="customizer-layout-popup-instruction">
-          Select a saved custom product to load
+          Chọn sản phẩm đã lưu để tải
         </p>
         <div className="customizer-layout-popup-content">
           {isLoading ? (
             <div className="customizer-layout-popup-empty">
-              <p>Loading custom products...</p>
+              <p>Đang tải sản phẩm tùy chỉnh...</p>
             </div>
           ) : customProducts && customProducts.length > 0 ? (
             customProducts.map((product) => {
-              // Get preview image from the first image in the images array or use fallback
               const previewImage = product.images && product.images.length > 0
                 ? product.images[0].address
                 : (product.previewImage || (product.image && product.image.address));
               
-              // Get price from totalprice or price field
               const price = product.totalprice || product.price || 0;
               
               return (
@@ -49,7 +49,7 @@ export default function CustomProductModal({
                   key={product.id}
                   className="customizer-layout-popup-item"
                   onClick={() => handleCustomProductSelect(product)}
-                  title={`Load "${product.title}" - $${price}`}
+                  title={`Tải "${product.title}" - ${formatVnd(price)} VND`}
                 >
                   {previewImage ? (
                     <img
@@ -62,15 +62,15 @@ export default function CustomProductModal({
                     />
                   ) : (
                     <div className="customizer-layout-popup-placeholder">
-                      No image
+                      Không có ảnh
                     </div>
                   )}
                   <div className="customizer-layout-popup-info">
                     <p className="customizer-layout-popup-name">{product.title}</p>
-                    <p className="customizer-layout-popup-price">${(price / 1000).toFixed(2)}</p>
+                    <p className="customizer-layout-popup-price">{formatVnd(price)} VND</p>
                     <p className="customizer-layout-popup-description">{product.descript}</p>
                     <p className="customizer-layout-popup-date">
-                      Created: {new Date(product.createDate).toLocaleDateString()}
+                      Ngày tạo: {new Date(product.createDate).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -78,8 +78,8 @@ export default function CustomProductModal({
             })
           ) : (
             <div className="customizer-layout-popup-empty">
-              <p>No saved custom products found.</p>
-              <p>Create and save a custom product to see it here!</p>
+              <p>Chưa có sản phẩm tùy chỉnh.</p>
+              <p>Tạo và lưu để xem danh sách tại đây!</p>
             </div>
           )}
         </div>

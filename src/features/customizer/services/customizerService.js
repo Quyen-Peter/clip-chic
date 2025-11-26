@@ -79,6 +79,46 @@ export const createCustomProduct = async (productData, images, modelFile) => {
 };
 
 /**
+ * Update an existing custom product (including model file)
+ * PUT /Product/UpdateWithFile
+ */
+export const updateCustomProduct = async (productData, images, modelFile) => {
+  try {
+    const formData = new FormData();
+
+    formData.append('id', productData.id || '');
+    formData.append('collectId', productData.collectId || '');
+    formData.append('title', productData.title || '');
+    formData.append('descript', productData.descript || '');
+    formData.append('baseId', productData.baseId || '');
+    formData.append('price', productData.price || 0);
+    formData.append('userId', productData.userId || '');
+    formData.append('stock', productData.stock || 1);
+    formData.append('modelId', productData.modelId || '');
+    formData.append('createDate', productData.createDate || new Date().toISOString());
+    formData.append('status', productData.status || 'active');
+    
+    if (images && images.length > 0) {
+      images.forEach((image) => {
+        formData.append('Images', image);
+      });
+    }
+    
+    if (modelFile) {
+      formData.append('ModelFile', modelFile);
+    }
+
+    return await apiRequest('Product/UpdateWithFile', {
+      method: 'PUT',
+      body: formData
+    });
+  } catch (error) {
+    console.error('Error updating product:', error);
+    throw error;
+  }
+};
+
+/**
  * Calculate total price for a custom product
  */
 export const calculateCustomProductPrice = (base, selectedCharms) => {
@@ -96,6 +136,7 @@ const customizerService = {
   fetchCharms,
   fetchUserProducts,
   createCustomProduct,
+  updateCustomProduct,
   calculateCustomProductPrice
 };
 

@@ -18,12 +18,12 @@ export default function CustomProductSelector({
           style={{ opacity: isLoading ? 0.6 : 1, cursor: isLoading ? 'not-allowed' : 'pointer' }}
         >
           <div className="customizer-layout-product-card-content">
-            <h5 className="customizer-layout-title">Customs</h5>
+            <h5 className="customizer-layout-title">Sản phẩm đã lưu</h5>
 
             {hasCustomProducts && previewImage ? (
               <img
                 src={previewImage}
-                alt="Custom products"
+                alt="Sản phẩm tùy chỉnh"
                 className="customizer-layout-product-image"
                 style={{ maxHeight: '60px', objectFit: 'cover' }}
               />
@@ -34,7 +34,7 @@ export default function CustomProductSelector({
             )}
             {hasCustomProducts && (
               <p style={{ fontSize: '0.8em', marginTop: '5px', color: '#666' }}>
-                {customProducts.length} saved
+                {customProducts.length} sản phẩm
               </p>
             )}
           </div>

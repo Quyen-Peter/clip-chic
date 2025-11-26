@@ -176,7 +176,8 @@ const ModelViewer = forwardRef(({
   transformMode = "translate",
   isCameraLocked = true,
   selectedCharm = null,
-  onSelectedCharmChange
+  onSelectedCharmChange,
+  onSceneChange
 }, ref) => {
   const [charms, setCharms] = useState([]);
   const [isAnyCharmTransforming, setIsAnyCharmTransforming] = useState(false);
@@ -302,6 +303,9 @@ const ModelViewer = forwardRef(({
           : charm
       )
     );
+    if (onSceneChange) {
+      onSceneChange();
+    }
   };
 
   const updateCharmRotation = (charmId, newRotation) => {
@@ -312,6 +316,9 @@ const ModelViewer = forwardRef(({
           : charm
       )
     );
+    if (onSceneChange) {
+      onSceneChange();
+    }
   };
 
   const updateCharmScale = (charmId, newScale) => {
@@ -322,6 +329,9 @@ const ModelViewer = forwardRef(({
           : charm
       )
     );
+    if (onSceneChange) {
+      onSceneChange();
+    }
   };
   
   return (

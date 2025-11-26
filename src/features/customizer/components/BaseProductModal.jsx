@@ -10,6 +10,8 @@ export default function BaseProductModal({
 }) {
   if (!isVisible) return null;
 
+  const formatVnd = (value) => Number(value || 0).toLocaleString('vi-VN');
+
   const handleBaseSelect = (base) => {
     onSelectBase(base);
     onClose();
@@ -19,18 +21,18 @@ export default function BaseProductModal({
     <div className="customizer-layout-popup-overlay" onClick={onClose}>
       <div className="customizer-layout-popup-menu" onClick={(e) => e.stopPropagation()}>
         <div className="customizer-layout-popup-header">
-          <h6>Select Base Product</h6>
+          <h6>Chọn mẫu kẹp</h6>
           <button 
             className="customizer-layout-popup-close"
             onClick={onClose}
           >
-            ×
+            A-
           </button>
         </div>
         <div className="customizer-layout-popup-content">
           {isLoading ? (
             <div className="customizer-layout-popup-empty">
-              <p>Loading bases...</p>
+              <p>Đang tải danh sách mẫu kẹp...</p>
             </div>
           ) : bases && bases.length > 0 ? (
             bases.map((base) => {
@@ -46,24 +48,24 @@ export default function BaseProductModal({
                   {previewImage ? (
                     <img
                       src={previewImage}
-                      alt={base.name}
-                      className="customizer-layout-popup-image"
-                    />
-                  ) : (
-                    <div className="customizer-layout-popup-placeholder">
-                      No image
-                    </div>
-                  )}
-                  <div className="customizer-layout-popup-info">
-                    <p className="customizer-layout-popup-name">{base.name}</p>
-                    <p className="customizer-layout-popup-price">${base.price}</p>
-                  </div>
+                  alt={base.name}
+                  className="customizer-layout-popup-image"
+                />
+              ) : (
+                <div className="customizer-layout-popup-placeholder">
+                  Không có ảnh
                 </div>
-              );
-            })
+              )}
+              <div className="customizer-layout-popup-info">
+                <p className="customizer-layout-popup-name">{base.name}</p>
+                <p className="customizer-layout-popup-price">{formatVnd(base.price)} VND</p>
+              </div>
+            </div>
+          );
+        })
           ) : (
             <div className="customizer-layout-popup-empty">
-              <p>No bases available.</p>
+              <p>Không có mẫu kẹp nào.</p>
             </div>
           )}
         </div>

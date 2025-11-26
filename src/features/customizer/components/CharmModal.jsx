@@ -9,6 +9,8 @@ export default function CharmModal({
 }) {
   if (!isVisible) return null;
 
+  const formatVnd = (value) => Number(value || 0).toLocaleString('vi-VN');
+
   const handleCharmDoubleClick = (charm) => {
     onCharmDoubleClick(charm);
     onClose();
@@ -18,19 +20,19 @@ export default function CharmModal({
     <div className="customizer-layout-popup-overlay" onClick={onClose}>
       <div className="customizer-layout-popup-menu" onClick={(e) => e.stopPropagation()}>
         <div className="customizer-layout-popup-header">
-          <h6>Select Charm</h6>
+          <h6>Chọn phụ kiện</h6>
           <button 
             className="customizer-layout-popup-close"
             onClick={onClose}
           >
-            ×
+            A-
           </button>
         </div>
-        <p className="customizer-layout-popup-instruction">Double-click to add to model</p>
+        <p className="customizer-layout-popup-instruction">Nhấp đúp để thêm vào mô hình</p>
         <div className="customizer-layout-popup-content">
           {isLoading ? (
             <div className="customizer-layout-popup-empty">
-              <p>Loading charms...</p>
+              <p>Đang tải phụ kiện...</p>
             </div>
           ) : charms && charms.length > 0 ? (
             charms.map((charm) => (
@@ -38,7 +40,7 @@ export default function CharmModal({
                 key={charm.id}
                 className="customizer-layout-popup-item"
                 onDoubleClick={() => handleCharmDoubleClick(charm)}
-                title="Double-click to add to model"
+                title="Nhấp đúp để thêm vào mô hình"
               >
                 <img
                   src={charm.previewImage || charm.image?.address}
@@ -47,13 +49,13 @@ export default function CharmModal({
                 />
                 <div className="customizer-layout-popup-info">
                   <p className="customizer-layout-popup-name">{charm.name}</p>
-                  <p className="customizer-layout-popup-price">${charm.price}</p>
+                  <p className="customizer-layout-popup-price">{formatVnd(charm.price)} VND</p>
                 </div>
               </div>
             ))
           ) : (
             <div className="customizer-layout-popup-empty">
-              <p>No charms available.</p>
+              <p>Không có phụ kiện nào.</p>
             </div>
           )}
         </div>

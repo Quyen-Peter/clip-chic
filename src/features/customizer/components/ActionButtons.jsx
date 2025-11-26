@@ -5,38 +5,43 @@ import camera360 from "../../../assest/360.png";
 export default function ActionButtons({ 
   isCameraLocked, 
   onToggleCameraLock, 
-  onSaveAll
+  onSaveAll,
+  onAddToCart,
+  addToCartState = {}
 }) {
+  const { isSubmitting = false, isSuccess = false } = addToCartState;
   return (
     <div className="customizer-layout-bottom-row">
       <div className="customizer-layout-bottom-controls">
         <div className="customizer-layout-bottom-left-controls">
-        <button
-          onClick={onToggleCameraLock}
-          className={`customizer-layout-bottom-button ${isCameraLocked ? 'camera-locked' : 'camera-unlocked'}`}
-        >
-          <img 
-            src={camera360}
-            alt="Camera Toggle" 
-            className="camera-toggle-icon"
-          />
-        </button>
+          <button
+            onClick={onToggleCameraLock}
+            className={`customizer-layout-bottom-button ${isCameraLocked ? 'camera-locked' : 'camera-unlocked'}`}
+          >
+            <img 
+              src={camera360}
+              alt="Chuyển trạng thái camera" 
+              className="camera-toggle-icon"
+            />
+          </button>
         </div>
 
         <div className="customizer-layout-bottom-right-controls">
-        <button
-          onClick={onSaveAll}
-          className="customizer-layout-bottom-button save-button"
-          title="Save configuration & product"
-        >
-          💾🛍️ Save
-        </button>
-        <button
-          className="customizer-layout-bottom-button add-button"
-          title="add to cart"
-        >
-          Add to cart
-        </button>
+          <button
+            onClick={onSaveAll}
+            className="customizer-layout-bottom-button save-button"
+            title="Lưu cấu hình & sản phẩm"
+          >
+            Lưu
+          </button>
+          <button
+            className="customizer-layout-bottom-button add-button"
+            title="Thêm vào giỏ hàng"
+            onClick={onAddToCart}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Đang thêm...' : isSuccess ? 'Đã thêm!' : 'Thêm vào giỏ'}
+          </button>
         </div>
       </div>
     </div>

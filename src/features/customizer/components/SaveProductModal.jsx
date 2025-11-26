@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createCustomProduct } from "../services/customizerService";
+import { createCustomProduct, updateCustomProduct } from "../services/customizerService";
 import { getUserIdFromToken } from "../../../utils/authUtils";
 import { toast } from "react-toastify";
 
@@ -15,7 +15,8 @@ export default function SaveProductModal({
   setProductDescription,
   productStatus,
   setProductStatus,
-  onSaveComplete
+  onSaveComplete,
+  editingProduct
 }) {
   const [isSaving, setIsSaving] = useState(false);
 
@@ -28,6 +29,7 @@ export default function SaveProductModal({
     }, 0);
     return basePrice + charmsPrice;
   };
+  const formatVnd = (value) => Number(value || 0).toLocaleString('vi-VN');
 
   const handleSaveProduct = async () => {
     try {
@@ -47,15 +49,19 @@ export default function SaveProductModal({
 
       const totalPrice = calculateTotalPrice();
 
+      const isUpdate = !!(editingProduct && editingProduct.id);
       const productData = {
-        collectId: null,
+        id: isUpdate ? editingProduct.id : null,
+        collectId: editingProduct?.collectId || null,
         title: productTitle.trim(),
         descript: productDescription.trim(),
         baseId: selectedBase?.id,
         price: totalPrice,
         userId: userId,
-        stock: 1,
-        status: productStatus || 'private'
+        stock: editingProduct?.stock || 1,
+        status: productStatus || 'private',
+        modelId: editingProduct?.modelId || editingProduct?.model?.id || null,
+        createDate: editingProduct?.createDate
       };
 
       // Capture screenshot from 3D viewer as product image
@@ -109,9 +115,11 @@ export default function SaveProductModal({
         console.warn('Could not create model file:', error);
       }
 
-      const result = await createCustomProduct(productData, images, modelFile);
+      const result = isUpdate
+        ? await updateCustomProduct(productData, images, modelFile)
+        : await createCustomProduct(productData, images, modelFile);
       
-      toast.success(`Product "${productTitle}" created successfully!`);
+      toast.success(`Product "${productTitle}" ${isUpdate ? 'updated' : 'created'} successfully!`);
       setIsSaving(false);
       
       if (onSaveComplete) {
@@ -200,7 +208,7 @@ export default function SaveProductModal({
           
           <div className="customizer-layout-price-preview">
             <span>Total Price: </span>
-            <strong>${calculateTotalPrice().toFixed(2)}</strong>
+            <strong>{formatVnd(calculateTotalPrice())} VND</strong>
           </div>
           
           <div className="customizer-layout-modal-actions">
