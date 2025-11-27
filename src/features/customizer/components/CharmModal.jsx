@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 
 export default function CharmModal({ 
   isVisible, 
@@ -7,9 +7,16 @@ export default function CharmModal({
   charms = [],
   isLoading = false
 }) {
-  if (!isVisible) return null;
-
+  const [search, setSearch] = useState("");
   const formatVnd = (value) => Number(value || 0).toLocaleString('vi-VN');
+
+  const filteredCharms = useMemo(() => {
+    if (!search.trim()) return charms;
+    const term = search.toLowerCase();
+    return charms.filter((c) => (c.name || "").toLowerCase().includes(term));
+  }, [charms, search]);
+
+  if (!isVisible) return null;
 
   const handleCharmDoubleClick = (charm) => {
     onCharmDoubleClick(charm);
@@ -28,17 +35,26 @@ export default function CharmModal({
             A-
           </button>
         </div>
+        <div className="customizer-layout-popup-search">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Tìm kiếm phụ kiện..."
+            className="customizer-layout-search-input"
+          />
+        </div>
         <p className="customizer-layout-popup-instruction">Nhấp đúp để thêm vào mô hình</p>
-        <div className="customizer-layout-popup-content">
+        <div className="customizer-layout-popup-content charm-grid">
           {isLoading ? (
             <div className="customizer-layout-popup-empty">
               <p>Đang tải phụ kiện...</p>
             </div>
-          ) : charms && charms.length > 0 ? (
-            charms.map((charm) => (
+          ) : filteredCharms && filteredCharms.length > 0 ? (
+            filteredCharms.map((charm) => (
               <div
                 key={charm.id}
-                className="customizer-layout-popup-item"
+                className="customizer-layout-popup-item charm-card"
                 onDoubleClick={() => handleCharmDoubleClick(charm)}
                 title="Nhấp đúp để thêm vào mô hình"
               >

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 
 export default function BaseProductModal({ 
   bases = [], 
@@ -8,9 +8,16 @@ export default function BaseProductModal({
   onSelectBase,
   isLoading = false
 }) {
-  if (!isVisible) return null;
-
+  const [search, setSearch] = useState("");
   const formatVnd = (value) => Number(value || 0).toLocaleString('vi-VN');
+
+  const filteredBases = useMemo(() => {
+    if (!search.trim()) return bases;
+    const term = search.toLowerCase();
+    return bases.filter((b) => (b.name || "").toLowerCase().includes(term));
+  }, [bases, search]);
+
+  if (!isVisible) return null;
 
   const handleBaseSelect = (base) => {
     onSelectBase(base);
@@ -29,13 +36,24 @@ export default function BaseProductModal({
             A-
           </button>
         </div>
+
+        <div className="customizer-layout-popup-search">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Tìm kiếm dáng kẹp..."
+            className="customizer-layout-search-input"
+          />
+        </div>
+
         <div className="customizer-layout-popup-content">
           {isLoading ? (
             <div className="customizer-layout-popup-empty">
               <p>Đang tải danh sách mẫu kẹp...</p>
             </div>
-          ) : bases && bases.length > 0 ? (
-            bases.map((base) => {
+          ) : filteredBases && filteredBases.length > 0 ? (
+            filteredBases.map((base) => {
               const previewImage = base.previewImage || (base.image && base.image.address);
               return (
                 <div
@@ -48,21 +66,21 @@ export default function BaseProductModal({
                   {previewImage ? (
                     <img
                       src={previewImage}
-                  alt={base.name}
-                  className="customizer-layout-popup-image"
-                />
-              ) : (
-                <div className="customizer-layout-popup-placeholder">
-                  Không có ảnh
+                      alt={base.name}
+                      className="customizer-layout-popup-image"
+                    />
+                  ) : (
+                    <div className="customizer-layout-popup-placeholder">
+                      Không có ảnh
+                    </div>
+                  )}
+                  <div className="customizer-layout-popup-info">
+                    <p className="customizer-layout-popup-name">{base.name}</p>
+                    <p className="customizer-layout-popup-price">{formatVnd(base.price)} VND</p>
+                  </div>
                 </div>
-              )}
-              <div className="customizer-layout-popup-info">
-                <p className="customizer-layout-popup-name">{base.name}</p>
-                <p className="customizer-layout-popup-price">{formatVnd(base.price)} VND</p>
-              </div>
-            </div>
-          );
-        })
+              );
+            })
           ) : (
             <div className="customizer-layout-popup-empty">
               <p>Không có mẫu kẹp nào.</p>

@@ -48,6 +48,9 @@ export default function CustomizerPage() {
   const [isDirty, setIsDirty] = useState(false);
   const [pendingAddToCart, setPendingAddToCart] = useState(false);
   const [addToCartState, setAddToCartState] = useState({ isSubmitting: false, isSuccess: false });
+  const [previewBgColor, setPreviewBgColor] = useState("#f9fafb");
+  const baseBg = "#f9fafb";
+  const targetBg = "#003ea8";
   
   // Refs for selection containers and ModelViewer
   const baseSelectionRef = useRef(null);
@@ -65,6 +68,21 @@ export default function CustomizerPage() {
   const handleProductStatusChange = (value) => {
     setProductStatus(value);
     setIsDirty(true);
+  };
+  const handlePreviewBgChange = (value) => {
+    // value 0-100 => interpolate between baseBg and targetBg
+    const t = Math.min(Math.max(value / 100, 0), 1);
+    const mix = (c1, c2) => {
+      const a = parseInt(c1.slice(1), 16);
+      const b = parseInt(c2.slice(1), 16);
+      const r1 = (a >> 16) & 0xff, g1 = (a >> 8) & 0xff, b1 = a & 0xff;
+      const r2 = (b >> 16) & 0xff, g2 = (b >> 8) & 0xff, b2 = b & 0xff;
+      const r = Math.round(r1 + (r2 - r1) * t);
+      const g = Math.round(g1 + (g2 - g1) * t);
+      const bch = Math.round(b1 + (b2 - b1) * t);
+      return `#${[r, g, bch].map((x) => x.toString(16).padStart(2, "0")).join("")}`;
+    };
+    setPreviewBgColor(mix(baseBg, targetBg));
   };
 
   // Fetch bases from API
@@ -508,13 +526,25 @@ export default function CustomizerPage() {
                 charms={charms}
                 isLoading={isLoadingCharms}
               />
+              <div className="customizer-layout-preview-slider-wrap">
+                <span className="customizer-layout-preview-slider-label">Nền 3D</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  defaultValue="0"
+                  className="customizer-layout-preview-slider"
+                  onChange={(e) => handlePreviewBgChange(Number(e.target.value))}
+                  orient="vertical"
+                />
+              </div>
             </div>
           </div>
 
           {/* 3D Preview */}
           <div className="customizer-layout-preview">
             <div className="customizer-layout-card-preview">
-              <div className="customizer-layout-preview-container">
+              <div className="customizer-layout-preview-container" style={{ background: previewBgColor }}>
                 {selectedBase ? (
                   <ModelViewer
                     ref={modelViewerRef}

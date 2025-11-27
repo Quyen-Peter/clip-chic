@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 
 export default function CustomProductModal({ 
   customProducts = [],
@@ -7,9 +7,16 @@ export default function CustomProductModal({
   onSelectCustomProduct,
   isLoading = false
 }) {
-  if (!isVisible) return null;
-
+  const [search, setSearch] = useState("");
   const formatVnd = (value) => Number(value || 0).toLocaleString('vi-VN');
+
+  const filteredProducts = useMemo(() => {
+    if (!search.trim()) return customProducts;
+    const term = search.toLowerCase();
+    return customProducts.filter((p) => (p.title || "").toLowerCase().includes(term));
+  }, [customProducts, search]);
+
+  if (!isVisible) return null;
 
   const handleCustomProductSelect = (customProduct) => {
     onSelectCustomProduct(customProduct);
@@ -28,6 +35,15 @@ export default function CustomProductModal({
             A-
           </button>
         </div>
+        <div className="customizer-layout-popup-search">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Tìm kiếm sản phẩm..."
+            className="customizer-layout-search-input"
+          />
+        </div>
         <p className="customizer-layout-popup-instruction">
           Chọn sản phẩm đã lưu để tải
         </p>
@@ -36,8 +52,8 @@ export default function CustomProductModal({
             <div className="customizer-layout-popup-empty">
               <p>Đang tải sản phẩm tùy chỉnh...</p>
             </div>
-          ) : customProducts && customProducts.length > 0 ? (
-            customProducts.map((product) => {
+          ) : filteredProducts && filteredProducts.length > 0 ? (
+            filteredProducts.map((product) => {
               const previewImage = product.images && product.images.length > 0
                 ? product.images[0].address
                 : (product.previewImage || (product.image && product.image.address));
