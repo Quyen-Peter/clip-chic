@@ -231,7 +231,7 @@ const Cart = () => {
       const interval = setInterval(async () => {
         try {
           const res = await fetch(
-            `https://localhost:7169/api/Payment/check?account=${acc}`
+            `${API_URL}/api/Payment/check?account=${acc}`
           );
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
